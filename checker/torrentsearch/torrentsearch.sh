@@ -21,7 +21,8 @@ do
   src=`cat ${SCRIPT_DIR}/${LISTNAME}.crawl | grep "${keyword}"`
   if [ "${src}" != "" ]; then
     flg=1
-    /home/swirhen/tiasock/tiasock_swirhentv.sh "d swirhen 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} !!!ヒットしました!!!"
+    /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} !!!ヒットしました!!!"
+    /home/swirhen/sh/slack/post.sh "swirhentv" "@j_suzuki 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} !!!ヒットしました!!!"
   else
     echo "${keyword}" >> ${LIST2}
   fi

@@ -20,7 +20,8 @@ if [ "${SEARCH_WORD3}" != "" ]; then
 fi
 
 if [ "${HIT}" != "" -a "${HIT2}" != "" -a "${HIT3}" != "" ]; then
-  /home/swirhen/tiasock/tiasock_swirhentv.sh "d swirhen 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
+  /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
+  /home/swirhen/sh/slack/post.sh "swirhentv" "@j_suzuki 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
 fi
 
 sed -i '/^search: ここまで読んだ/d' /data/share/log/${CHANNEL}/${DATE}.txt

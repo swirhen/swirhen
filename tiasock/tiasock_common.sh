@@ -1,7 +1,7 @@
 #!/bin/bash
 CHANNEL=$1
 POST=$2
-if [ ${#POST} > 140 ]; then
+if [ ${#POST} -gt 140 ]; then
   POST="${POST:0:137}(ry"
 fi
 

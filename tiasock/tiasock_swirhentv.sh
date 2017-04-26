@@ -1,6 +1,6 @@
 #!/bin/bash
 POST=$1
-if [ ${#POST} > 140 ]; then
+if [ ${#POST} -gt 140 ]; then
   POST="${POST:0:137}(ry"
 fi
 

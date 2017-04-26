@@ -5,6 +5,7 @@ if [ "${TIME}" = "0000" ]; then
 else
   DATE=`date "+%m%d-%Y"`
 fi
+DATETIME=`date "+%Y/%m/%d %H:%M:%S"`
 CHANNEL=$1
 SEARCH_WORD=$2
 SEARCH_WORD2=$3
@@ -19,7 +20,7 @@ if [ "${SEARCH_WORD3}" != "" ]; then
 fi
 
 if [ "${HIT}" != "" -a "${HIT2}" != "" -a "${HIT3}" != "" ]; then
-  /home/swirhen/tiasock/tiasock_swirhentv.sh "d swirhen `date` ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
+  /home/swirhen/tiasock/tiasock_swirhentv.sh "d swirhen 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
 fi
 
 sed -i '/^search: ここまで読んだ/d' /data/share/log/${CHANNEL}/${DATE}.txt

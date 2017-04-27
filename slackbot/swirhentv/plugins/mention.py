@@ -13,6 +13,7 @@ slack = Slacker(slackbot_settings.API_TOKEN)
 def torrent_search(message, argment):
     message.send('さがすー')
     resultfile='temp/tss.result'
+    os.remove(resultfile)
     cmd = './tss.sh {0}'.format(argment)
     call_cmd(cmd)
     if os.path.exists(resultfile):

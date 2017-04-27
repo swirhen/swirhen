@@ -20,7 +20,7 @@ def torrent_download(message):
     launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
     logfile = 'temp/torrent_download_' + launch_dt + '.temp'
     filetitle = 'torrent_download_' + launch_dt
-    cmd = './tdl.sh &> ${0}'.format(logfile)
+    cmd = './tdl.sh &> {0}'.format(logfile)
     call_cmd(cmd)
     message.reply('おわた(｀･ω･´)')
     time.sleep(1)

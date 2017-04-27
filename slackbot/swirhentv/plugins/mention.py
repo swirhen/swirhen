@@ -17,9 +17,16 @@ def doya(message):
 @respond_to('^ *tdl')
 def torrent_download(message):
     message.send('やるー')
-    cmd = './tdl.sh'
+    launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
+    logfile = 'temp/torrent_download_' + launch_dt + '.temp'
+    filetitle = 'torrent_download_' + launch_dt
+    cmd = './tdl.sh &> ${0}'.format(logfile)
     call_cmd(cmd)
     message.reply('おわた(｀･ω･´)')
+    time.sleep(1)
+    file_upload(logfile, filetitle, 'text', message)
+    time.sleep(1)
+    os.remove(logfile)
 
 
 @respond_to('^ *(.*) の種ない？')

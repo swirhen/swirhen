@@ -10,6 +10,7 @@ slack = Slacker(slackbot_settings.API_TOKEN)
 
 
 @respond_to('^ *(.*) の種ない？')
+@respond_to('^ *tss (.*)')
 def torrent_search(message, argment):
     message.send('さがすー')
     resultfile='temp/tss.result'

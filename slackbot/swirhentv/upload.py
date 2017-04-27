@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # slackモジュール(snippet)
-# tokenが @ppm_dev_bot のものなので、プライベートグループへの発言は @ppm_dev_bot がchannnelにjoinしている必要あり
+# tokenが @swirhentv のものなので、プライベートグループへの発言は @swirhentv がchannnelにjoinしている必要あり
 # 第1引数：発言チャンネル
 # 第2引数：ファイル名
 # 第3引数：ファイルタイトル

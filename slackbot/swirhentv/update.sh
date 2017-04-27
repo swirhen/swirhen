@@ -19,7 +19,7 @@ if [ "${upflg}" = "1" -o "${upflg}" = "2" ]; then
   echo "chmod +x *.sh" | tee -a ${logfile}
   chmod +x *.sh | tee -a ${logfile}
 
-  git commit -m 'chmod'
+  git commit -m 'chmod' *.sh
   git push origin master
 fi
 

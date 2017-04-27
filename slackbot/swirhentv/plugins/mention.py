@@ -17,7 +17,7 @@ def doya(message):
 @respond_to('^ *tdl')
 def torrent_download(message):
     message.send('やるー')
-    cmd = 'cd /data/share/movie/; /data/share/movie/sh/tdlstop.sh 38888 &;/usr/bin/wine aria2c.exe --listen-port=38888 --max-upload-limit=200K --seed-ratio=0.01 --seed-time=1 *.torrent'
+    cmd = './tdl.sh'
     call_cmd(cmd)
     message.reply('おわた(｀･ω･´)')
 

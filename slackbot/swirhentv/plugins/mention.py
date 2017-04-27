@@ -29,6 +29,36 @@ def torrent_download(message):
     os.remove(logfile)
 
 
+@respond_to('^ *mre')
+def movie_rename(message):
+    message.send('やるー')
+    launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
+    logfile = 'temp/mre' + launch_dt + '.temp'
+    filetitle = 'movie_rename_' + launch_dt
+    cmd = './mre.sh &> {0}'.format(logfile)
+    call_cmd(cmd)
+    message.reply('おわた(｀･ω･´)')
+    time.sleep(1)
+    file_upload(logfile, filetitle, 'text', message)
+    time.sleep(1)
+    os.remove(logfile)
+
+
+@respond_to('^ *rmm')
+def movie_rename2(message):
+    message.send('やるー')
+    launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
+    logfile = 'temp/rmm_' + launch_dt + '.temp'
+    filetitle = 'movie_rename_' + launch_dt
+    cmd = './rmm.sh &> {0}'.format(logfile)
+    call_cmd(cmd)
+    message.reply('おわた(｀･ω･´)')
+    time.sleep(1)
+    file_upload(logfile, filetitle, 'text', message)
+    time.sleep(1)
+    os.remove(logfile)
+
+
 @respond_to('^ *(.*) の種ない？')
 @respond_to('^ *tss (.*)')
 def torrent_search(message, argment):

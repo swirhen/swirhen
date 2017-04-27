@@ -12,21 +12,21 @@ slack = Slacker(slackbot_settings.API_TOKEN)
 @respond_to('^ *reload.*')
 def reload(message):
     message.reply(slackbot_settings.HOSTNAME + ' slackbot 自己更新します')
-    cmd = './upres.sh 2 ' + message._body['channel']
+    cmd = './update.sh 2 ' + message._body['channel']
     call_cmd(cmd)
 
 
 @respond_to('^ *reboot.*')
 def reboot(message):
     message.reply(slackbot_settings.HOSTNAME + ' slackbot 再起動します')
-    cmd = './upres.sh 0 ' + message._body['channel']
+    cmd = './update.sh 0 ' + message._body['channel']
     call_cmd(cmd)
 
 
 @respond_to('^ *update.*')
 def update(message):
     message.reply(slackbot_settings.HOSTNAME + ' slackbot 自己更新 & 再起動します')
-    cmd = './upres.sh 1 ' + message._body['channel']
+    cmd = './update.sh 1 ' + message._body['channel']
     call_cmd(cmd)
 
 

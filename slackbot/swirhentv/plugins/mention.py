@@ -67,6 +67,13 @@ def movie_rename2(message):
     os.remove(logfile)
 
 
+@respond_to('^ *ae')
+def auto_encode(message):
+    message.send('やるー')
+    cmd = '/data/share/movie/sh/169f.sh'
+    call_cmd(cmd)
+
+
 @respond_to('^ *(.*) の種ない？')
 @respond_to('^ *tss (.*)')
 def torrent_search(message, argment):

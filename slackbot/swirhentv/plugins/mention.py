@@ -13,6 +13,12 @@ slack = Slacker(slackbot_settings.API_TOKEN)
 def doya(message):
     message.send('(｀･ω･´)ﾄﾞﾔｧ...')
 
+@respond_to('^ *sdl')
+def seed_download(message):
+    message.send('やるー')
+    cmd = '/data/share/movie/sh/autodl.sh'
+    call_cmd(cmd)
+
 
 @respond_to('^ *tdl')
 def torrent_download(message):

@@ -8,6 +8,10 @@ from slackbot.bot import respond_to
 from slacker import Slacker
 slack = Slacker(slackbot_settings.API_TOKEN)
 
+@respond_to('^ *でかした.*')
+@respond_to('^ *よくやった.*')
+def doya(message):
+    message.send('(｀･ω･´)ﾄﾞﾔｧ...')
 
 @respond_to('^ *(.*) の種ない？')
 @respond_to('^ *tss (.*)')

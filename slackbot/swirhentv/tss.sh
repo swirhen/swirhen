@@ -13,18 +13,18 @@ rm -f ${RESULT_FILE}
 while read URI
 do
   curl -L -X GET "${URI}&page=rss" | grep "${KEYWORD}" > ${CRAWL_TEMP}
-  if [ ! -z "${CRAWL_TEMP}" ]; then
+  if [ -z "${CRAWL_TEMP}" ]; then
     echo "${URI}" > ${RESULT_FILE}
     exit 0
   fi
   curl -L -X GET "${URI}&offset=2&page=rss" | grep "${KEYWORD}" > ${CRAWL_TEMP}
-  if [ ! -z "${CRAWL_TEMP}" ]; then
+  if [ -z "${CRAWL_TEMP}" ]; then
     echo "${URI}&offset=2" > ${RESULT_FILE}
     exit 0
   fi
-  curl -L -X GET "${URI}&offset=2&page=rss" | grep "${KEYWORD}" > ${CRAWL_TEMP}
-  if [ ! -z "${CRAWL_TEMP}" ]; then
-    echo "${URI}&offset=2" > ${RESULT_FILE}
+  curl -L -X GET "${URI}&offset=3&page=rss" | grep "${KEYWORD}" > ${CRAWL_TEMP}
+  if [ -z "${CRAWL_TEMP}" ]; then
+    echo "${URI}&offset=3" > ${RESULT_FILE}
     exit 0
   fi
 done < ${NYAA_LIST}

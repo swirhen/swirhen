@@ -13,6 +13,15 @@ slack = Slacker(slackbot_settings.API_TOKEN)
 def doya(message):
     message.send('(｀･ω･´)ﾄﾞﾔｧ...')
 
+
+@respond_to('^ *tdl')
+def torrent_download(message):
+    message.send('やるー')
+    cmd = 'cd /data/share/movie/; /data/share/movie/sh/tdlstop.sh 38888 &;/usr/bin/wine aria2c.exe --listen-port=38888 --max-upload-limit=200K --seed-ratio=0.01 --seed-time=1 *.torrent'
+    call_cmd(cmd)
+    message.reply('おわた(｀･ω･´)')
+
+
 @respond_to('^ *(.*) の種ない？')
 @respond_to('^ *tss (.*)')
 def torrent_search(message, argment):

@@ -22,7 +22,8 @@ do
   if [ "${src}" != "" ]; then
     flg=1
     /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} !!!ヒットしました!!!"
-    /home/swirhen/sh/slack/post.sh "swirhentv" "@j_suzuki 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} !!!ヒットしました!!!"
+    /home/swirhen/sh/slack/post.sh "swirhentv" "@here 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} !!!ヒットしました!!!"
+    python /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} !!!ヒットしました!!!"
   else
     echo "${keyword}" >> ${LIST2}
   fi

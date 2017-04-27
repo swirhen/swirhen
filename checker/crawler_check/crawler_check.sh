@@ -18,6 +18,7 @@ fi
 if [ "`diff ${FILE} ${FILE}.old`" != "" ]; then
   /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【汎用URLクロールチェック ${DATE}】 差分あり！ チェックID: ${ID} URL: ${URI}"
   /home/swirhen/sh/slack/post.sh "swirhentv" "@j_suzuki 【汎用URLクロールチェック ${DATE}】 差分あり！ チェックID: ${ID} URL: ${URI}"
+  python /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【汎用URLクロールチェック ${DATE}】 差分あり！ チェックID: ${ID} URL: ${URI}"
 fi
 
 mv ${FILE} ${FILE}.old

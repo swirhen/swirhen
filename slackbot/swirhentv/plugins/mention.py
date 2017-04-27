@@ -9,6 +9,19 @@ from slacker import Slacker
 slack = Slacker(slackbot_settings.API_TOKEN)
 
 
+@respond_to('^ *(.*) の種ない？')
+def torrent_search(message, argment):
+    message.send('さがすー')
+    resultfile='temp/tss.result'
+    cmd = './tss.sh {0}'.format(argment)
+    call_cmd(cmd)
+    if os.path.exists(resultfile):
+        uri=open(resultfile).read()
+        message.reply(uri + ' にあったよ')
+    else:
+        message.send('なかったよ(´･ω･`)')
+
+
 @respond_to('^ *reload.*')
 def reload(message):
     message.reply(slackbot_settings.HOSTNAME + ' slackbot 自己更新します')

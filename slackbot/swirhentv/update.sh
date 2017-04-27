@@ -14,10 +14,13 @@ if [ "${upflg}" = "1" -o "${upflg}" = "2" ]; then
   echo "*** slackbot 自己更新 ***" | tee -a ${logfile}
 
   echo "git pull" | tee -a ${logfile}
-  git pull origin master | tee -a ${logfile}
+  git pull origin master --force | tee -a ${logfile}
 
   echo "chmod +x *.sh" | tee -a ${logfile}
   chmod +x *.sh | tee -a ${logfile}
+
+  git commit -m 'chmod'
+  git push origin master
 fi
 
 if [ "${upflg}" != "2" ]; then

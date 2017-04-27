@@ -27,7 +27,7 @@ if __name__ == '__main__':
     if len(args) >= 4:
         username = args[3]
     else:
-        username = "ppm_dev_bot"
+        username = "swirhentv"
 
     if len(args) >= 5:
         icon_emoji = args[4]

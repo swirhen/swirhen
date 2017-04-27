@@ -12,6 +12,6 @@ fi
 DATETIME="`date '+%Y%m%d'`"
 token=`cat ${script_dir}/token`
 
-echo "curl -F channels=${channel} -F file=@${filename} -F title=${filetitle} -F token=${token} -F filetype=${filetype} https://slack.com/api/files.upload -k"
+echo "curl -F channels=${channel} -F file=@${filename} -F title=\"${filetitle}\" -F token=${token} -F filetype=${filetype} https://slack.com/api/files.upload -k"
 
 curl -F channels=${channel} -F file=@${filename} -F title=${filetitle} -F token=${token} https://slack.com/api/files.upload -k

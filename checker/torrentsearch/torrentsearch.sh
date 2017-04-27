@@ -18,6 +18,7 @@ curl -L -X GET "${URI}&offset=3&page=rss" >> ${SCRIPT_DIR}/${LISTNAME}.crawl
 
 while read keyword
 do
+  echo "keyword: ${keyword}"
   src=`cat ${SCRIPT_DIR}/${LISTNAME}.crawl | grep "${keyword}"`
   if [ "${src}" != "" ]; then
     echo "hit"

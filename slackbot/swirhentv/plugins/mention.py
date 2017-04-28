@@ -74,21 +74,23 @@ def auto_encode(message):
     call_cmd(cmd)
 
 
-@respond_to('^ *(.*) の種ない？')
 @respond_to('^ *tss (.*)')
 def torrent_search(message, argment):
     message.send('さがすー')
-    resultfile='temp/tss.result'
-    if os.path.exists(resultfile):
-        os.remove(resultfile)
-
-    cmd = './tss.sh {0}'.format(argment)
+    launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
+    logfile = 'temp/tss_' + launch_dt + '.temp'
+    filetitle = 'seed_search_result_' + launch_dt
+    cmd = './tss.sh {0} > {1}'.format(argment, logfile)
     call_cmd(cmd)
-    if os.path.exists(resultfile):
-        uri=open(resultfile).read()
-        message.reply('\n```' + uri + '```\nにあったよ')
-    else:
+    result=open(logfile).read()
+    if result == 'no result.':
         message.send('なかったよ(´･ω･`)')
+    else:
+        message.reply('あったよ(｀･ω･´)')
+        time.sleep(1)
+        file_upload(logfile, filetitle, 'text', message)
+        time.sleep(1)
+        os.remove(logfile)
 
 
 @respond_to('^ *reload.*')

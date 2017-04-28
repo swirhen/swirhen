@@ -48,4 +48,4 @@ do
     fi
     (( cnt++ ))
   done
-done
+done < ${NYAA_LIST}

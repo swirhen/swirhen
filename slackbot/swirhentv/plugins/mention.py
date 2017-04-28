@@ -72,6 +72,7 @@ def auto_encode(message):
     message.send('やるー')
     cmd = '/data/share/movie/sh/169f.sh'
     call_cmd(cmd)
+    message.reply('おわた(｀･ω･´)')
 
 
 @respond_to('^ *tss (.*)')

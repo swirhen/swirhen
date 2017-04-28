@@ -30,8 +30,8 @@ do
 done < ${LIST}
 
 if [ ${flg} = 1 ]; then
-  /home/swirhen/tiasock/tiasock_swirhentv.sh "【謎調査 ${DATE}】検索キーワードにヒットしました！"
+  /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "【謎調査 ${DATE}】検索キーワードにヒットしました！"
   mv ${LIST2} ${LIST}
 else
-  /home/swirhen/tiasock/tiasock_swirhentv.sh "【謎調査 ${DATE}】検索キーワードにヒットありません"
+  /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "【謎調査 ${DATE}】検索キーワードにヒットありません"
 fi

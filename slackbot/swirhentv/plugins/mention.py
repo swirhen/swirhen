@@ -22,7 +22,7 @@ def seed_download(message):
     call_cmd(cmd)
     if os.path.exists(resultfile):
         result = open(resultfile).read()
-        message.reply('おわた(｀･ω･´)\n```' + 'download file:\n' + result + '\n```')
+        message.reply('おわた(｀･ω･´)\n```' + 'download seeds:\n' + result + '```')
     else:
         message.send('おわた(´･ω･`)')
 

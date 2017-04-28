@@ -49,7 +49,7 @@ do
     (( cnt++ ))
   done
 done < ${NYAA_LIST}
-if [ ${hit_cnt} -eq - ]; then
+if [ ${hit_cnt} -eq 0 ]; then
   echo "no result."
 fi
 end

@@ -1,7 +1,6 @@
 import subprocess
 import os
 import time
-import re
 import slackbot_settings
 from datetime import datetime
 from slackbot.bot import respond_to
@@ -18,8 +17,14 @@ def doya(message):
 @respond_to('^ *sdl')
 def seed_download(message):
     message.send('やるー')
-    cmd = '/data/share/movie/sh/autodl.sh'
+    resultfile = "/data/share/movie/sh/autodl.result"
+    cmd = '/data/share/movie/sh/autodl.sh 1'
     call_cmd(cmd)
+    if os.path.exists(resultfile):
+        result = open(resultfile).read()
+        message.reply('おわた(｀･ω･´)\n```' + 'download file:\n' + result + '\n```')
+    else:
+        message.send('おわた(´･ω･`)')
 
 
 @respond_to('^ *tdl')
@@ -83,7 +88,7 @@ def torrent_search(message, argment):
     filetitle = 'seed_search_result_' + launch_dt
     cmd = './tss.sh {0} > {1}'.format(argment, logfile)
     call_cmd(cmd)
-    result=open(logfile).read()
+    result = open(logfile).read()
     if result == 'no result.':
         message.send('なかったよ(´･ω･`)')
     else:

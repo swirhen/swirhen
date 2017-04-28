@@ -40,7 +40,7 @@ do
     category=`echo "${item_xml}" | grep category | sed "s#<category>\(.*\)</category>#\1#" | sed "s/^      //"`
     link=`echo "${item_xml}" | grep link | sed "s#<link>\(.*\)</link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
 
-    echo "[${category}] ${title} : ${link}" >> ${RESULT_FILE}
+    echo "[${category}] ${title} : ${link}"
     (( hit_cnt++ ))
 
     if [ ${hit_cnt} -ge ${MAX_SRC_CNT} ]; then
@@ -49,3 +49,7 @@ do
     (( cnt++ ))
   done
 done < ${NYAA_LIST}
+if [ ${hit_cnt} -eq - ]; then
+  echo "no result."
+fi
+end

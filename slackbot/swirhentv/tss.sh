@@ -20,18 +20,15 @@ while read URI
 do
   curl -L -X GET "${URI}&page=rss" | grep "${KEYWORD}" > ${CRAWL_TEMP}
   if [ -s "${CRAWL_TEMP}" ]; then
-    echo -n "${URI}" > ${RESULT_FILE}
-    end
+    echo "${URI}" > ${RESULT_FILE}
   fi
   curl -L -X GET "${URI}&offset=2&page=rss" | grep "${KEYWORD}" > ${CRAWL_TEMP}
   if [ -s "${CRAWL_TEMP}" ]; then
-    echo -n "${URI}&offset=2" > ${RESULT_FILE}
-    end
+    echo "${URI}&offset=2" > ${RESULT_FILE}
   fi
   curl -L -X GET "${URI}&offset=3&page=rss" | grep "${KEYWORD}" > ${CRAWL_TEMP}
   if [ -s "${CRAWL_TEMP}" ]; then
-    echo -n "${URI}&offset=3" > ${RESULT_FILE}
-    end
+    echo "${URI}&offset=3" > ${RESULT_FILE}
   fi
 done < ${NYAA_LIST}
 end

@@ -86,7 +86,7 @@ def torrent_search(message, argment):
     call_cmd(cmd)
     if os.path.exists(resultfile):
         uri=open(resultfile).read()
-        message.reply(uri + ' にあったよ')
+        message.reply('\n```' + uri + '```\nにあったよ')
     else:
         message.send('なかったよ(´･ω･`)')
 

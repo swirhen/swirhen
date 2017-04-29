@@ -35,6 +35,7 @@ done
 cnt=1
 for TEXT in "${TEXT[@]}"
 do
+  echo "cnt:${cnt} ${TEXT}"
   HIT=`cat "${TEXT}" | grep "${SEARCH_WORD}"`
   if [ "${SEARCH_WORD2}" != "" ]; then
     HIT2=`cat "${TEXT}" | grep "${SEARCH_WORD2}"`

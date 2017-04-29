@@ -27,6 +27,7 @@ ${TEXT}"
   else
     TEXT[${cnt}]="${TEXT}"
   fi
+  echo "L: ${D_T_C_N[${cnt}]} ${TEXT}"
 done
 
 echo "cnt: ${cnt}"

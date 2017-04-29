@@ -12,22 +12,38 @@ SEARCH_WORD=$2
 SEARCH_WORD2=$3
 SEARCH_WORD3=$4
 
-HIT=`cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' | grep "${SEARCH_WORD}"`
+HIT=`cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' | grep "${SEARCH_WORD}" -3`
 if [ "${SEARCH_WORD2}" != "" ]; then
-  HIT2=`cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' | grep "${SEARCH_WORD2}"`
+  HIT2=`cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' | grep "${SEARCH_WORD2}" -3`
 else
   HIT2="HIT"
 fi
 if [ "${SEARCH_WORD3}" != "" ]; then
-  HIT3=`cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' | grep "${SEARCH_WORD3}"`
+  HIT3=`cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' | grep "${SEARCH_WORD3}" -3`
 else
   HIT3="HIT"
 fi
 
 if [ "${HIT}" != "" -a "${HIT2}" != "" -a "${HIT3}" != "" ]; then
+  if [ "${HIT2}" = "HIT" ]; then
+    HIT2=""
+  fi
+  if [ "${HIT3}" = "HIT" ]; then
+    HIT3=""
+  fi
   /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
-  /home/swirhen/sh/slack/post.sh "swirhentv" "@j_suzuki 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
-  ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
+  /home/swirhen/sh/slack/post.sh "swirhentv" "@here 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ
+\`\`\`
+${HIT}
+${HIT2}
+${HIT3}
+\`\`\`"
+  ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ
+\`\`\`
+${HIT}
+${HIT2}
+${HIT3}
+\`\`\`"
 fi
 
 sed -i '/^search: ここまで読んだ/d' /data/share/log/${CHANNEL}/${DATE}.txt

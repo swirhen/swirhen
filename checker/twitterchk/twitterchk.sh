@@ -18,7 +18,7 @@ SEARCH_WORD3=$4
 cnt=0
 D_T_C_N=()
 TEXT=()
-if [ "`cat /data/share/log/${CHANNEL}/${DATE}.txt \"search: ここまで読んだ\"`" = "" ]; then
+if [ "`cat /data/share/log/${CHANNEL}/${DATE}.txt | grep \"^search: ここまで読んだ\"`" = "" ]; then
   sed -i -e "1i search: ここまで読んだ" /data/share/log/${CHANNEL}/${DATE}.txt
 fi
 

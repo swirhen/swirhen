@@ -14,6 +14,9 @@ CHANNEL=$1
 SEARCH_WORD=$2
 SEARCH_WORD2=$3
 SEARCH_WORD3=$4
+if [ "$5" != "" ]; then
+  DATE=`date -d "$5 day ago" "+%m%d-%Y"`
+fi
 
 cnt=0
 D_T_C_N=()

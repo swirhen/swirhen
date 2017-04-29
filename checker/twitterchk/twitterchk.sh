@@ -49,6 +49,7 @@ do
 
   if [ "${HIT}" != "" -a "${HIT2}" != "" -a "${HIT3}" != "" ]; then
     HIT_STR="${D_T_C_N[${cnt}]} ${TEXT}"
+    echo "hit! ${HIT_STR}"
     /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
     /home/swirhen/sh/slack/post.sh "swirhentv" "@here 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ
 \`\`\`

@@ -8,7 +8,7 @@ else
 fi
 DATETIME=`date "+%Y/%m/%d %H:%M:%S"`
 DATETIME2=`date "+%Y%m%d%H%M%S"`
-TEMPFILE=${SCRIPT_DIR}/twittersearch_${DATETIME2}.temp
+TEMPFILE=${SCRIPT_DIR}/twitterchk_${DATETIME2}.temp
 PYTHON_PATH="/home/swirhen/.pythonbrew/pythons/Python-3.4.3/bin/python"
 CHANNEL=$1
 SEARCH_WORD=$2
@@ -41,6 +41,7 @@ ${TEXT}"
     TEXT[${cnt}]="${TEXT}"
   fi
 done < ${TEMPFILE}
+rm -f ${TEMPFILE}
 
 cnt=1
 for TEXT in "${TEXT[@]}"

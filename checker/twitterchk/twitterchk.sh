@@ -30,7 +30,7 @@ ${TEXT}"
   echo "${cnt}: ${D_T_C_N[${cnt}]} ${TEXT}"
 done
 
-echo "cnt: ${cnt}"
+echo "DTCN19: ${D_T_C_N[19]}"
 
 cnt=1
 for TEXT in "${TEXT[@]}"

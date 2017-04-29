@@ -56,6 +56,6 @@ do
 done < ${NYAA_LIST}
 
 if [ ${hit_cnt} -eq 0 ]; then
-  echo "no result."
+  echo -n "no result."
 fi
 end

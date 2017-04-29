@@ -32,6 +32,8 @@ ${TEXT}"
   fi
 done
 
+echo "cnt: ${cnt}"
+
 cnt=1
 for TEXT in "${TEXT[@]}"
 do

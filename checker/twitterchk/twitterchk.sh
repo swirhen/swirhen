@@ -14,13 +14,15 @@ CHANNEL=$1
 SEARCH_WORD=$2
 SEARCH_WORD2=$3
 SEARCH_WORD3=$4
-if [ "$5" != "" ]; then
-  DATE=`date -d "$5 day ago" "+%m%d-%Y"`
-fi
 
 cnt=0
 D_T_C_N=()
 TEXT=()
+
+if [ "$5" != "" ]; then
+  DATE=`date -d "$5 day ago" "+%m%d-%Y"`
+  sed -i '/^search: ここまで読んだ/d' /data/share/log/${CHANNEL}/${DATE}.txt
+fi
 if [ "`cat /data/share/log/${CHANNEL}/${DATE}.txt | grep \"^search: ここまで読んだ\"`" = "" ]; then
   sed -i -e "1i search: ここまで読んだ" /data/share/log/${CHANNEL}/${DATE}.txt
 fi

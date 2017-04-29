@@ -38,20 +38,17 @@ ${TEXT}"
   echo "${cnt}: ${D_T_C_N[${cnt}]} ${TEXT}"
 done < ${TEMPFILE}
 
-echo "DTCN19: ${D_T_C_N[19]} ${TEXT}"
-
 cnt=1
 for TEXT in "${TEXT[@]}"
 do
-  echo "cnt:${cnt} ${TEXT}"
-  HIT=`cat "${TEXT}" | grep "${SEARCH_WORD}"`
+  HIT=`echo "${TEXT}" | grep "${SEARCH_WORD}"`
   if [ "${SEARCH_WORD2}" != "" ]; then
-    HIT2=`cat "${TEXT}" | grep "${SEARCH_WORD2}"`
+    HIT2=`echo "${TEXT}" | grep "${SEARCH_WORD2}"`
   else
     HIT2="HIT"
   fi
   if [ "${SEARCH_WORD3}" != "" ]; then
-    HIT3=`cat "${TEXT}" | grep "${SEARCH_WORD3}"`
+    HIT3=`echo "${TEXT}" | grep "${SEARCH_WORD3}"`
   else
     HIT3="HIT"
   fi

@@ -1,4 +1,5 @@
 #!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
 TIME=`date "+%H%M"`
 if [ "${TIME}" = "0000" ]; then
   DATE=`date -d "1 day ago" "+%m%d-%Y"`
@@ -6,6 +7,8 @@ else
   DATE=`date "+%m%d-%Y"`
 fi
 DATETIME=`date "+%Y/%m/%d %H:%M:%S"`
+DATETIME2=`date "+%Y%m%d%H%M%S"`
+TEMPFILE=${SCRIPT_DIR}/twittersearch_${DATETIME2}.temp
 PYTHON_PATH="/home/swirhen/.pythonbrew/pythons/Python-3.4.3/bin/python"
 CHANNEL=$1
 SEARCH_WORD=$2
@@ -15,7 +18,12 @@ SEARCH_WORD3=$4
 cnt=0
 D_T_C_N=()
 TEXT=()
-cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' | while read LOGDATE LOGTIME CHANNEL_AND_NICK TEXT
+if [ "`cat /data/share/log/${CHANNEL}/${DATE}.txt \"search: ここまで読んだ\"`" = "" ]; then
+  sed -i -e "1i search: ここまで読んだ" /data/share/log/${CHANNEL}/${DATE}.txt
+fi
+
+cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' > ${TEMPFILE}
+while read LOGDATE LOGTIME CHANNEL_AND_NICK TEXT
 do
   if [ "${D_T_C_N[${cnt}]}" != "${LOGDATE} ${LOGTIME} ${CHANNEL_AND_NICK}" ]; then
     (( cnt++ ))
@@ -28,7 +36,7 @@ ${TEXT}"
     TEXT[${cnt}]="${TEXT}"
   fi
   echo "${cnt}: ${D_T_C_N[${cnt}]} ${TEXT}"
-done
+done < ${TEMPFILE}
 
 echo "DTCN19: ${D_T_C_N[19]} ${TEXT}"
 

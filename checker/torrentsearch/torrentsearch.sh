@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
 URI=$1
 LISTNAME=$2
 DATE=`date "+%Y/%m/%d %H:%M:%S"`
+PYTHON_PATH="/home/swirhen/.pythonbrew/pythons/Python-3.4.3/bin/python"
 LIST=${SCRIPT_DIR}/${LISTNAME}.txt
 LIST2=${SCRIPT_DIR}/${LISTNAME}.temp
 flg=0
@@ -23,7 +24,7 @@ do
     flg=1
     /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} ヒットしました！"
     /home/swirhen/sh/slack/post.sh "swirhentv" "@here 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} ヒットしました！ URL: ${URI}"
-    python /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} ヒットしました！ URL: ${URI}"
+    ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} ヒットしました！ URL: ${URI}"
   else
     echo "${keyword}" >> ${LIST2}
   fi

@@ -35,7 +35,6 @@ ${TEXT}"
   else
     TEXT[${cnt}]="${TEXT}"
   fi
-  echo "${cnt}: ${D_T_C_N[${cnt}]} ${TEXT}"
 done < ${TEMPFILE}
 
 cnt=1

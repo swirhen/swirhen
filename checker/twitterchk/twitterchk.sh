@@ -17,9 +17,6 @@ D_T_C_N=()
 TEXT=()
 cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' | while read LOGDATE LOGTIME CHANNEL_AND_NICK TEXT
 do
-  if [ "${DATE}" = "search:" ]; then
-    continue
-  fi
   if [ "${D_T_C_N[${cnt}]}" != "${LOGDATE} ${LOGTIME} ${CHANNEL_AND_NICK}" ]; then
     (( cnt++ ))
     D_T_C_N[${cnt}]="${LOGDATE} ${LOGTIME} ${CHANNEL_AND_NICK}"

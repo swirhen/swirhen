@@ -10,24 +10,16 @@ DOWNLOAD_DIR="/data/share/temp/torrentsearch/${DATE2}"
 PYTHON_PATH="/home/swirhen/.pythonbrew/pythons/Python-3.4.3/bin/python"
 LIST=${SCRIPT_DIR}/${LISTNAME}.txt
 LIST_TEMP=${SCRIPT_DIR}/${LISTNAME}.temp
-CRAWL_TEMP1=${SCRIPT_DIR}/${LISTNAME}.crawl_1.temp
-CRAWL_XML1=${SCRIPT_DIR}/${LISTNAME}.crawl_1.xml
-#CRAWL_TEMP2=${SCRIPT_DIR}/${LISTNAME}.crawl_2.temp
-#CRAWL_XML2=${SCRIPT_DIR}/${LISTNAME}.crawl_2.xml
-#CRAWL_TEMP3=${SCRIPT_DIR}/${LISTNAME}.crawl_3.temp
-#CRAWL_XML3=${SCRIPT_DIR}/${LISTNAME}.crawl_3.xml
+CRAWL_TEMP=${SCRIPT_DIR}/${LISTNAME}.crawl_1.temp
+CRAWL_XML=${SCRIPT_DIR}/${LISTNAME}.crawl_1.xml
 RESULT_FILE=${SCRIPT_DIR}/${LISTNAME}.result
 hit_flg=0
 rm -f ${LIST_TEMP}
 touch ${LIST_TEMP}
 rm -f ${RESULT_FILE}
 
-curl -s -S "${URI}&page=rss" > ${CRAWL_TEMP1}
-#curl -s -S "${URI}&offset=2&page=rss" > ${CRAWL_TEMP2}
-#curl -s -S "${URI}&offset=3&page=rss" > ${CRAWL_TEMP3}
-xmllint --format ${CRAWL_TEMP1} > ${CRAWL_XML1}
-#xmllint --format ${CRAWL_TEMP2} > ${CRAWL_XML2}
-#xmllint --format ${CRAWL_TEMP3} > ${CRAWL_XML3}
+curl -s -S "${URI}" > ${CRAWL_TEMP}
+xmllint --format ${CRAWL_TEMP} > ${CRAWL_XML}
 
 while read keyword
 do
@@ -35,7 +27,7 @@ do
     hit_flg=0
     while :
     do
-      item_xml=`echo "cat /rss/channel/item[${cnt}]" | xmllint --shell "${CRAWL_XML1}"`
+      item_xml=`echo "cat /rss/channel/item[${cnt}]" | xmllint --shell "${CRAWL_XML}"`
       title=`echo "${item_xml}" | grep title | sed "s#<title>\(.*\)</title>#\1#" | sed "s/^      //"`
       # feed end
       if [ "${title}" = "" ]; then
@@ -46,7 +38,8 @@ do
         hit_flg=1
         mkdir -p ${DOWNLOAD_DIR}
         echo "# keyword hit : ${keyword} title: ${title}" >> ${RESULT_FILE}
-        link=`echo "${item_xml}" | grep link | sed "s#<link>\(.*\)</link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
+#        link=`echo "${item_xml}" | grep link | sed "s#<link>\(.*\)</link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
+        link=`echo "${item_xml}" | grep link | sed "s#<link><\!\[CDATA[\(.*\)\]\]></link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
         wget --no-check-certificate --restrict-file-names=nocontrol --trust-server-names --content-disposition "${link}" -P "${DOWNLOAD_DIR}" > /dev/null
       fi
       (( cnt++ ))

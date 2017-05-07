@@ -10,8 +10,8 @@ DOWNLOAD_DIR="/data/share/temp/torrentsearch/${DATE2}"
 PYTHON_PATH="/home/swirhen/.pythonbrew/pythons/Python-3.4.3/bin/python"
 LIST=${SCRIPT_DIR}/${LISTNAME}.txt
 LIST_TEMP=${SCRIPT_DIR}/${LISTNAME}.temp
-CRAWL_TEMP=${SCRIPT_DIR}/${LISTNAME}.crawl_1.temp
-CRAWL_XML=${SCRIPT_DIR}/${LISTNAME}.crawl_1.xml
+CRAWL_TEMP=${SCRIPT_DIR}/${LISTNAME}.crawl.temp
+CRAWL_XML=${SCRIPT_DIR}/${LISTNAME}.crawl.xml
 RESULT_FILE=${SCRIPT_DIR}/${LISTNAME}.result
 hit_flg=0
 rm -f ${LIST_TEMP}

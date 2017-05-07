@@ -91,6 +91,7 @@ def torrent_search(message, argment):
     result = open(logfile).read()
     if result == 'no result.':
         message.send('なかったよ(´･ω･`)')
+        os.remove(logfile)
     else:
         message.reply('あったよ(｀･ω･´)')
         time.sleep(1)

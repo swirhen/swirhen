@@ -14,9 +14,9 @@ fi
 DATE=`date "+%Y/%m/%d %H:%M:%S"`
 DATE2=`date "+%Y%m%d%H%M%S"`
 HIT_FLG=0
-NYAA_LIST=${SCRIPT_DIR}/list/nyaa2.txt
-CRAWL_TEMP=${SCRIPT_DIR}/temp/tss2_${DATE2}.crawl.temp
-CRAWL_XML=${SCRIPT_DIR}/temp/tss2_${DATE2}.crawl.xml
+TRACKER_LIST=${SCRIPT_DIR}/list/tracker.txt
+CRAWL_TEMP=${SCRIPT_DIR}/temp/tss_${DATE2}.crawl.temp
+CRAWL_XML=${SCRIPT_DIR}/temp/tss_${DATE2}.crawl.xml
 
 end()
 {
@@ -29,7 +29,7 @@ hit_cnt=0
 while read CATEGORY URI
 do
   if [ "${SRC_CAT}" = "ALL" -o "${SRC_CAT}" = "${CATEGORY}" ]; then
-    curl -s -S "${URI}&term=${KEYWORD}&page=rss" > ${CRAWL_TEMP}
+    curl -s -S "${URI}" > ${CRAWL_TEMP}
     xmllint --format ${CRAWL_TEMP} > ${CRAWL_XML}
     cnt=1
     while :
@@ -41,11 +41,14 @@ do
         break
       fi
 
-      category=`echo "${item_xml}" | grep category | sed "s#<category>\(.*\)</category>#\1#" | sed "s/^      //"`
-      link=`echo "${item_xml}" | grep link | sed "s#<link>\(.*\)</link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
+      if [ "`echo ${title} | grep \"${KEYWORD}\"`" != "" ]; then
+        category=`echo "${item_xml}" | grep category | sed "s#<category>\(.*\)</category>#\1#" | sed "s/^      //"`
+  #      link=`echo "${item_xml}" | grep link | sed "s#<link>\(.*\)</link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
+        link=`echo "${item_xml}" | grep link | sed "s#<link><\!\[CDATA\[\(.*\)\]\]></link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
 
-      echo "[${category}] ${title} : ${link}"
-      (( hit_cnt++ ))
+        echo "[${category}] ${title} : ${link}"
+        (( hit_cnt++ ))
+      fi
 
       if [ ${hit_cnt} -ge ${MAX_SRC_CNT} ]; then
         end
@@ -53,7 +56,7 @@ do
       (( cnt++ ))
     done
   fi
-done < ${NYAA_LIST}
+done < ${TRACKER_LIST}
 
 if [ ${hit_cnt} -eq 0 ]; then
   echo -n "no result."

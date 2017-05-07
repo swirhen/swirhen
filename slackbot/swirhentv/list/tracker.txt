@@ -1,4 +1,4 @@
-anime http://www.tokyotosho.info/rss.php?filter=7&entries=450
-manga http://www.tokyotosho.info/rss.php?filter=3&entries=450
-music http://www.tokyotosho.info/rss.php?filter=2&entries=450
-r18manga http://www.tokyotosho.info/rss.php?filter=13&entries=450
+anime https://www.tokyotosho.info/rss.php?filter=7&entries=450
+manga https://www.tokyotosho.info/rss.php?filter=3&entries=450
+music https://www.tokyotosho.info/rss.php?filter=2&entries=450
+r18manga https://www.tokyotosho.info/rss.php?filter=13&entries=450

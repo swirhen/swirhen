@@ -39,7 +39,7 @@ do
         mkdir -p ${DOWNLOAD_DIR}
         echo "# keyword hit : ${keyword} title: ${title}" >> ${RESULT_FILE}
 #        link=`echo "${item_xml}" | grep link | sed "s#<link>\(.*\)</link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
-        link=`echo "${item_xml}" | grep link | sed "s#<link><\!\[CDATA[\(.*\)\]\]></link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
+        link=`echo "${item_xml}" | grep link | sed "s#<link><\!\[CDATA\[\(.*\)\]\]></link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
         wget --no-check-certificate --restrict-file-names=nocontrol --trust-server-names --content-disposition "${link}" -P "${DOWNLOAD_DIR}" > /dev/null
       fi
       (( cnt++ ))

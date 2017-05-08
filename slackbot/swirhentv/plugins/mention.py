@@ -75,9 +75,10 @@ def movie_rename2(message):
 @respond_to('^ *ae')
 def auto_encode(message):
     message.send('やるー')
+    launch_dt = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
     cmd = '/data/share/movie/sh/169f.sh'
     call_cmd(cmd)
-    message.reply('おわた(｀･ω･´)')
+    message.reply('おわた(｀･ω･´) (' + launch_dt + ' かいしの おーとえんこーど)')
 
 
 @respond_to('^ *tss (.*)')

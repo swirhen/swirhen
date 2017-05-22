@@ -1,4 +1,5 @@
-anime https://www.tokyotosho.info/rss.php?filter=7&entries=450
-manga https://www.tokyotosho.info/rss.php?filter=3&entries=450
-music https://www.tokyotosho.info/rss.php?filter=2&entries=450
-r18manga https://www.tokyotosho.info/rss.php?filter=13&entries=450
+anime https://www.nyaa.si/??page=rss&c=1_4
+manga https://www.nyaa.si/??page=rss&c=3_3
+music https://www.nyaa.si/??page=rss&c=2_0
+r18manga https://sukebei.nyaa.si/??page=rss&c=1_4
+doujin https://sukebei.nyaa.si/??page=rss&c=1_2

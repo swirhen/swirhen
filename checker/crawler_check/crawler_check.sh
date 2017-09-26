@@ -9,11 +9,16 @@ DATE=`date "+%Y/%m/%d %H:%M:%S"`
 PYTHON_PATH="/home/swirhen/.pythonbrew/pythons/Python-3.4.3/bin/python"
 HIT_ST="$3"
 HIT_ED="$4"
+CONVFROM="$5"
+ICONV=""
+if [ "${CONVFROM}" != "" ];then
+  ICONV="| iconv -f ${CONVFROM} -t UTF8"
+fi
 
 if [ "${HIT_ST}" != "" -a "${HIT_ED}" != "" ]; then
-  curl "${URI}" | sed -n "/${HIT_ST}/,/${HIT_ED}/p" > "${FILE}"
+  curl "${URI}" ${ICONV} | sed -n "/${HIT_ST}/,/${HIT_ED}/p" > "${FILE}"
 else
-  curl "${URI}" > "${FILE}"
+  curl "${URI}" ${ICONV} > "${FILE}"
 fi
 
 if [ "`diff ${FILE} ${FILE}.old`" != "" ]; then

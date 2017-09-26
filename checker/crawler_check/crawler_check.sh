@@ -10,15 +10,19 @@ PYTHON_PATH="/home/swirhen/.pythonbrew/pythons/Python-3.4.3/bin/python"
 HIT_ST="$3"
 HIT_ED="$4"
 CONVFROM="$5"
-ICONV=""
-if [ "${CONVFROM}" != "" ];then
-  ICONV="| iconv -f ${CONVFROM} -t UTF8"
-fi
 
 if [ "${HIT_ST}" != "" -a "${HIT_ED}" != "" ]; then
-  curl "${URI}" ${ICONV} | sed -n "/${HIT_ST}/,/${HIT_ED}/p" > "${FILE}"
+  if [ "${CONVFROM}" != "" ];then
+    curl "${URI}" | iconv -f ${CONVFROM} -t UTF8 | sed -n "/${HIT_ST}/,/${HIT_ED}/p" > "${FILE}"
+  else
+    curl "${URI}" | sed -n "/${HIT_ST}/,/${HIT_ED}/p" > "${FILE}"
+  fi
 else
-  curl "${URI}" ${ICONV} > "${FILE}"
+  if [ "${CONVFROM}" != "" ];then
+    curl "${URI}" | iconv -f ${CONVFROM} -t UTF8 > "${FILE}"
+  else
+    curl "${URI}" > "${FILE}"
+  fi
 fi
 
 if [ "`diff ${FILE} ${FILE}.old`" != "" ]; then

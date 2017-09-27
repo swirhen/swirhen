@@ -10,7 +10,7 @@ if [ ${#ARGS[@]} -lt 2 ]; then
   exit 1
 fi
 
-#cd "${LISTDIR}"
+cd "${LISTDIR}"
 if [ "${MODE}" = "i" ]; then
   i=0
   for TEXT in "${ARGS[@]}"

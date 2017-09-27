@@ -120,7 +120,7 @@ def delete_list(message, argment):
     message.send('リストからさくじょするで')
     launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
     logfile = 'temp/delete_list_' + launch_dt + '.temp'
-    cmd = './chklist_mod.sh d {0} > {1}'.format(argment.replace(' ', '_').replace(',', ' '), logfile)
+    cmd = './chklist_mod.sh d "{0}" > {1}'.format(argment.replace(' ', '_').replace(',', '" "'), logfile)
     call_cmd(cmd)
     message.reply('おあり')
     time.sleep(1)

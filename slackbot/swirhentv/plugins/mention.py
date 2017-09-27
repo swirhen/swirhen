@@ -106,7 +106,7 @@ def insert_list(message, argment):
     message.send('リストについかするで')
     launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
     logfile = 'temp/insert_list_' + launch_dt + '.temp'
-    cmd = './chklist_mod.sh i "{0}" > {1}'.format(argment.replace(',', '" "'), logfile)
+    cmd = './chklist_mod.sh i "{0}" > {1}'.format(argment.replace(' ', '_').replace(',', '" "'), logfile)
     call_cmd(cmd)
     message.reply('おあり')
     time.sleep(1)

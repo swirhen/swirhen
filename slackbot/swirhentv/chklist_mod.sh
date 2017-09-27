@@ -16,8 +16,8 @@ if [ "${MODE}" = "i" ]; then
   for TEXT in "${ARGS[@]}"
   do
     if [ ${i} -gt 0 ]; then
-      echo "# insert: ${TEXT/_/ }"
-      echo "# 0 ${TEXT/_/ }" >> "${LISTFILE}"
+      echo "# insert: ${TEXT//_/ }"
+      echo "# 0 ${TEXT//_/ }" >> "${LISTFILE}"
     fi
     (( i++ ))
   done
@@ -30,8 +30,8 @@ elif [ "${MODE}" = "d" ]; then
   for TEXT in "${ARGS[@]}"
   do
     if [ ${i} -gt 0 ]; then
-      echo "# delete: ${TEXT/_/ }"
-      sed -i -e "/${TEXT/_/ }/d" "${LISTFILE}"
+      echo "# delete: ${TEXT//_/ }"
+      sed -i -e "/${TEXT//_/ }/d" "${LISTFILE}"
     fi
     (( i++ ))
   done

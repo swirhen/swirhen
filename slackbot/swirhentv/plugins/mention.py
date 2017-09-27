@@ -108,7 +108,7 @@ def insert_list(message, argment):
     logfile = 'temp/insert_list_' + launch_dt + '.temp'
     cmd = './chklist_mod.sh i "{0}" > {1}'.format(argment.replace(' ', '_').replace(',', '" "'), logfile)
     call_cmd(cmd)
-    message.reply('おあり')
+    message.reply('おあり。')
     time.sleep(1)
     file_upload(logfile, logfile, 'text', message)
     time.sleep(1)
@@ -122,7 +122,7 @@ def delete_list(message, argment):
     logfile = 'temp/delete_list_' + launch_dt + '.temp'
     cmd = './chklist_mod.sh d "{0}" > {1}'.format(argment.replace(' ', '_').replace(',', '" "'), logfile)
     call_cmd(cmd)
-    message.reply('おあり')
+    message.reply('おあり。')
     time.sleep(1)
     file_upload(logfile, logfile, 'text', message)
     time.sleep(1)

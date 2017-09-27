@@ -101,6 +101,34 @@ def torrent_search(message, argment):
         os.remove(logfile)
 
 
+@respond_to('^ *il (.*)')
+def insert_list(message, argment):
+    message.send('リストについかするで')
+    launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
+    logfile = 'temp/insert_list_' + launch_dt + '.temp'
+    cmd = './chklist_mod.sh i "{0}" > {1}'.format(argment.replace(',', '" "'), logfile)
+    call_cmd(cmd)
+    message.reply('おあり')
+    time.sleep(1)
+    file_upload(logfile, logfile, 'text', message)
+    time.sleep(1)
+    os.remove(logfile)
+
+
+@respond_to('^ *dl (.*)')
+def delete_list(message, argment):
+    message.send('リストからさくじょするで')
+    launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
+    logfile = 'temp/delete_list_' + launch_dt + '.temp'
+    cmd = './chklist_mod.sh d "{0}" > {1}'.format(argment.replace(',', '" "'), logfile)
+    call_cmd(cmd)
+    message.reply('おあり')
+    time.sleep(1)
+    file_upload(logfile, logfile, 'text', message)
+    time.sleep(1)
+    os.remove(logfile)
+
+
 @respond_to('^ *reload.*')
 def reload(message):
     message.reply(slackbot_settings.HOSTNAME + ' slackbot 自己更新します')

@@ -36,7 +36,7 @@ elif [ "${MODE}" = "d" ]; then
     (( i++ ))
   done
   git diff "${LISTFILE}"
-  git commit -m "LIST ADD FROM SLACKBOT" "${LISTFILE}"
+  git commit -m "LIST DEL FROM SLACKBOT" "${LISTFILE}"
   git pull
   git push origin master
 else

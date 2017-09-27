@@ -10,14 +10,14 @@ if [ ${#ARGS[@]} -lt 2 ]; then
   exit 1
 fi
 
+#cd "${LISTDIR}"
 if [ "${MODE}" = "i" ]; then
   i=0
   for TEXT in "${ARGS[@]}"
   do
     if [ ${i} -gt 0 ]; then
-      echo "# insert: ${TEXT}"
-#      echo "echo \"# 0 ${TEXT}\" >> \"${LISTFILE}\""
-      echo "# 0 ${TEXT}" >> "${LISTFILE}"
+      echo "# insert: ${TEXT/_/ }"
+      echo "# 0 ${TEXT/_/ }" >> "${LISTFILE}"
     fi
     (( i++ ))
   done
@@ -30,9 +30,8 @@ elif [ "${MODE}" = "d" ]; then
   for TEXT in "${ARGS[@]}"
   do
     if [ ${i} -gt 0 ]; then
-      echo "# delete: ${TEXT}"
-#      echo "sed -i -e '/${TEXT}/d' \"${LISTFILE}\""
-      sed -i -e "/${TEXT}/d" "${LISTFILE}"
+      echo "# delete: ${TEXT/_/ }"
+      sed -i -e "/${TEXT/_/ }/d" "${LISTFILE}"
     fi
     (( i++ ))
   done

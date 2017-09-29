@@ -103,7 +103,7 @@ def torrent_search(message, argment):
 
 @respond_to('^ *il (.*)')
 def insert_list(message, argment):
-    message.send('リストについかするで')
+    message.send('リストについかするで(/data/share/movie/sh/checklist.txt)')
     launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
     logfile = 'temp/insert_list_' + launch_dt + '.temp'
     cmd = './chklist_mod.sh i "{0}" > {1}'.format(argment.replace(' ', '_').replace(',', '" "'), logfile)
@@ -117,10 +117,56 @@ def insert_list(message, argment):
 
 @respond_to('^ *dl (.*)')
 def delete_list(message, argment):
-    message.send('リストからさくじょするで')
+    message.send('リストからさくじょするで(/data/share/movie/sh/checklist.txt)')
     launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
     logfile = 'temp/delete_list_' + launch_dt + '.temp'
     cmd = './chklist_mod.sh d "{0}" > {1}'.format(argment.replace(' ', '_').replace(',', '" "'), logfile)
+    call_cmd(cmd)
+    message.reply('おあり。')
+    time.sleep(1)
+    file_upload(logfile, logfile, 'text', message)
+    time.sleep(1)
+    os.remove(logfile)
+
+
+@respond_to('^ *ilm (.*)')
+def insert_list_manual(message, argment):
+    args = argment.split()
+    listpath = args[0]
+    wordlist = []
+    for i, arg in enumerate(args):
+        if i < 1:
+            pass
+        else:
+            wordlist.append(arg)
+
+    message.send('リストについかするで(' + listpath + ')')
+    launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
+    logfile = 'temp/insert_list_manual_' + launch_dt + '.temp'
+    cmd = './common_list_mod.sh "{0}" i "{1}" > {2}'.format(listpath, '_'.join(wordlist).replace(',', '" "'), logfile)
+    call_cmd(cmd)
+    message.reply('おあり。')
+    time.sleep(1)
+    file_upload(logfile, logfile, 'text', message)
+    time.sleep(1)
+    os.remove(logfile)
+
+
+@respond_to('^ *dlm (.*)')
+def delete_list_manual(message, argment):
+    args = argment.split()
+    listpath = args[0]
+    wordlist = []
+    for i, arg in enumerate(args):
+        if i < 1:
+            pass
+        else:
+            wordlist.append(arg)
+
+    message.send('リストからさくじょするで(' + listpath + ')')
+    launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
+    logfile = 'temp/delete_list_manual_' + launch_dt + '.temp'
+    cmd = './common_list_mod.sh "{0}" d "{1}" > {2}'.format(listpath, '_'.join(wordlist).replace(',', '" "'), logfile)
     call_cmd(cmd)
     message.reply('おあり。')
     time.sleep(1)

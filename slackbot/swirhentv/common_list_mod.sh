@@ -17,7 +17,7 @@ if [ "${MODE}" = "i" ]; then
   do
     if [ ${i} -gt 1 ]; then
       echo "# insert: ${TEXT//_/ }"
-      echo "# 0 ${TEXT//_/ }" >> "${LISTFILE}"
+      echo "${TEXT//_/ }" >> "${LISTFILE}"
     fi
     (( i++ ))
   done

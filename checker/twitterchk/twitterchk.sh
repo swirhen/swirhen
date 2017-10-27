@@ -6,7 +6,7 @@ if [ "${TIME}" = "0000" ]; then
 else
   DATE=`date "+%m%d-%Y"`
 fi
-DATETIME=`date "+%Y/%m/%d %H:%M:%S"`
+DATETIME=`date "+%Y/%m/%d %H：%M：%S"`
 DATETIME2=`date "+%Y%m%d%H%M%S"`
 TEMPFILE=${SCRIPT_DIR}/twitterchk_${DATETIME2}.temp
 PYTHON_PATH="/home/swirhen/.pythonbrew/pythons/Python-3.4.3/bin/python"

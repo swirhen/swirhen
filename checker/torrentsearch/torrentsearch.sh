@@ -7,7 +7,7 @@ LISTNAME=$2
 DATE=`date "+%Y/%m/%d %H:%M:%S"`
 DATE2=`date "+%Y%m%d"`
 DOWNLOAD_DIR="/data/share/temp/torrentsearch/${DATE2}"
-PYTHON_PATH="/home/swirhen/.pythonbrew/pythons/Python-3.4.3/bin/python"
+PYTHON_PATH="python3"
 LIST=${SCRIPT_DIR}/${LISTNAME}.txt
 LIST_TEMP=${SCRIPT_DIR}/${LISTNAME}.temp
 CRAWL_TEMP=${SCRIPT_DIR}/${LISTNAME}.crawl.temp
@@ -46,15 +46,14 @@ do
       (( cnt++ ))
     done
 
-    if [ "${hit_flg}" = "1" ]; then
-      /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} ヒットしました！"
-    else
+    if [ "${hit_flg}" = "0" ]; then
+      #/home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【汎用種調査 ${DATE}】検索キーワード ${keyword} リスト名: ${LISTNAME} ヒットしました！"
       echo "${keyword}" >> ${LIST_TEMP}
     fi
 done < ${LIST}
 
 if [ -f "${RESULT_FILE}" ]; then
-  /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "【謎調査 ${DATE}】検索キーワードにヒットしました！"
+  #/home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "【謎調査 ${DATE}】検索キーワードにヒットしました！"
   ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【汎用種調査 ${DATE}】キーワードヒット: ダウンロードしました
 \`\`\`
 # 結果:
@@ -64,5 +63,6 @@ if [ -f "${RESULT_FILE}" ]; then
 \`\`\`"
   mv ${LIST_TEMP} ${LIST}
 else
-  /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "【謎調査 ${DATE}】検索キーワードにヒットありません"
+  #/home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "【謎調査 ${DATE}】検索キーワードにヒットありません"
+  ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "【謎調査 ${DATE}】検索キーワードにヒットありません"
 fi

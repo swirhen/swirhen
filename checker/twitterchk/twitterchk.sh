@@ -6,7 +6,7 @@ if [ "${TIME}" = "0000" ]; then
 else
   DATE=`date "+%m%d-%Y"`
 fi
-DATETIME=`date "+%Y/%m/%d %H：%M：%S"`
+DATETIME=`date "+%Y/%m/%d %H:%M:%S"`
 DATETIME2=`date "+%Y%m%d%H%M%S"`
 TEMPFILE=${SCRIPT_DIR}/twitterchk_${DATETIME2}.temp
 PYTHON_PATH="/home/swirhen/.pythonbrew/pythons/Python-3.4.3/bin/python"
@@ -61,11 +61,7 @@ do
   if [ "${HIT}" != "" -a "${HIT2}" != "" -a "${HIT3}" != "" ]; then
     HIT_STR="${D_T_C_N[${cnt}]}
 ${TEXT}"
-    /home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
-    /home/swirhen/sh/slack/post.sh "swirhentv" "@here 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ
-\`\`\`
-${HIT_STR}
-\`\`\`"
+    #/home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
     ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ
 \`\`\`
 ${HIT_STR}

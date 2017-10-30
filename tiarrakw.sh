@@ -1,3 +1,4 @@
+#!/bin/bash
 ps -ef | grep tiarra.conf | grep -v grep | awk '{print $2}' | xargs kill -9
 sleep 10
 cd /home/swirhen

@@ -10,6 +10,8 @@ fi
 logfile="${script_dir}/temp/update_restart.log"
 rm -f ${logfile}
 
+cd ${script_dir}
+
 if [ "${upflg}" = "1" -o "${upflg}" = "2" ]; then
   echo "*** slackbot 自己更新 ***" | tee -a ${logfile}
 

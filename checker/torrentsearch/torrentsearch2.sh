@@ -18,6 +18,7 @@ PYTHON_PATH="python3"
 hit_flg=0
 check_list=()
 check_list_temp=()
+hit_keyword=()
 category_list=()
 download_url_list=()
 
@@ -69,7 +70,6 @@ do
   do
     item_xml=`echo "cat /rss/channel/item[${cnt}]" | xmllint --shell "${crawl_xml}"`
     title=`echo "${item_xml}" | grep title | sed "s#<title>\(.*\)</title>#\1#" | sed "s/^      //"`
-    echo "title: ${title}"
     # feed end
     if [ "${title}" = "" ]; then
       break
@@ -85,9 +85,7 @@ do
         erase_flg=1
       fi
 
-      dl_flg=0
       if [ "${category}.xml" = "${crawl_xml##*/}" ]; then
-        echo "keyword: ${keyword}"
         if [ "`echo \"${title}\" | grep \"${keyword}\"`" != "" ];then
           # キーワードヒットしたら、DL済みURLリストとも突き合わせ
           link=`echo "${item_xml}" | grep link | sed "s#<link>\(.*\)</link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
@@ -102,17 +100,25 @@ do
           # DL済みリストになければ、ダウンロードして、DL済みリストにURLを追加
           if [ ${dled_flg} -eq 0 ]; then
             hit_flg=1
-            dl_flg=1
             mkdir -p ${DOWNLOAD_DIR}
             echo "# keyword hit : ${keyword} title: ${title}" >> ${LOG_FILE}
             curl "${link}" -o "${DOWNLOAD_DIR}/${title}.torrent"
             echo "${link}" >> ${DL_URL_LIST}
+
+            # キーワードヒットリストに追加
+            hkw_flg=0
+            for hkw in "${hit_keyword[@]}"
+            do
+              if [ "${keyword}" = "${hkw}" ]; then
+                hkw_flg=1
+                break
+              fi
+            done
+            if [ ${hit_flg} -eq 0 ]; then
+              hit_keyword+=( "${keyword}" )
+            fi
           fi
         fi
-      fi
-      # ダウンロードが行われた and 消去するキーワードの場合、最終的なリストに載せない
-      if [ ${dl_flg} -eq 0 -o ${erase_flg} -eq 0 ]; then
-        check_list_temp+=( "${line}" )
       fi
     done
     (( cnt++ ))
@@ -129,6 +135,34 @@ if [ ${hit_flg} -eq 1 ]; then
 `ls -l ${DOWNLOAD_DIR}`
 \`\`\`"
 fi
+
+# リスト整備
+for line in "${check_list[@]}"
+do
+  keyword="${line#*\|}"
+  erase_flg=0
+  if [ "${keyword:0:1}" = "@" ]; then
+    keyword="${keyword:1}"
+    erase_flg=1
+  fi
+
+  hkw_flg=0
+  for hkw in "${hit_keyword[@]}"
+  do
+    if [ "${keyword}" = "${hkw}" ]; then
+      hkw_flg=1
+      break
+    fi
+  done
+  if [ ${hit_flg} -eq 0 ]; then
+    hit_keyword+=( "${keyword}" )
+  fi
+
+  # ダウンロードが行われた and 消去するキーワードの場合、リストから消去する
+  if [ ${hkw_flg} -eq 0 -o ${erase_flg} -eq 0 ]; then
+    check_list_temp+=( "${line}" )
+  fi
+done
 
 rm -f "${CHECKLIST_TMP}"
 for clt in "${check_list_temp[@]}"

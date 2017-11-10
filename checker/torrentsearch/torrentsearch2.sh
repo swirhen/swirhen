@@ -114,7 +114,7 @@ do
                 break
               fi
             done
-            if [ ${hit_flg} -eq 0 ]; then
+            if [ ${hkw_flg} -eq 0 ]; then
               hit_keyword+=( "${keyword}" )
             fi
           fi
@@ -154,9 +154,6 @@ do
       break
     fi
   done
-  if [ ${hit_flg} -eq 0 ]; then
-    hit_keyword+=( "${keyword}" )
-  fi
 
   # ダウンロードが行われた and 消去するキーワードの場合、リストから消去する
   if [ ${hkw_flg} -eq 0 -o ${erase_flg} -eq 0 ]; then

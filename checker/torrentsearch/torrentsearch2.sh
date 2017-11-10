@@ -69,6 +69,7 @@ do
   do
     item_xml=`echo "cat /rss/channel/item[${cnt}]" | xmllint --shell "${crawl_xml}"`
     title=`echo "${item_xml}" | grep title | sed "s#<title>\(.*\)</title>#\1#" | sed "s/^      //"`
+    echo "title: ${title}"
     # feed end
     if [ "${title}" = "" ]; then
       break
@@ -86,6 +87,7 @@ do
 
       dl_flg=0
       if [ "${category}.xml" = "${crawl_xml}" ]; then
+        echo "keyword: ${keyword}"
         if [ "`echo \"${title}\" | grep \"${keyword}\"`" != "" ];then
           # キーワードヒットしたら、DL済みURLリストとも突き合わせ
           link=`echo "${item_xml}" | grep link | sed "s#<link>\(.*\)</link>#\1#" | sed "s/^      //" | sed "s/amp;//"`

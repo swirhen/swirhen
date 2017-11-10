@@ -86,7 +86,7 @@ do
       fi
 
       dl_flg=0
-      if [ "${category}.xml" = "${crawl_xml}" ]; then
+      if [ "${category}.xml" = "${crawl_xml##*/}" ]; then
         echo "keyword: ${keyword}"
         if [ "`echo \"${title}\" | grep \"${keyword}\"`" != "" ];then
           # キーワードヒットしたら、DL済みURLリストとも突き合わせ
@@ -131,7 +131,7 @@ if [ ${hit_flg} -eq 1 ]; then
 fi
 
 rm -f "${CHECKLIST_TMP}"
-for clt in "${check_list_temp}"
+for clt in "${check_list_temp[@]}"
 do
   echo "${clt}" >> "${CHECKLIST_TMP}"
 done

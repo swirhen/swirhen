@@ -22,6 +22,9 @@ hit_keyword=()
 category_list=()
 download_url_list=()
 
+cd ${SCRIPT_DIR}
+git pull
+
 # リストからカテゴリ、キーワードを取得
 # カテゴリは別途配列に入れる（重複チェック）
 while read line
@@ -127,13 +130,15 @@ done
 
 # 報告
 if [ ${hit_flg} -eq 1 ]; then
-  ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【汎用種調査 ${DATE}】キーワードヒット: ダウンロードしました
+  ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【汎用種調査2 ${DATE}】キーワードヒット: ダウンロードしました
 \`\`\`
 # 結果:
 `cat ${LOG_FILE}`
 # ダウンロードした種ファイル:
 `ls -l ${DOWNLOAD_DIR}`
 \`\`\`"
+else
+  ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "【汎用種調査2 ${DATE}】検索キーワードにヒットありません"
 fi
 
 # リスト整備
@@ -170,5 +175,6 @@ cp -p "${CHECKLIST_TMP}" "${CHECKLIST}"
 
 cd ${SCRIPT_DIR}
 git commit -m 'checklist.txt update' checklist.txt
+git commit -m 'download_url.txt update' download_url.txt
 git pull
 git push origin master

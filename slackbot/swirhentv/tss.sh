@@ -42,9 +42,9 @@ do
       fi
 
       if [ "`echo ${title} | grep \"${KEYWORD}\"`" != "" ]; then
-        category=`echo "${item_xml}" | grep category | sed "s#<category>\(.*\)</category>#\1#" | sed "s/^      //"`
-  #      link=`echo "${item_xml}" | grep link | sed "s#<link>\(.*\)</link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
-        link=`echo "${item_xml}" | grep link | sed "s#<link><\!\[CDATA\[\(.*\)\]\]></link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
+        category=`echo "${item_xml}" | grep category | sed "s#<.*category>\(.*\)</.*category>#\1#" | sed "s/^      //"`
+        link=`echo "${item_xml}" | grep link | sed "s#<link>\(.*\)</link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
+#        link=`echo "${item_xml}" | grep link | sed "s#<link><\!\[CDATA\[\(.*\)\]\]></link>#\1#" | sed "s/^      //" | sed "s/amp;//"`
 
         echo "[${category}] ${title} : ${link}"
         (( hit_cnt++ ))

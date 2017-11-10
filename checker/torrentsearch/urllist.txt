@@ -1,0 +1,4 @@
+doujin https://sukebei.nyaa.si/?page=rss&c=1_2
+manga https://sukebei.nyaa.si/?page=rss&c=1_4
+music https://nyaa.si/?page=rss&c=2_0
+comic https://nyaa.si/?page=rss&c=3_3

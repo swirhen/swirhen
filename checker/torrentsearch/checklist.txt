@@ -17,6 +17,23 @@ doujin|@Messlog
 manga|@ママにないしょの発情期
 manga|@キラキラおとなレッスン
 manga|秋月伊槻
+manga|鬼束直
+manga|雪雨こん
+manga|前島龍
+manga|オオカミうお
+manga|小路あゆむ
+manga|藤坂リリック
+manga|チグチミリ
+manga|上田裕
+manga|宮内由香
+manga|東山翔
+manga|さつよ
+manga|浦井民
+manga|ポンスケ
+manga|彦馬ヒロユキ
+manga|リーフィ
+manga|佐々原憂樹
+manga|せいほうけい
 music|STARLIGHT MASTER
 music|THE@TER GENERATION
 music|M@STER SPARKLE

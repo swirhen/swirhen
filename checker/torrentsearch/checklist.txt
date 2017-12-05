@@ -38,6 +38,8 @@ music|M@STER SPARKLE
 music|STELLA MASTER
 music|Blooming Clover
 comic|@インベスターZ
+comic|COMIC REX
+comic|Comic REX
 doujin|シンデレラガールズ
 doujin|ミリオンライブ
 music|WILD WIND GIRL

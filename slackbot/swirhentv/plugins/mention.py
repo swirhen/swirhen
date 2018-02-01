@@ -107,7 +107,7 @@ def torrent_search(message, argment):
     launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
     logfile = 'temp/nico_' + launch_dt + '.temp'
     filetitle = 'niconico_search_result_' + launch_dt
-    cmd = '/data/share/temp/voiceactor_nico_ch/s_crawlnicoch.sh "{0}" | awk '{$1="";print}' > {1}'.format(argment, logfile)
+    cmd = '/data/share/temp/voiceactor_nico_ch/s_crawlnicoch.sh "{0}" | awk ''{$1="";print}'' > {1}'.format(argment, logfile)
     call_cmd(cmd)
     result = open(logfile).read()
     if result == 'no result.':

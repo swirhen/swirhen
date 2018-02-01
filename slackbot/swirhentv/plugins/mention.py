@@ -101,6 +101,26 @@ def torrent_search(message, argment):
         os.remove(logfile)
 
 
+@respond_to('^ *nico (.*)')
+def torrent_search(message, argment):
+    message.send('さがすー')
+    launch_dt = datetime.now().strftime('%Y%m%d%H%M%S')
+    logfile = 'temp/nico_' + launch_dt + '.temp'
+    filetitle = 'niconico_search_result_' + launch_dt
+    cmd = '/data/share/temp/voiceactor_nico_ch/s_crawlnicoch.sh "{0}" | awk \'{$1="";print}\'  > {1}'.format(argment, logfile)
+    call_cmd(cmd)
+    result = open(logfile).read()
+    if result == 'no result.':
+        message.send('なかったよ(´･ω･`)')
+        os.remove(logfile)
+    else:
+        message.reply('あったよ(｀･ω･´)')
+        time.sleep(1)
+        file_upload(logfile, filetitle, 'text', message)
+        time.sleep(1)
+        os.remove(logfile)
+
+
 @respond_to('^ *il (.*)')
 def insert_list(message, argment):
     message.send('リストについかするで(/data/share/movie/sh/checklist.txt)')

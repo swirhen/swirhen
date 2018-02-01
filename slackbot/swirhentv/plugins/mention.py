@@ -110,7 +110,7 @@ def torrent_search(message, argment):
     cmd = '/data/share/temp/voiceactor_nico_ch/sls_crawlnicoch.sh "{0}" > {1}'.format(argment, logfile)
     call_cmd(cmd)
     result = open(logfile).read()
-    if result == 'no result.':
+    if result == '':
         message.send('なかったよ(´･ω･`)')
         os.remove(logfile)
     else:

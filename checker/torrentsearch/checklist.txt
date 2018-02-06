@@ -29,6 +29,7 @@ music|STELLA MASTER
 music|Blooming Clover
 music|CINDERELLA GIRLS
 music|CINDERELLA MASTER
+music|@アザレア
 comic|@インベスターZ
 comic|COMIC REX
 comic|Comic REX

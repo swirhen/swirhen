@@ -171,10 +171,10 @@ ping_test () {
     echo "*** ${FUNCNAME[0]/_/ } ***"
     echo ""
     echo "# ping server lists:"
-    cnt=1
+    cnt=0
     for PINGSRV in "${PING_LIST[@]}"
     do
-        echo "${PINGSRV}"
+        echo "${cnt}: ${PINGSRV}"
         (( cnt++ ))
     done
     echo "pingを発行するサーバーを選択してください(1 - ${#PING_LIST[@]})."
@@ -183,15 +183,22 @@ ping_test () {
     PINGSRVS=`plzinput`
     for PINGSRV in `echo "${PINGSRVS}" | fold -s1`
     do
-        PINGSRVS2+="\"${PING_LIST[${PINGSRV}]}\" "
-        if [ ${MULTIPANEMODE} -eq 0 ]; then
-            ping -c 3 -W 1 "${PING_LIST[${PINGSRV}]}"
+        if [ "${PING_LIST[${PINGSRV}]}" != "" ]; then
+            PINGSRVS2+="\"${PING_LIST[${PINGSRV}]}\" "
+            if [ ${MULTIPANEMODE} -eq 0 ]; then
+                ping -c 3 -W 1 "${PING_LIST[${PINGSRV}]}"
+            fi
         fi
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
 #        xpanes -c "ping -c 3 -W 1 {}" "${PINGSRVS2}"
-        echo "xpanes -c \"ping -c 3 -W 1 {}\" \"${PINGSRVS2}\""
+        echo "xpanes -c ping -c 3 -W 1 {}\" \"${PINGSRVS2}"
     fi
+
+    echo ""
+    echo "テスト終了"
+    echo ""
+
     plzcontinue
 }
 

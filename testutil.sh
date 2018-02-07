@@ -191,8 +191,8 @@ ping_test () {
         fi
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
-#        xpanes -c "ping -c 3 -W 1 {}" "${PINGSRVS2}"
-        echo "xpanes -c ping -c 3 -W 1 {}\" \"${PINGSRVS2}"
+#        xpanes -c "ping -c 3 -W 1 {}" ${PINGSRVS2}
+        echo "xpanes -c \"ping -c 3 -W 1 {}\" ${PINGSRVS2}"
     fi
 
     echo ""

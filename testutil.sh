@@ -195,6 +195,7 @@ ping_test () {
     plzcontinue
 }
 
+
 # telnet test
 telnet_test () {
     clear

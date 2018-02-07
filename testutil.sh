@@ -179,7 +179,7 @@ ping_test () {
     done
     echo "pingを発行するサーバーを選択してください(1 - ${#PING_LIST[@]})."
     echo "複数に発行する場合は番号を続けて書いてください"
-    echo "ex) 12357"
+    echo "ex) 0135"
     PINGSRVS=`plzinput`
     for PINGSRV in `echo "${PINGSRVS}" | fold -s1`
     do

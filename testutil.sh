@@ -39,11 +39,11 @@ yesno() {
 
 # yes/no 2
 yesno2() {
-    read -p "hit enter(Y)/N > " YESNO2
+    read -p "hit enter/q > " YESNO2
     case "${YESNO2}" in
-        y | Y | "" ) return 1;;
-        n | N ) return 0;;
-        * ) echo "prease input enter or enter or Y/N(y/n)."
+        "" ) return 1;;
+        q | Q ) return 0;;
+        * ) echo "prease input enter or q."
         yesno2
     esac
 }
@@ -149,7 +149,7 @@ main_menu_i() {
 
 # plz continue
 plzcontinue() {
-    echo "テストを継続しますか？ (enterかY で継続 / N で終了)"
+    echo "テストを継続しますか？ (enter で継続 / q で終了)"
     yesno2
     if [ "$?" -eq 1 ]; then
         clear
@@ -172,12 +172,14 @@ ping_test () {
     echo ""
     echo "# ping server lists:"
     cnt=0
+    echo "--"
     for PINGSRV in "${PING_LIST[@]}"
     do
         echo "${cnt}: ${PINGSRV}"
         (( cnt++ ))
     done
     (( cnt-- ))
+    echo "--"
     echo "pingを発行するサーバーを選択してください(0 - ${cnt})."
     echo "複数に発行する場合は番号を続けて書いてください"
     echo "ex) 0135"
@@ -187,14 +189,17 @@ ping_test () {
         if [ "${PING_LIST[${PINGSRV}]}" != "" ]; then
             PINGSRVS2+="\"${PING_LIST[${PINGSRV}]}\" "
             if [ ${MULTIPANEMODE} -eq 0 ]; then
-                ping -c 3 -W 1 "${PING_LIST[${PINGSRV}]}"
+                echo ""
+                echo "ping test: to ${PING_LIST[${PINGSRV}]}"
+                echo "ping -c 3 \"${PING_LIST[${PINGSRV}]}\""
+                ping -c 3 "${PING_LIST[${PINGSRV}]}"
             fi
         fi
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         echo "結果を確認したら Ctrl-Dでウインドウを閉じてください"
-        xpanes -c "ping -c 3 -W 1 {}" ${PINGSRVS2}
-#        echo "xpanes -c \"ping -c 3 -W 1 {}\" ${PINGSRVS2}"
+        xpanes -c "ping -c 3 {}" ${PINGSRVS2}
+#        echo "xpanes -c \"ping -c 3 {}\" ${PINGSRVS2}"
     fi
 
     echo ""

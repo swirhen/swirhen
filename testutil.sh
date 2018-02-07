@@ -27,6 +27,7 @@ yesno() {
     esac
 }
 
+
 # yes/no 2
 yesno2() {
     read -p "hit enter(Y)/N > " YESNO2

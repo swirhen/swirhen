@@ -27,7 +27,6 @@ yesno() {
     esac
 }
 
-
 # yes/no 2
 yesno2() {
     read -p "hit enter(Y)/N > " YESNO2
@@ -72,7 +71,7 @@ tmuxcheck() {
         yesno
         if [ $? -eq 1 ]; then
             if [ "`tmux ls`" = "" ]; then
-                "tmux の起動中セッションが見つかりません。マルチペインモードを有効にするには、tmuxのセッション上からこのシェルを起動してください"
+                echo "tmux の起動中セッションが見つかりません。マルチペインモードを有効にするには、tmuxのセッション上からこのシェルを起動してください"
                 end
             else
                 MULTIPANEMODE=1

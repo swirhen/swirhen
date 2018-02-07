@@ -13,8 +13,18 @@
 # option: tmux & tmux-xpanesが入っていればマルチペイン化で同時表示
 
 # グローバル変数
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
+LIST_FILE=${SCRIPT_DIR}/serverlist.txt
 SELECTMENU=0
 MULTIPANEMODE=0
+PING_LIST=()
+TELNET_LIST=()
+NTP_LIST=()
+FTP_LIST=()
+LFTP_LIST=()
+DNS_LIST=()
+PROXY_LIST=()
+LOG_LIST=()
 
 # yes/no
 yesno() {
@@ -57,8 +67,11 @@ main_menu(){
     echo "3: ntpdate"
     echo "4: ftp"
     echo "5: lftp"
-    echo "6: tail log"
-    echo "7: grep log"
+    echo "6: dns test"
+    echo "7: proxy test"
+    echo "8: tail log"
+    echo "9: grep log"
+    echo "q: quit"
     echo "please select operation."
     main_menu_i
 }
@@ -82,6 +95,39 @@ tmuxcheck() {
     fi
 }
 
+# read list file
+readlist () {
+    while read IDENTIFIER SERVER PORT
+    do
+        if [ "${IDENTIFIER:0:1}" != "#" ]; then
+            if [[ ${IDENTIFIER} =~ p ]]; then
+                PING_LIST+=( "${SERVER}" )
+            fi
+            if [[ ${IDENTIFIER} =~ t ]]; then
+                TELNET_LIST+=( "${SERVER} ${PORT}" )
+            fi
+            if [[ ${IDENTIFIER} =~ n ]]; then
+                NTP_LIST+=( "${SERVER}" )
+            fi
+            if [[ ${IDENTIFIER} =~ f ]]; then
+                FTP_LIST+=( "${SERVER} ${PORT}" )
+            fi
+            if [[ ${IDENTIFIER} =~ l ]]; then
+                LFTP_LIST+=( "${SERVER} ${PORT}" )
+            fi
+            if [[ ${IDENTIFIER} =~ d ]]; then
+                DNS_LIST+=( "${SERVER}" )
+            fi
+            if [[ ${IDENTIFIER} =~ x ]]; then
+                PROXY_LIST+=( "${SERVER}:${PORT}" )
+            fi
+            if [[ ${IDENTIFIER} =~ g ]]; then
+                LOG_LIST+=( "${SERVER}" )
+            fi
+        fi
+    done < ${LIST_FILE}
+}
+
 # menu input
 main_menu_i() {
     SELECTMENU=`plzinput`
@@ -95,7 +141,8 @@ main_menu_i() {
         7 ) proxy_test;;
         8 ) tail_log;;
         9 ) grep_log;;
-        * ) echo "prease input 1-9."
+        q ) end;;
+        * ) echo "prease input 1-9 or q."
         main_menu_i
     esac
 }
@@ -123,7 +170,28 @@ ping_test () {
     clear
     echo "*** ${FUNCNAME[0]/_/ } ***"
     echo ""
-    echo "under construction."
+    echo "# ping server lists:"
+    cnt=1
+    for PINGSRV in "${PING_LIST[@]}"
+    do
+        echo "${PINGSRV}"
+        (( cnt++ ))
+    done
+    echo "pingを発行するサーバーを選択してください(1 - ${#PING_LIST[@]})."
+    echo "複数に発行する場合は番号を続けて書いてください"
+    echo "ex) 12357"
+    PINGSRVS=`plzinput`
+    for PINGSRV in `echo "${PINGSRVS}" | fold -s1`
+    do
+        PINGSRVS2+="\"${PING_LIST[${PINGSRV}]}\" "
+        if [ ${MULTIPANEMODE} -eq 0 ]; then
+            ping -c 3 -W 1 "${PING_LIST[${PINGSRV}]}"
+        fi
+    done
+    if [ ${MULTIPANEMODE} -eq 1 ]; then
+#        xpanes -c "ping -c 3 -W 1 {}" "${PINGSRVS2}"
+        echo "xpanes -c \"ping -c 3 -W 1 {}\" \"${PINGSRVS2}\""
+    fi
     plzcontinue
 }
 
@@ -206,7 +274,7 @@ echo "ある程度のターミナル解像度で使用してください"
 echo ""
 
 # リストファイル読み込み
-# readlist
+readlist
 
 # tmux xpanes存在チェック
 tmuxcheck

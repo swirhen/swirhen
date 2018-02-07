@@ -1,0 +1,15 @@
+# testutil用設定ファイル
+# 設定識別子 サーバ名/IP (ポート)
+# 設定識別子の説明
+# p: ping t: telnet n: ntp
+# f: ftp l: lftp d: dns
+# x: proxy g: log
+ptnfld ntp.nict.jp 25
+ptnfld time.windows.com 25
+ptnfld 221.113.139.250 25
+ptnfld 202.234.232.6 25
+ptnfld 8.8.8.8 25
+ptnfld 9.9.9.9 25
+x 192.168.0.254 8080
+g /var/log/syslog
+g /var/log/maillog

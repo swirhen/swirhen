@@ -4,6 +4,8 @@
 # ping
 # telnet
 # ntpdate
+# dns(digg)
+# proxy
 # ログのテール
 # ログのgrep
 # 対象サーバーやポートは別ファイルでリスト化して数字[Enter]で選択出来るようにする
@@ -12,6 +14,7 @@
 
 # グローバル変数
 SELECTMENU=0
+MULTIPANEMODE=0
 
 # yes/no
 yesno() {
@@ -60,6 +63,25 @@ main_menu(){
     main_menu_i
 }
 
+# tmux / xpanes install check
+tmuxcheck() {
+    if [ "`tmux -V`" != "" -a "`xpanes -V`" != "" ]; then
+        echo "terminal multiplexer(tmux) and xpanes detected."
+        echo "enable multi-pane mode?"
+        yesno
+        if [ $? -eq 1 ]; then
+            if [ "`tmux ls`" = "" ]; then
+                "tmux の起動中セッションが見つかりません。マルチペインモードを有効にするには、tmuxのセッション上からこのシェルを起動してください"
+                end
+            else
+                MULTIPANEMODE=1
+            fi
+        else
+            MULTIPANEMODE=0
+        fi
+    fi
+}
+
 # menu input
 main_menu_i() {
     SELECTMENU=`plzinput`
@@ -69,9 +91,11 @@ main_menu_i() {
         3 ) ntpdate_test;;
         4 ) ftp_test;;
         5 ) lftp_test;;
-        6 ) tail_log;;
-        7 ) grep_log;;
-        * ) echo "prease input 1-7."
+        6 ) dns_test;;
+        7 ) proxy_test;;
+        8 ) tail_log;;
+        9 ) grep_log;;
+        * ) echo "prease input 1-9."
         main_menu_i
     esac
 }
@@ -114,6 +138,24 @@ telnet_test () {
 
 # ntpdate test
 ntpdate_test () {
+    clear
+    echo "*** ${FUNCNAME[0]/_/ } ***"
+    echo ""
+    echo "under construction."
+    plzcontinue
+}
+
+# dns test
+dns_test () {
+    clear
+    echo "*** ${FUNCNAME[0]/_/ } ***"
+    echo ""
+    echo "under construction."
+    plzcontinue
+}
+
+# proxy test
+proxy_test () {
     clear
     echo "*** ${FUNCNAME[0]/_/ } ***"
     echo ""
@@ -165,6 +207,9 @@ echo ""
 
 # リストファイル読み込み
 # readlist
+
+# tmux xpanes存在チェック
+tmuxcheck
 
 # main menu
 main_menu

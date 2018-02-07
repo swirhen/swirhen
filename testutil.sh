@@ -191,6 +191,7 @@ ping_test () {
         fi
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
+        echo "結果を確認したら Ctrl-Dでウインドウを閉じてください"
         xpanes -c "ping -c 3 -W 1 {}" ${PINGSRVS2}
 #        echo "xpanes -c \"ping -c 3 -W 1 {}\" ${PINGSRVS2}"
     fi

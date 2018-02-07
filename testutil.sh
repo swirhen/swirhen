@@ -177,6 +177,7 @@ ping_test () {
         echo "${cnt}: ${PINGSRV}"
         (( cnt++ ))
     done
+    (( cnt-- ))
     echo "pingを発行するサーバーを選択してください(0 - ${cnt})."
     echo "複数に発行する場合は番号を続けて書いてください"
     echo "ex) 0135"

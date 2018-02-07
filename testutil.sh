@@ -65,12 +65,12 @@ main_menu(){
 
 # tmux / xpanes install check
 tmuxcheck() {
-    if [ "`tmux -V`" != "" -a "`xpanes -V`" != "" ]; then
+    if [ "`tmux -V 2>/dev/null`" != "" -a "`xpanes -V 2>/dev/null`" != "" ]; then
         echo "terminal multiplexer(tmux) and xpanes detected."
         echo "enable multi-pane mode?"
         yesno
         if [ $? -eq 1 ]; then
-            if [ "`tmux ls`" = "" ]; then
+            if [ "`tmux ls 2>/dev/null`" = "" ]; then
                 echo "tmux の起動中セッションが見つかりません。マルチペインモードを有効にするには、tmuxのセッション上からこのシェルを起動してください"
                 end
             else

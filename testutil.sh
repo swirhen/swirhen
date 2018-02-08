@@ -234,7 +234,7 @@ telnet_test () {
     for SRV in `echo "${SRVS}" | fold -s1`
     do
         if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
-            SRVS2+="'${TELNET_LIST[${SRV}]}' "
+            SRVS2+=""${TELNET_LIST[${SRV}]}" "
             if [ ${MULTIPANEMODE} -eq 0 ]; then
                 echo ""
                 echo "# telnet test: to ${TELNET_LIST[${SRV}]}"
@@ -245,8 +245,8 @@ telnet_test () {
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
-        xpanes -c "telnet {}" ${SRVS2}
-#        echo "xpanes -c \"telnet {}\" ${SRVS2}"
+        xpanes -c "telnet \"{}\"" ${SRVS2}
+#        echo "xpanes -c \"telnet \"{}\"\" ${SRVS2}"
     fi
 
     echo ""

@@ -232,7 +232,7 @@ telnet_test () {
     SRVS=`plzinput`
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
-        XPANESCMD="xpanes -c 'telnet \{\}' "
+        XPANESCMD=""
         for SRV in `echo "${SRVS}" | fold -s1`
         do
             if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
@@ -240,7 +240,7 @@ telnet_test () {
             fi
         done
 #        echo "${XPANESCMD}"
-        ${XPANESCMD}
+        xpanes -c "telnet {}" ${XPANESCMD}
     else
         for SRV in `echo "${SRVS}" | fold -s1`
         do

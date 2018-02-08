@@ -184,6 +184,7 @@ ping_test () {
     echo "複数に発行する場合は番号を続けて書いてください"
     echo "ex) 0135"
     SRVS=`plzinput`
+    SRVS2=""
     for SRV in `echo "${SRVS}" | fold -s1`
     do
         if [ "${PING_LIST[${SRV}]}" != "" ]; then
@@ -229,6 +230,7 @@ telnet_test () {
     echo "複数に発行する場合は番号を続けて書いてください"
     echo "ex) 0135"
     SRVS=`plzinput`
+    SRVS2=""
     for SRV in `echo "${SRVS}" | fold -s1`
     do
         if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
@@ -243,8 +245,8 @@ telnet_test () {
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
-#        xpanes -c "telnet {}" ${SRVS2}
-        echo "xpanes -c \"telnet {}\" ${SRVS2}"
+        xpanes -c "telnet {}" ${SRVS2}
+#        echo "xpanes -c \"telnet {}\" ${SRVS2}"
     fi
 
     echo ""

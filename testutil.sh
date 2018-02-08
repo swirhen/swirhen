@@ -245,7 +245,7 @@ telnet_test () {
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
-        xpanes -c "telnet \"{}\"" ${SRVS2}
+        xpanes -c "telnet \\\"{}\\\"" ${SRVS2}
 #        echo "xpanes -c \"telnet \"{}\"\" ${SRVS2}"
     fi
 

@@ -288,14 +288,14 @@ ntpdate_test () {
             if [ ${MULTIPANEMODE} -eq 0 ]; then
                 echo ""
                 echo "# ntp test: to ${SRV}"
-                echo "ntpdate \"${SRV}\""
-                ntpdate "${SRV}"
+                echo "ntpdate -q \"${SRV}\""
+                ntpdate -q "${SRV}"
             fi
         fi
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         echo "結果を確認したら Ctrl-Dでウインドウを閉じてください"
-        xpanes -c "ntpdate {}" ${SRVS2}
+        xpanes -c "ntpdate -q {}" ${SRVS2}
     fi
 
     echo ""

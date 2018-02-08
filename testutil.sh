@@ -190,16 +190,16 @@ ping_test () {
             PINGSRVS2+="\"${PING_LIST[${PINGSRV}]}\" "
             if [ ${MULTIPANEMODE} -eq 0 ]; then
                 echo ""
-                echo "ping test: to ${PING_LIST[${PINGSRV}]}"
+                echo "# ping test: to ${PING_LIST[${PINGSRV}]}"
                 echo "ping -c 3 \"${PING_LIST[${PINGSRV}]}\""
                 ping -c 3 "${PING_LIST[${PINGSRV}]}"
             fi
         fi
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
-        echo "結果を確認したら Ctrl-Dでウインドウを閉じてください"
-        xpanes -c "ping -c 3 {}" ${PINGSRVS2}
-#        echo "xpanes -c \"ping -c 3 {}\" ${PINGSRVS2}"
+        echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
+        xpanes -c "ping {}" ${PINGSRVS2}
+#        echo "xpanes -c \"ping {}\" ${PINGSRVS2}"
     fi
 
     echo ""

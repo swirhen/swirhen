@@ -4,6 +4,7 @@
 # p: ping t: telnet n: ntp
 # f: ftp l: lftp d: dns
 # x: proxy g: log
+# u: proxy test url
 ptnfld ntp.nict.jp 25
 ptnfld time.windows.com 25
 ptnfld 221.113.139.250 25

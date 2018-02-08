@@ -230,23 +230,27 @@ telnet_test () {
     echo "複数に発行する場合は番号を続けて書いてください"
     echo "ex) 0135"
     SRVS=`plzinput`
-    SRVS2=""
-    for SRV in `echo "${SRVS}" | fold -s1`
-    do
-        if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
-            SRVS2+="'${TELNET_LIST[${SRV}]}' "
-            if [ ${MULTIPANEMODE} -eq 0 ]; then
+    if [ ${MULTIPANEMODE} -eq 1 ]; then
+        echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
+        XPANESCMD="xpanes -c \"telnet {}\" "
+        for SRV in `echo "${SRVS}" | fold -s1`
+        do
+            if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
+                XPANESCMD+="\"${TELNET_LIST[${SRV}]}\" "
+            fi
+        done
+        echo "${XPANESCMD}"
+#        ${XPANESCMD}
+    else
+        for SRV in `echo "${SRVS}" | fold -s1`
+        do
+            if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
                 echo ""
                 echo "# telnet test: to ${TELNET_LIST[${SRV}]}"
                 echo "telnet \"${TELNET_LIST[${SRV}]}\""
                 telnet "${TELNET_LIST[${SRV}]}"
             fi
-        fi
-    done
-    if [ ${MULTIPANEMODE} -eq 1 ]; then
-        echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
-        xpanes -c "telnet \\\"{}\\\"" ${SRVS2}
-#        echo "xpanes -c \"telnet \"{}\"\" ${SRVS2}"
+        done
     fi
 
     echo ""

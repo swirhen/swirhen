@@ -201,6 +201,7 @@ ping_test () {
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
+        sleep 1
         xpanes -c "ping {}" ${SRVS2}
     fi
 
@@ -233,13 +234,14 @@ telnet_test () {
     SRVS=`plzinput`
     rm -f ${XPANES_TMP}
     if [ ${MULTIPANEMODE} -eq 1 ]; then
-        echo "結果を確認したら quit, Ctrl-Dでウインドウを閉じてください"
         for SRV in `echo "${SRVS}" | fold -s1`
         do
             if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
                 echo "${TELNET_LIST[${SRV}]}" >> ${XPANES_TMP}
             fi
         done
+        echo "結果を確認したら quit, Ctrl-Dでウインドウを閉じてください"
+        sleep 1
         cat ${XPANES_TMP} | xpanes -c "telnet {}"
     else
         for SRV in `echo "${SRVS}" | fold -s1`
@@ -295,6 +297,7 @@ ntpdate_test () {
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         echo "結果を確認したら Ctrl-Dでウインドウを閉じてください"
+        sleep 1
         xpanes -c "ntpdate -q {}" ${SRVS2}
     fi
 

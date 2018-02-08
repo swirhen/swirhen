@@ -234,7 +234,7 @@ telnet_test () {
     for SRV in `echo "${SRVS}" | fold -s1`
     do
         if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
-            SRVS2+=""${TELNET_LIST[${SRV}]}" "
+            SRVS2+="'${TELNET_LIST[${SRV}]}' "
             if [ ${MULTIPANEMODE} -eq 0 ]; then
                 echo ""
                 echo "# telnet test: to ${TELNET_LIST[${SRV}]}"

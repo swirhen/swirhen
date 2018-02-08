@@ -239,8 +239,8 @@ telnet_test () {
                 XPANESCMD+="\"${TELNET_LIST[${SRV}]}\" "
             fi
         done
-        echo "${XPANESCMD}"
-#        ${XPANESCMD}
+#        echo "${XPANESCMD}"
+        ${XPANESCMD}
     else
         for SRV in `echo "${SRVS}" | fold -s1`
         do

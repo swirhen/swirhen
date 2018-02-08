@@ -186,22 +186,22 @@ ping_test () {
     echo "ex) 0135"
     SRVS=`plzinput`
     SRVS2=""
-    for SRV in `echo "${SRVS}" | fold -s1`
+    for SRVNUM in `echo "${SRVS}" | fold -s1`
     do
-        if [ "${PING_LIST[${SRV}]}" != "" ]; then
-            SRVS2+="\"${PING_LIST[${SRV}]}\" "
+        SRV="${PING_LIST[${SRVNUM}]}"
+        if [ "${SRV}" != "" ]; then
+            SRVS2+="\"${SRV}\" "
             if [ ${MULTIPANEMODE} -eq 0 ]; then
                 echo ""
-                echo "# ping test: to ${PING_LIST[${SRV}]}"
-                echo "ping -c 3 \"${PING_LIST[${SRV}]}\""
-                ping -c 3 "${PING_LIST[${SRV}]}"
+                echo "# ping test: to ${SRV}"
+                echo "ping -c 3 \"${SRV}\""
+                ping -c 3 "${SRV}"
             fi
         fi
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
         xpanes -c "ping {}" ${SRVS2}
-#        echo "xpanes -c \"ping {}\" ${PINGSRVS2}"
     fi
 
     echo ""
@@ -231,9 +231,9 @@ telnet_test () {
     echo "複数に発行する場合は番号を続けて書いてください"
     echo "ex) 0135"
     SRVS=`plzinput`
-    echo "" > ${XPANES_TMP}
+    rm -f ${XPANES_TMP}
     if [ ${MULTIPANEMODE} -eq 1 ]; then
-        echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
+        echo "結果を確認したら quit, Ctrl-Dでウインドウを閉じてください"
         for SRV in `echo "${SRVS}" | fold -s1`
         do
             if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
@@ -265,7 +265,43 @@ ntpdate_test () {
     clear
     echo "*** ${FUNCNAME[0]/_/ } ***"
     echo ""
-    echo "under construction."
+    echo "# ntp server lists:"
+    cnt=0
+    echo "--"
+    for SRV in "${NTP_LIST[@]}"
+    do
+        echo "${cnt}: ${SRV}"
+        (( cnt++ ))
+    done
+    (( cnt-- ))
+    echo "--"
+    echo "ntpdateを発行するサーバーを選択してください(0 - ${cnt})."
+    echo "複数に発行する場合は番号を続けて書いてください"
+    echo "ex) 0135"
+    SRVS=`plzinput`
+    SRVS2=""
+    for SRVNUM in `echo "${SRVS}" | fold -s1`
+    do
+        SRV="${NTP_LIST[${SRVNUM}]}"
+        if [ "${SRV}" != "" ]; then
+            SRVS2+="\"${SRV}\" "
+            if [ ${MULTIPANEMODE} -eq 0 ]; then
+                echo ""
+                echo "# ntp test: to ${SRV}"
+                echo "ntpdate \"${SRV}\""
+                ntpdate "${SRV}"
+            fi
+        fi
+    done
+    if [ ${MULTIPANEMODE} -eq 1 ]; then
+        echo "結果を確認したら Ctrl-Dでウインドウを閉じてください"
+        xpanes -c "ntpdate {}" ${SRVS2}
+    fi
+
+    echo ""
+    echo "テスト終了"
+    echo ""
+
     plzcontinue
 }
 

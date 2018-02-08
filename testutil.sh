@@ -173,9 +173,9 @@ ping_test () {
     echo "# ping server lists:"
     cnt=0
     echo "--"
-    for PINGSRV in "${PING_LIST[@]}"
+    for SRV in "${PING_LIST[@]}"
     do
-        echo "${cnt}: ${PINGSRV}"
+        echo "${cnt}: ${SRV}"
         (( cnt++ ))
     done
     (( cnt-- ))
@@ -183,22 +183,22 @@ ping_test () {
     echo "pingを発行するサーバーを選択してください(0 - ${cnt})."
     echo "複数に発行する場合は番号を続けて書いてください"
     echo "ex) 0135"
-    PINGSRVS=`plzinput`
-    for PINGSRV in `echo "${PINGSRVS}" | fold -s1`
+    SRVS=`plzinput`
+    for SRV in `echo "${SRVS}" | fold -s1`
     do
-        if [ "${PING_LIST[${PINGSRV}]}" != "" ]; then
-            PINGSRVS2+="\"${PING_LIST[${PINGSRV}]}\" "
+        if [ "${PING_LIST[${SRV}]}" != "" ]; then
+            SRVS2+="\"${PING_LIST[${SRV}]}\" "
             if [ ${MULTIPANEMODE} -eq 0 ]; then
                 echo ""
-                echo "# ping test: to ${PING_LIST[${PINGSRV}]}"
-                echo "ping -c 3 \"${PING_LIST[${PINGSRV}]}\""
-                ping -c 3 "${PING_LIST[${PINGSRV}]}"
+                echo "# ping test: to ${PING_LIST[${SRV}]}"
+                echo "ping -c 3 \"${PING_LIST[${SRV}]}\""
+                ping -c 3 "${PING_LIST[${SRV}]}"
             fi
         fi
     done
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
-        xpanes -c "ping {}" ${PINGSRVS2}
+        xpanes -c "ping {}" ${SRVS2}
 #        echo "xpanes -c \"ping {}\" ${PINGSRVS2}"
     fi
 
@@ -215,7 +215,43 @@ telnet_test () {
     clear
     echo "*** ${FUNCNAME[0]/_/ } ***"
     echo ""
-    echo "under construction."
+    echo ""
+    echo "# telnet server lists:"
+    cnt=0
+    echo "--"
+    for TELNETSRV in "${TELNET_LIST[@]}"
+    do
+        echo "${cnt}: ${TELNETSRV}"
+        (( cnt++ ))
+    done
+    (( cnt-- ))
+    echo "--"
+    echo "telnetするサーバーを選択してください(0 - ${cnt})."
+    echo "複数に発行する場合は番号を続けて書いてください"
+    echo "ex) 0135"
+    SRVS=`plzinput`
+    for SRV in `echo "${SRVS}" | fold -s1`
+    do
+        if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
+            SRVS2+="\"${TELNET_LIST[${SRV}]}\" "
+            if [ ${MULTIPANEMODE} -eq 0 ]; then
+                echo ""
+                echo "# telnet test: to ${TELNET_LIST[${SRV}]}"
+                echo "telnet \"${TELNET_LIST[${SRV}]}\""
+                telnet "${TELNET_LIST[${SRV}]}"
+            fi
+        fi
+    done
+    if [ ${MULTIPANEMODE} -eq 1 ]; then
+        echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
+        xpanes -c "telnet {}" ${SRVS2}
+#        echo "xpanes -c \"telnet {}\" ${PINGSRVS2}"
+    fi
+
+    echo ""
+    echo "テスト終了"
+    echo ""
+
     plzcontinue
 }
 

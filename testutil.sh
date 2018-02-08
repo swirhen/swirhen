@@ -15,6 +15,7 @@
 # グローバル変数
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
 LIST_FILE=${SCRIPT_DIR}/serverlist.txt
+XPANES_TMP=${SCRIPT_DIR}/xptmp
 SELECTMENU=0
 MULTIPANEMODE=0
 PING_LIST=()
@@ -230,17 +231,16 @@ telnet_test () {
     echo "複数に発行する場合は番号を続けて書いてください"
     echo "ex) 0135"
     SRVS=`plzinput`
+    echo "" > ${XPANES_TMP}
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
-        XPANESCMD=""
         for SRV in `echo "${SRVS}" | fold -s1`
         do
             if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
-                XPANESCMD+="\"${TELNET_LIST[${SRV}]}\" "
+                echo "${TELNET_LIST[${SRV}]}" >> ${XPANES_TMP}
             fi
         done
-#        echo "${XPANESCMD}"
-        xpanes -c "telnet {}" ${XPANESCMD}
+        cat ${XPANES_TMP} | xpanes -c "telnet {}"
     else
         for SRV in `echo "${SRVS}" | fold -s1`
         do

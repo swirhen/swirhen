@@ -151,7 +151,8 @@ main_menu_i() {
         2 ) test_main "telnet" ${TELNET_LIST};;
         3 ) test_main "ntpdate" ${NTP_LIST} "-q";;
         4 ) test_main "ftp" ${FTP_LIST};;
-        5 ) test_main "lftp" ${LFTP_LIST};;
+#        5 ) test_main "lftp" ${LFTP_LIST};;
+        5 ) uc;;
         6 ) test_main "dig" ${DNS_LIST} ${DIG_URL};;
         7 ) test_main "proxy" ${PROXY_LIST};;
         8 ) test_main "tail" ${LOG_LIST} "-f";;
@@ -160,6 +161,13 @@ main_menu_i() {
         * ) echo "prease input 1-9 or q."
         main_menu_i
     esac
+}
+
+# under construction
+uc() {
+    clear
+    echo "under construction."
+    plzcontinue
 }
 
 # plz continue

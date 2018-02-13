@@ -4,13 +4,36 @@
 # p: ping t: telnet n: ntp
 # f: ftp l: lftp d: dns
 # x: proxy g: log
-# u: proxy test url
-ptnfld ntp.nict.jp 25
-ptnfld time.windows.com 25
-ptnfld 221.113.139.250 25
-ptnfld 202.234.232.6 25
-ptnfld 8.8.8.8 25
-ptnfld 9.9.9.9 25
-x 192.168.0.254 8080
-g /var/log/syslog
-g /var/log/maillog
+# ptnfld ntp.nict.jp 25
+# ptnfld time.windows.com 25
+# ptnfld 221.113.139.250 25
+# ptnfld 202.234.232.6 25
+# ptnfld 8.8.8.8 25
+# ptnfld 9.9.9.9 25
+# x 192.168.0.254 8080
+# g /var/log/syslog
+# g /var/log/maillog
+pfdn 10.18.0.11
+f 10.18.0.11 10021
+t 10.18.0.11 25
+t 10.18.0.13 22025
+t 10.18.0.13 23025
+t 10.18.0.13 24025
+t 10.18.0.11 80
+t 10.18.0.11 110
+t 10.18.0.11 10110
+t 10.18.0.11 10025
+x 10.18.0.11 8000
+x 10.18.0.11 8080
+x 10.18.0.11 8081
+x 10.18.0.11 8082
+x 10.18.0.11 8083
+x 10.18.0.11 8084
+x 10.18.0.11 8088
+x 10.18.0.11 8089
+x 10.18.0.11 18080
+x 10.18.0.11 18081
+x 10.18.0.11 18082
+x 10.18.0.11 18083
+x 10.18.0.11 18084
+x 10.18.0.11 18085

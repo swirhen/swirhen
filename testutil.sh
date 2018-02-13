@@ -185,6 +185,7 @@ end() {
     rm -f ${PROXY_LIST}
     rm -f ${URL_LIST}
     rm -f ${LOG_LIST}
+    rm -f ${XPANES_TMP}
     echo "end."
     exit 0
 }

@@ -236,12 +236,12 @@ test_main() {
     (( cnt-- ))
     echo "--"
     echo "${TEST_CMD} 対象サーバーを選択してください(0 - ${cnt})."
-    echo "複数に発行する場合は番号を続けて書いてください"
-    echo "ex) 0135"
+    echo "複数に発行する場合は番号をスペースで続けて書いてください"
+    echo "ex) 0 1 3 5"
     SRVS=`plzinput`
     rm -f ${XPANES_TMP}
     if [ ${MULTIPANEMODE} -eq 1 ]; then
-        for SRV in `echo "${SRVS}" | fold -s1`
+        for SRV in ${SRVS}
         do
             if [ "${SERVER_LIST[${SRV}]}" != "" ]; then
                 echo "${SERVER_LIST[${SRV}]}" >> ${XPANES_TMP}
@@ -255,7 +255,7 @@ test_main() {
             cat ${XPANES_TMP} | xpanes -c "${TEST_CMD} ${OPTION} {}"
         fi
     else
-        for SRV in `echo "${SRVS}" | fold -s1`
+        for SRV in ${SRVS}
         do
             if [ "${SERVER_LIST[${SRV}]}" != "" ]; then
                 echo ""

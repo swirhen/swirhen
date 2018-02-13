@@ -162,7 +162,6 @@ main_menu_i() {
     esac
 }
 
-
 # plz continue
 plzcontinue() {
     echo "テストを継続しますか？ (enter で継続 / q で終了)"
@@ -177,6 +176,15 @@ plzcontinue() {
 
 # end
 end() {
+    rm -f ${PING_LIST}
+    rm -f ${TELNET_LIST}
+    rm -f ${NTP_LIST}
+    rm -f ${FTP_LIST}
+    rm -f ${LFTP_LIST}
+    rm -f ${DNS_LIST}
+    rm -f ${PROXY_LIST}
+    rm -f ${URL_LIST}
+    rm -f ${LOG_LIST}
     echo "end."
     exit 0
 }

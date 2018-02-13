@@ -91,6 +91,7 @@ readlist () {
     rm -f ${DNS_LIST}
     rm -f ${PROXY_LIST}
     rm -f ${URL_LIST}
+    rm -f ${LOG_LIST}
     while read IDENTIFIER SERVER PORT
     do
         if [ "${IDENTIFIER:0:1}" != "#" ]; then

@@ -153,8 +153,8 @@ main_menu_i() {
         5 ) test_general "lftp" ${LFTP_LIST};;
         6 ) test_general "dig" ${DNS_LIST} ${DIG_URL};;
         7 ) test_general "proxy" ${PROXY_LIST};;
-        8 ) tail_log;;
-        9 ) grep_log;;
+        8 ) test_general "tail" ${LOG_LIST} "-f";;
+        8 ) test_general "grep" ${LOG_LIST};;
         q ) end;;
         * ) echo "prease input 1-9 or q."
         main_menu_i
@@ -194,6 +194,10 @@ test_general() {
 
     clear
     echo "*** ${TEST_CMD} test ***"
+    if [ "${TEST_CMD}" = "grep" ]; then
+        echo "grep する語句を設定してください"
+        OPTION=`plzinput`
+    fi
     echo ""
     echo "# ${TEST_CMD} server lists:"
     echo "--"
@@ -234,7 +238,7 @@ test_general() {
                 echo "# ${TEST_CMD} test: to ${SERVER_LIST[${SRV}]}"
                 if [ "${TEST_CMD}" = "proxy" ]; then
                     echo "curl -LI -x ${SERVER_LIST[${SRV}]} http://www.google.com/ -o /dev/null -w '%{http_code}\\n' -s"
-#                    curl -LI -x ${SERVER_LIST[${SRV}]} http://www.google.com/ -o /dev/null -w '%{http_code}\n' -s
+                    curl -LI -x ${SERVER_LIST[${SRV}]} http://www.google.com/ -o /dev/null -w '%{http_code}\n' -s
                 else
                     echo "${TEST_CMD} ${OPTION} \"${SERVER_LIST[${SRV}]}\""
                     ${TEST_CMD} ${OPTION} "${SERVER_LIST[${SRV}]}"
@@ -247,60 +251,6 @@ test_general() {
     echo "テスト終了"
     echo ""
 
-    plzcontinue
-}
-
-# dns test
-dns_test () {
-    clear
-    echo "*** ${FUNCNAME[0]/_/ } ***"
-    echo ""
-    echo "under construction."
-    plzcontinue
-}
-
-# proxy test
-proxy_test () {
-    clear
-    echo "*** ${FUNCNAME[0]/_/ } ***"
-    echo ""
-    echo "under construction."
-    plzcontinue
-}
-
-# tail log
-tail_log () {
-    clear
-    echo "*** ${FUNCNAME[0]/_/ } ***"
-    echo ""
-    echo "under construction."
-    plzcontinue
-}
-
-# grep log
-grep_log () {
-    clear
-    echo "*** ${FUNCNAME[0]/_/ } ***"
-    echo ""
-    echo "under construction."
-    plzcontinue
-}
-
-# ftp test
-ftp_test() {
-    clear
-    echo "*** ${FUNCNAME[0]/_/ } ***"
-    echo ""
-    echo "under construction."
-    plzcontinue
-}
-
-# lftp test
-lftp_test() {
-    clear
-    echo "*** ${FUNCNAME[0]/_/ } ***"
-    echo ""
-    echo "under construction."
     plzcontinue
 }
 

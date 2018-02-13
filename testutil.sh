@@ -147,15 +147,15 @@ main_menu(){
 main_menu_i() {
     SELECTMENU=`plzinput`
     case "${SELECTMENU}" in
-        1 ) test_general "ping" ${PING_LIST};;
-        2 ) test_general "telnet" ${TELNET_LIST};;
-        3 ) test_general "ntpdate" ${NTP_LIST} "-q";;
-        4 ) test_general "ftp" ${FTP_LIST};;
-        5 ) test_general "lftp" ${LFTP_LIST};;
-        6 ) test_general "dig" ${DNS_LIST} ${DIG_URL};;
-        7 ) test_general "proxy" ${PROXY_LIST};;
-        8 ) test_general "tail" ${LOG_LIST} "-f";;
-        9 ) test_general "grep" ${LOG_LIST};;
+        1 ) test_main "ping" ${PING_LIST};;
+        2 ) test_main "telnet" ${TELNET_LIST};;
+        3 ) test_main "ntpdate" ${NTP_LIST} "-q";;
+        4 ) test_main "ftp" ${FTP_LIST};;
+        5 ) test_main "lftp" ${LFTP_LIST};;
+        6 ) test_main "dig" ${DNS_LIST} ${DIG_URL};;
+        7 ) test_main "proxy" ${PROXY_LIST};;
+        8 ) test_main "tail" ${LOG_LIST} "-f";;
+        9 ) test_main "grep" ${LOG_LIST};;
         q ) end;;
         * ) echo "prease input 1-9 or q."
         main_menu_i
@@ -181,8 +181,8 @@ end() {
     exit 0
 }
 
-# test汎用
-test_general() {
+# test main logic
+test_main() {
     TEST_CMD=$1
     SERVER_LIST_FILE=$2
     OPTION=$3
@@ -198,7 +198,14 @@ test_general() {
     if [ "${TEST_CMD}" = "grep" ]; then
         echo "grep する語句を設定してください"
         OPTION=`plzinput`
+        if [ "${OPTION}" != "" ]; then
+            "grep wordを設定しました: ${OPTION}"
+        else
+            "grep word に空白は設定できません"
+            test_main ${TEST_CMD} ${SERVER_LIST_FILE}
+        fi
     fi
+
     echo ""
     echo "# ${TEST_CMD} server lists:"
     echo "--"
@@ -226,7 +233,6 @@ test_general() {
         echo "結果を確認したら Ctrl-Dでウインドウを閉じてください"
         sleep 1
         if [ "${TEST_CMD}" = "proxy" ]; then
-
             cat ${XPANES_TMP} | xpanes -c "echo \"proxy test to {}\"; curl -LI -x {} http://www.google.com/ -o /dev/null -w '%{http_code}\n' -s"
         else
             cat ${XPANES_TMP} | xpanes -c "${TEST_CMD} ${OPTION} {}"

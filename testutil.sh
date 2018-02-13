@@ -18,14 +18,16 @@ LIST_FILE=${SCRIPT_DIR}/serverlist.txt
 XPANES_TMP=${SCRIPT_DIR}/xptmp
 SELECTMENU=0
 MULTIPANEMODE=0
-PING_LIST=()
-TELNET_LIST=()
-NTP_LIST=()
-FTP_LIST=()
-LFTP_LIST=()
-DNS_LIST=()
-PROXY_LIST=()
-LOG_LIST=()
+PING_LIST=${SCRIPT_DIR}/ping_list
+TELNET_LIST=${SCRIPT_DIR}/telnet_list
+NTP_LIST=${SCRIPT_DIR}/ntp_list
+FTP_LIST=${SCRIPT_DIR}/ftp_list
+LFTP_LIST=${SCRIPT_DIR}/lftp_list
+DNS_LIST=${SCRIPT_DIR}/dns_list
+PROXY_LIST=${SCRIPT_DIR}/proxy_list
+LOG_LIST=${SCRIPT_DIR}/log_list
+URL_LIST=${SCRIPT_DIR}/url_list
+DIG_URL="mec-proxy.gslb.in.mec.co.jp"
 
 # yes/no
 yesno() {
@@ -60,23 +62,6 @@ plzinput() {
     echo "${INPUT}"
 }
 
-# main menu
-main_menu(){
-    echo "*** main menu ***"
-    echo "1: ping"
-    echo "2: telnet"
-    echo "3: ntpdate"
-    echo "4: ftp"
-    echo "5: lftp"
-    echo "6: dns test"
-    echo "7: proxy test"
-    echo "8: tail log"
-    echo "9: grep log"
-    echo "q: quit"
-    echo "please select operation."
-    main_menu_i
-}
-
 # tmux / xpanes install check
 tmuxcheck() {
     if [ "`tmux -V 2>/dev/null`" != "" -a "`xpanes -V 2>/dev/null`" != "" ]; then
@@ -98,48 +83,76 @@ tmuxcheck() {
 
 # read list file
 readlist () {
+    rm -f ${PING_LIST}
+    rm -f ${TELNET_LIST}
+    rm -f ${NTP_LIST}
+    rm -f ${FTP_LIST}
+    rm -f ${LFTP_LIST}
+    rm -f ${DNS_LIST}
+    rm -f ${PROXY_LIST}
+    rm -f ${URL_LIST}
     while read IDENTIFIER SERVER PORT
     do
         if [ "${IDENTIFIER:0:1}" != "#" ]; then
             if [[ ${IDENTIFIER} =~ p ]]; then
-                PING_LIST+=( "${SERVER}" )
+                echo "${SERVER}" >> ${PING_LIST}
             fi
             if [[ ${IDENTIFIER} =~ t ]]; then
-                TELNET_LIST+=( "${SERVER} ${PORT}" )
+                echo "${SERVER} ${PORT}" >> ${TELNET_LIST}
             fi
             if [[ ${IDENTIFIER} =~ n ]]; then
-                NTP_LIST+=( "${SERVER}" )
+                echo "${SERVER}" >> ${NTP_LIST}
             fi
             if [[ ${IDENTIFIER} =~ f ]]; then
-                FTP_LIST+=( "${SERVER} ${PORT}" )
+                echo "${SERVER} ${PORT}" >> ${FTP_LIST}
             fi
             if [[ ${IDENTIFIER} =~ l ]]; then
-                LFTP_LIST+=( "${SERVER} ${PORT}" )
+                echo "${SERVER} ${PORT}" >> ${LFTP_LIST}
             fi
             if [[ ${IDENTIFIER} =~ d ]]; then
-                DNS_LIST+=( "${SERVER}" )
+                echo "@${SERVER}" >> ${DNS_LIST}
             fi
             if [[ ${IDENTIFIER} =~ x ]]; then
-                PROXY_LIST+=( "${SERVER}:${PORT}" )
+                echo "${SERVER}:${PORT}" >> ${PROXY_LIST}
             fi
             if [[ ${IDENTIFIER} =~ g ]]; then
-                LOG_LIST+=( "${SERVER}" )
+                echo "${SERVER}" >> ${LOG_LIST}
+            fi
+            if [[ ${IDENTIFIER} =~ u ]]; then
+                echo "${SERVER}" >> ${URL_LIST}
             fi
         fi
     done < ${LIST_FILE}
+}
+
+# main menu
+main_menu(){
+    echo "*** main menu ***"
+    echo "1: ping"
+    echo "2: telnet"
+    echo "3: ntpdate"
+    echo "4: ftp"
+    echo "5: lftp"
+    echo "6: dns(dig)"
+    echo "7: proxy"
+    echo "8: tail log"
+    echo "9: grep log"
+    echo "q: quit"
+    echo "please select operation."
+    main_menu_i
 }
 
 # menu input
 main_menu_i() {
     SELECTMENU=`plzinput`
     case "${SELECTMENU}" in
-        1 ) ping_test;;
-        2 ) telnet_test;;
-        3 ) ntpdate_test;;
-        4 ) ftp_test;;
-        5 ) lftp_test;;
-        6 ) dns_test;;
-        7 ) proxy_test;;
+        1 ) test_general "ping" ${PING_LIST};;
+        2 ) test_general "telnet" ${TELNET_LIST};;
+        3 ) test_general "ntpdate" ${NTP_LIST} "-q";;
+        4 ) test_general "ftp" ${FTP_LIST};;
+        5 ) test_general "lftp" ${LFTP_LIST};;
+        6 ) test_general "dig" ${DNS_LIST} ${DIG_URL};;
+        7 ) test_general "proxy" ${PROXY_LIST};;
         8 ) tail_log;;
         9 ) grep_log;;
         q ) end;;
@@ -147,6 +160,7 @@ main_menu_i() {
         main_menu_i
     esac
 }
+
 
 # plz continue
 plzcontinue() {
@@ -166,69 +180,33 @@ end() {
     exit 0
 }
 
-# ping test
-ping_test () {
+# test汎用
+test_general() {
+    TEST_CMD=$1
+    SERVER_LIST_FILE=$2
+    OPTION=$3
+
+    SERVER_LIST=()
+    while read SERVER
+    do
+        SERVER_LIST+=( "${SERVER}" )
+    done < ${SERVER_LIST_FILE}
+
     clear
-    echo "*** ${FUNCNAME[0]/_/ } ***"
+    echo "*** ${TEST_CMD} test ***"
     echo ""
-    echo "# ping server lists:"
-    cnt=0
+    echo "# ${TEST_CMD} server lists:"
     echo "--"
-    for SRV in "${PING_LIST[@]}"
+
+    cnt=0
+    for SRV in "${SERVER_LIST[@]}"
     do
         echo "${cnt}: ${SRV}"
         (( cnt++ ))
     done
     (( cnt-- ))
     echo "--"
-    echo "pingを発行するサーバーを選択してください(0 - ${cnt})."
-    echo "複数に発行する場合は番号を続けて書いてください"
-    echo "ex) 0135"
-    SRVS=`plzinput`
-    SRVS2=""
-    for SRVNUM in `echo "${SRVS}" | fold -s1`
-    do
-        SRV="${PING_LIST[${SRVNUM}]}"
-        if [ "${SRV}" != "" ]; then
-            SRVS2+="\"${SRV}\" "
-            if [ ${MULTIPANEMODE} -eq 0 ]; then
-                echo ""
-                echo "# ping test: to ${SRV}"
-                echo "ping -c 3 \"${SRV}\""
-                ping -c 3 "${SRV}"
-            fi
-        fi
-    done
-    if [ ${MULTIPANEMODE} -eq 1 ]; then
-        echo "結果を確認したら Ctrl-C, Ctrl-Dでウインドウを閉じてください"
-        sleep 1
-        xpanes -c "ping {}" ${SRVS2}
-    fi
-
-    echo ""
-    echo "テスト終了"
-    echo ""
-
-    plzcontinue
-}
-
-
-# telnet test
-telnet_test () {
-    clear
-    echo "*** ${FUNCNAME[0]/_/ } ***"
-    echo ""
-    echo "# telnet server lists:"
-    cnt=0
-    echo "--"
-    for TELNETSRV in "${TELNET_LIST[@]}"
-    do
-        echo "${cnt}: ${TELNETSRV}"
-        (( cnt++ ))
-    done
-    (( cnt-- ))
-    echo "--"
-    echo "telnetするサーバーを選択してください(0 - ${cnt})."
+    echo "${TEST_CMD} 対象サーバーを選択してください(0 - ${cnt})."
     echo "複数に発行する場合は番号を続けて書いてください"
     echo "ex) 0135"
     SRVS=`plzinput`
@@ -236,69 +214,33 @@ telnet_test () {
     if [ ${MULTIPANEMODE} -eq 1 ]; then
         for SRV in `echo "${SRVS}" | fold -s1`
         do
-            if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
-                echo "${TELNET_LIST[${SRV}]}" >> ${XPANES_TMP}
+            if [ "${SERVER_LIST[${SRV}]}" != "" ]; then
+                echo "${SERVER_LIST[${SRV}]}" >> ${XPANES_TMP}
             fi
         done
-        echo "結果を確認したら quit, Ctrl-Dでウインドウを閉じてください"
+        echo "結果を確認したら Ctrl-Dでウインドウを閉じてください"
         sleep 1
-        cat ${XPANES_TMP} | xpanes -c "telnet {}"
+        if [ "${TEST_CMD}" = "proxy" ]; then
+
+            cat ${XPANES_TMP} | xpanes -c "echo \"proxy test to {}\"; curl -LI -x {} http://www.google.com/ -o /dev/null -w '%{http_code}\n' -s"
+        else
+            cat ${XPANES_TMP} | xpanes -c "${TEST_CMD} ${OPTION} {}"
+        fi
     else
         for SRV in `echo "${SRVS}" | fold -s1`
         do
-            if [ "${TELNET_LIST[${SRV}]}" != "" ]; then
+            if [ "${SERVER_LIST[${SRV}]}" != "" ]; then
                 echo ""
-                echo "# telnet test: to ${TELNET_LIST[${SRV}]}"
-                echo "telnet \"${TELNET_LIST[${SRV}]}\""
-                telnet "${TELNET_LIST[${SRV}]}"
+                echo "# ${TEST_CMD} test: to ${SERVER_LIST[${SRV}]}"
+                if [ "${TEST_CMD}" = "proxy" ]; then
+                    echo "curl -LI -x ${SERVER_LIST[${SRV}]} http://www.google.com/ -o /dev/null -w '%{http_code}\\n' -s"
+#                    curl -LI -x ${SERVER_LIST[${SRV}]} http://www.google.com/ -o /dev/null -w '%{http_code}\n' -s
+                else
+                    echo "${TEST_CMD} ${OPTION} \"${SERVER_LIST[${SRV}]}\""
+                    ${TEST_CMD} ${OPTION} "${SERVER_LIST[${SRV}]}"
+                fi
             fi
         done
-    fi
-
-    echo ""
-    echo "テスト終了"
-    echo ""
-
-    plzcontinue
-}
-
-# ntpdate test
-ntpdate_test () {
-    clear
-    echo "*** ${FUNCNAME[0]/_/ } ***"
-    echo ""
-    echo "# ntp server lists:"
-    cnt=0
-    echo "--"
-    for SRV in "${NTP_LIST[@]}"
-    do
-        echo "${cnt}: ${SRV}"
-        (( cnt++ ))
-    done
-    (( cnt-- ))
-    echo "--"
-    echo "ntpdateを発行するサーバーを選択してください(0 - ${cnt})."
-    echo "複数に発行する場合は番号を続けて書いてください"
-    echo "ex) 0135"
-    SRVS=`plzinput`
-    SRVS2=""
-    for SRVNUM in `echo "${SRVS}" | fold -s1`
-    do
-        SRV="${NTP_LIST[${SRVNUM}]}"
-        if [ "${SRV}" != "" ]; then
-            SRVS2+="\"${SRV}\" "
-            if [ ${MULTIPANEMODE} -eq 0 ]; then
-                echo ""
-                echo "# ntp test: to ${SRV}"
-                echo "ntpdate -q \"${SRV}\""
-                ntpdate -q "${SRV}"
-            fi
-        fi
-    done
-    if [ ${MULTIPANEMODE} -eq 1 ]; then
-        echo "結果を確認したら Ctrl-Dでウインドウを閉じてください"
-        sleep 1
-        xpanes -c "ntpdate -q {}" ${SRVS2}
     fi
 
     echo ""

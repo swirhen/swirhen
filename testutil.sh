@@ -199,9 +199,9 @@ test_main() {
         echo "grep する語句を設定してください"
         OPTION=`plzinput`
         if [ "${OPTION}" != "" ]; then
-            "grep wordを設定しました: ${OPTION}"
+            echo "grep wordを設定しました: ${OPTION}"
         else
-            "grep word に空白は設定できません"
+            echo "grep word に空白は設定できません"
             test_main ${TEST_CMD} ${SERVER_LIST_FILE}
         fi
     fi

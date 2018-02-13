@@ -155,7 +155,7 @@ main_menu_i() {
         6 ) test_general "dig" ${DNS_LIST} ${DIG_URL};;
         7 ) test_general "proxy" ${PROXY_LIST};;
         8 ) test_general "tail" ${LOG_LIST} "-f";;
-        8 ) test_general "grep" ${LOG_LIST};;
+        9 ) test_general "grep" ${LOG_LIST};;
         q ) end;;
         * ) echo "prease input 1-9 or q."
         main_menu_i

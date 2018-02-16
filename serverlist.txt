@@ -1,6 +1,6 @@
-# testutilç”¨è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«
-# è¨­å®šè­˜åˆ¥å­ ã‚µãƒ¼ãƒå/IP (ãƒãƒ¼ãƒˆ)
-# è¨­å®šè­˜åˆ¥å­ã®èª¬æ˜
+# testutil—pİ’èƒtƒ@ƒCƒ‹
+# İ’è¯•Êq ƒT[ƒo–¼/IP (ƒ|[ƒg)
+# İ’è¯•Êq‚Ìà–¾
 # p: ping t: telnet n: ntp
 # f: ftp l: lftp d: dns
 # x: proxy g: log

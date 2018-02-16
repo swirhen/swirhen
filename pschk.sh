@@ -1,9 +1,9 @@
 #!/bin/sh
-WAKE=$1    # å†èµ·å‹•ã™ã‚‹ã‚·ã‚§ãƒ«ã®ä½ç½® ex)/home/swirhen/sh/tiarraup.sh
-NAME=$2    # ãƒã‚§ãƒƒã‚¯ã™ã‚‹ãƒ—ãƒ­ã‚»ã‚¹ã®åå‰ ex)tiarra
-if [ $# -eq 2 ]; then  # å¼•æ•°ãŒ2å€‹ãªã‹ã£ãŸã‚‰çµ‚äº†
+WAKE=$1    # Ä‹N“®‚·‚éƒVƒFƒ‹‚ÌˆÊ’u ex)/home/swirhen/sh/tiarraup.sh
+NAME=$2    # ƒ`ƒFƒbƒN‚·‚éƒvƒƒZƒX‚Ì–¼‘O ex)tiarra
+if [ $# -eq 2 ]; then  # ˆø”‚ª2ŒÂ‚È‚©‚Á‚½‚çI—¹
   CHK=`ps -eo comm,cmd | grep $NAME | grep -v grep | grep -v $0` #;echo $CHK
-  # ä¸ŠãŒã£ã¦ãªã‘ã‚Œã°ä¸Šã’ç›´ã™
+  # ã‚ª‚Á‚Ä‚È‚¯‚ê‚Îã‚°’¼‚·
   if [ "${CHK:-null}" = null ] ; then
     $WAKE
   fi

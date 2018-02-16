@@ -3,7 +3,7 @@ WAKE=/home/swirhen/sh/tigkw.sh
 BORDER=15
 PID=`cat /home/swirhen/tig.pid`
 MEM=`ps u $PID | grep $PID | awk '{print $4}' | cut -d"." -f1` #;echo $MEM
-# MEMŽg—p—¦‚ª‚µ‚«‚¢’l‚ð‰z‚¦‚Ä‚¢‚½ê‡Aã‚°’¼‚·
+# MEMä½¿ç”¨çŽ‡ãŒã—ãã„å€¤ã‚’è¶Šãˆã¦ã„ãŸå ´åˆã€ä¸Šã’ç›´ã™
 if [ `expr $MEM` -gt $BORDER ] ; then
   $WAKE;exit
 fi

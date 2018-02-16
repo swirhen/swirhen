@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-# Šeí‘a’ÊƒeƒXƒgƒ†[ƒeƒBƒŠƒeƒB
-# ‹@”\—\’è
+# å„ç¨®ç–é€šãƒ†ã‚¹ãƒˆãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£
+# æ©Ÿèƒ½äºˆå®š
 # ping
 # telnet
 # ntpdate
 # dns(digg)
 # proxy
-# ƒƒO‚Ìƒe[ƒ‹
-# ƒƒO‚Ìgrep
-# ‘ÎÛƒT[ƒo[‚âƒ|[ƒg‚Í•Êƒtƒ@ƒCƒ‹‚ÅƒŠƒXƒg‰»‚µ‚Ä”š[Enter]‚Å‘I‘ğo—ˆ‚é‚æ‚¤‚É‚·‚é
-# Šeí‘½’issh‚©‚ç“¯—l‚ÌƒeƒXƒg‚ª‚Å‚«‚é(‘½’issh‚Ìî•ñ‚ğ•Ê‚É‚Â‚©‚ÍŒŸ“¢)
-# option: tmux & tmux-xpanes‚ª“ü‚Á‚Ä‚¢‚ê‚Îƒ}ƒ‹ƒ`ƒyƒCƒ“‰»‚Å“¯•\¦
+# ãƒ­ã‚°ã®ãƒ†ãƒ¼ãƒ«
+# ãƒ­ã‚°ã®grep
+# å¯¾è±¡ã‚µãƒ¼ãƒãƒ¼ã‚„ãƒãƒ¼ãƒˆã¯åˆ¥ãƒ•ã‚¡ã‚¤ãƒ«ã§ãƒªã‚¹ãƒˆåŒ–ã—ã¦æ•°å­—[Enter]ã§é¸æŠå‡ºæ¥ã‚‹ã‚ˆã†ã«ã™ã‚‹
+# å„ç¨®å¤šæ®µsshã‹ã‚‰åŒæ§˜ã®ãƒ†ã‚¹ãƒˆãŒã§ãã‚‹(å¤šæ®µsshã®æƒ…å ±ã‚’åˆ¥ã«æŒã¤ã‹ã¯æ¤œè¨)
+# option: tmux & tmux-xpanesãŒå…¥ã£ã¦ã„ã‚Œã°ãƒãƒ«ãƒãƒšã‚¤ãƒ³åŒ–ã§åŒæ™‚è¡¨ç¤º
 
-# ƒOƒ[ƒoƒ‹•Ï”
+# ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
 LIST_FILE=${SCRIPT_DIR}/serverlist.txt
 XPANES_TMP=${SCRIPT_DIR}/xptmp
@@ -70,7 +70,7 @@ tmuxcheck() {
         yesno
         if [ $? -eq 1 ]; then
             if [ "`tmux ls 2>/dev/null`" = "" ]; then
-                echo "tmux ‚Ì‹N“®’†ƒZƒbƒVƒ‡ƒ“‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñBƒ}ƒ‹ƒ`ƒyƒCƒ“ƒ‚[ƒh‚ğ—LŒø‚É‚·‚é‚É‚ÍAtmux‚ÌƒZƒbƒVƒ‡ƒ“ã‚©‚ç‚±‚ÌƒVƒFƒ‹‚ğ‹N“®‚µ‚Ä‚­‚¾‚³‚¢"
+                echo "tmux ã®èµ·å‹•ä¸­ã‚»ãƒƒã‚·ãƒ§ãƒ³ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚ãƒãƒ«ãƒãƒšã‚¤ãƒ³ãƒ¢ãƒ¼ãƒ‰ã‚’æœ‰åŠ¹ã«ã™ã‚‹ã«ã¯ã€tmuxã®ã‚»ãƒƒã‚·ãƒ§ãƒ³ä¸Šã‹ã‚‰ã“ã®ã‚·ã‚§ãƒ«ã‚’èµ·å‹•ã—ã¦ãã ã•ã„"
                 end
             else
                 MULTIPANEMODE=1
@@ -172,7 +172,7 @@ uc() {
 
 # plz continue
 plzcontinue() {
-    echo "ƒeƒXƒg‚ğŒp‘±‚µ‚Ü‚·‚©H (enter ‚ÅŒp‘± / q ‚ÅI—¹)"
+    echo "ãƒ†ã‚¹ãƒˆã‚’ç¶™ç¶šã—ã¾ã™ã‹ï¼Ÿ (enter ã§ç¶™ç¶š / q ã§çµ‚äº†)"
     yesno2
     if [ "$?" -eq 1 ]; then
         clear
@@ -213,12 +213,12 @@ test_main() {
     clear
     echo "*** ${TEST_CMD} test ***"
     if [ "${TEST_CMD}" = "grep" ]; then
-        echo "grep ‚·‚éŒê‹å‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢"
+        echo "grep ã™ã‚‹èªå¥ã‚’è¨­å®šã—ã¦ãã ã•ã„"
         OPTION=`plzinput`
         if [ "${OPTION}" != "" ]; then
-            echo "grep word‚ğİ’è‚µ‚Ü‚µ‚½: ${OPTION}"
+            echo "grep wordã‚’è¨­å®šã—ã¾ã—ãŸ: ${OPTION}"
         else
-            echo "grep word ‚É‹ó”’‚Íİ’è‚Å‚«‚Ü‚¹‚ñ"
+            echo "grep word ã«ç©ºç™½ã¯è¨­å®šã§ãã¾ã›ã‚“"
             test_main ${TEST_CMD} ${SERVER_LIST_FILE}
         fi
     fi
@@ -235,8 +235,8 @@ test_main() {
     done
     (( cnt-- ))
     echo "--"
-    echo "${TEST_CMD} ‘ÎÛƒT[ƒo[‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢(0 - ${cnt})."
-    echo "•¡”‚É”­s‚·‚éê‡‚Í”Ô†‚ğƒXƒy[ƒX‚Å‘±‚¯‚Ä‘‚¢‚Ä‚­‚¾‚³‚¢"
+    echo "${TEST_CMD} å¯¾è±¡ã‚µãƒ¼ãƒãƒ¼ã‚’é¸æŠã—ã¦ãã ã•ã„(0 - ${cnt})."
+    echo "è¤‡æ•°ã«ç™ºè¡Œã™ã‚‹å ´åˆã¯ç•ªå·ã‚’ã‚¹ãƒšãƒ¼ã‚¹ã§ç¶šã‘ã¦æ›¸ã„ã¦ãã ã•ã„"
     echo "ex) 0 1 3 5"
     SRVS=`plzinput`
     rm -f ${XPANES_TMP}
@@ -247,7 +247,7 @@ test_main() {
                 echo "${SERVER_LIST[${SRV}]}" >> ${XPANES_TMP}
             fi
         done
-        echo "Œ‹‰Ê‚ğŠm”F‚µ‚½‚ç Ctrl-D‚ÅƒEƒCƒ“ƒhƒE‚ğ•Â‚¶‚Ä‚­‚¾‚³‚¢"
+        echo "çµæœã‚’ç¢ºèªã—ãŸã‚‰ Ctrl-Dã§ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦ã‚’é–‰ã˜ã¦ãã ã•ã„"
         sleep 1
         if [ "${TEST_CMD}" = "proxy" ]; then
             cat ${XPANES_TMP} | xpanes -c "echo \"proxy test to {}\"; curl -LI -x {} http://www.google.com/ -o /dev/null -w '%{http_code}\n' -s"
@@ -272,7 +272,7 @@ test_main() {
     fi
 
     echo ""
-    echo "ƒeƒXƒgI—¹"
+    echo "ãƒ†ã‚¹ãƒˆçµ‚äº†"
     echo ""
 
     plzcontinue
@@ -280,14 +280,14 @@ test_main() {
 
 # main section
 clear
-echo "ƒeƒXƒgƒ†[ƒeƒBƒŠƒeƒB:"
-echo "‚ ‚é’ö“x‚Ìƒ^[ƒ~ƒiƒ‹‰ğ‘œ“x‚Åg—p‚µ‚Ä‚­‚¾‚³‚¢"
+echo "ãƒ†ã‚¹ãƒˆãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£:"
+echo "ã‚ã‚‹ç¨‹åº¦ã®ã‚¿ãƒ¼ãƒŸãƒŠãƒ«è§£åƒåº¦ã§ä½¿ç”¨ã—ã¦ãã ã•ã„"
 echo ""
 
-# ƒŠƒXƒgƒtƒ@ƒCƒ‹“Ç‚İ‚İ
+# ãƒªã‚¹ãƒˆãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿
 readlist
 
-# tmux xpanes‘¶İƒ`ƒFƒbƒN
+# tmux xpaneså­˜åœ¨ãƒã‚§ãƒƒã‚¯
 tmuxcheck
 
 # main menu

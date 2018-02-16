@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# JPCERT‚ÌRSS‚ðŽæ“¾‚µ‚Ä•¶Žš—ñ‰»
+# JPCERTã®RSSã‚’å–å¾—ã—ã¦æ–‡å­—åˆ—åŒ–
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
 RSS_RDF=${SCRIPT_DIR}/jpcert.rdf
 RSS_OLD=${SCRIPT_DIR}/jpcert.old
@@ -43,7 +43,7 @@ do
     if [ "${title}" = "" ]; then
         break
     fi
-    if [[ ${title} =~ ’ˆÓŠ«‹N ]]; then
+    if [[ ${title} =~ æ³¨æ„å–šèµ· ]]; then
         if [ ${date_s} -gt ${LAST_FEED_DATE_S} ]; then
             echo "${date}" >> ${RESULT_TEMP}
             echo "title: ${title}" >> ${RESULT_TEMP}
@@ -56,10 +56,10 @@ done
 if [ `cat ${RESULT_TEMP} | wc -l` -ne 1 ]; then
     sed '1d' ${RESULT_FILE} >> ${RESULT_TEMP}
     mv ${RESULT_TEMP} ${RESULT_FILE}
-    echo "XV‚ ‚è"
+    echo "æ›´æ–°ã‚ã‚Š"
     cat ${RESULT_FILE}
 else
-    echo "XV–³‚µ"
+    echo "æ›´æ–°ç„¡ã—"
 fi
 
 end

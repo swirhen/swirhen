@@ -11,7 +11,7 @@ slack = Slacker(slackbot_settings.API_TOKEN)
 @respond_to('^ *でかした.*')
 @respond_to('^ *よくやった.*')
 def doya(message):
-    message.send('(｀･ω･´)ﾄﾞﾔｧ...')
+    message.send('(｀・ω・´)ドヤァ...')
 
 
 @respond_to('^ *sdl')
@@ -22,9 +22,9 @@ def seed_download(message):
     call_cmd(cmd)
     if os.path.exists(resultfile):
         result = open(resultfile).read()
-        message.reply('おわた(｀･ω･´)\n```' + 'download seeds:\n' + result + '```')
+        message.reply('おわた(｀・ω・´)\n```' + 'download seeds:\n' + result + '```')
     else:
-        message.send('おわた(´･ω･`)')
+        message.send('おわた(´・ω・`)')
 
 
 @respond_to('^ *tdl')
@@ -35,7 +35,7 @@ def torrent_download(message):
     filetitle = 'torrent_download_' + launch_dt
     cmd = './tdl.sh &> {0}'.format(logfile)
     call_cmd(cmd)
-    message.reply('おわた(｀･ω･´)')
+    message.reply('おわた(｀・ω・´)')
     time.sleep(1)
     file_upload(logfile, filetitle, 'text', message)
     time.sleep(1)
@@ -50,7 +50,7 @@ def movie_rename(message):
     filetitle = 'movie_rename_' + launch_dt
     cmd = './mre.sh &> {0}'.format(logfile)
     call_cmd(cmd)
-    message.reply('おわた(｀･ω･´)')
+    message.reply('おわた(｀・ω・´)')
     time.sleep(1)
     file_upload(logfile, filetitle, 'text', message)
     time.sleep(1)
@@ -65,7 +65,7 @@ def movie_rename2(message):
     filetitle = 'movie_rename_' + launch_dt
     cmd = './rmm.sh &> {0}'.format(logfile)
     call_cmd(cmd)
-    message.reply('おわた(｀･ω･´)')
+    message.reply('おわた(｀・ω・´)')
     time.sleep(1)
     file_upload(logfile, filetitle, 'text', message)
     time.sleep(1)
@@ -78,7 +78,7 @@ def auto_encode(message):
     launch_dt = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
     cmd = '/data/share/movie/sh/169f.sh'
     call_cmd(cmd)
-    message.reply('おわた(｀･ω･´) (' + launch_dt + ' かいしの おーとえんこーど)')
+    message.reply('おわた(｀・ω・´) (' + launch_dt + ' かいしの おーとえんこーど)')
 
 
 @respond_to('^ *tss (.*)')
@@ -91,10 +91,10 @@ def torrent_search(message, argment):
     call_cmd(cmd)
     result = open(logfile).read()
     if result == 'no result.':
-        message.send('なかったよ(´･ω･`)')
+        message.send('なかったよ(´・ω・`)')
         os.remove(logfile)
     else:
-        message.reply('あったよ(｀･ω･´)')
+        message.reply('あったよ(｀・ω・´)')
         time.sleep(1)
         file_upload(logfile, filetitle, 'text', message)
         time.sleep(1)
@@ -111,10 +111,10 @@ def torrent_search(message, argment):
     call_cmd(cmd)
     result = open(logfile).read()
     if result == '':
-        message.send('なかったよ(´･ω･`)')
+        message.send('なかったよ(´・ω・`)')
         os.remove(logfile)
     else:
-        message.reply('あったよ(｀･ω･´)')
+        message.reply('あったよ(｀・ω・´)')
         time.sleep(1)
         file_upload(logfile, filetitle, 'text', message)
         time.sleep(1)

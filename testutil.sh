@@ -28,6 +28,7 @@ PROXY_LIST=${SCRIPT_DIR}/proxy_list
 LOG_LIST=${SCRIPT_DIR}/log_list
 URL_LIST=${SCRIPT_DIR}/url_list
 DIG_URL="mec-proxy.gslb.in.mec.co.jp"
+LFTP_USR="anonymous@ftp.redhat.com"
 
 # yes/no
 yesno() {
@@ -151,8 +152,8 @@ main_menu_i() {
         2 ) test_main "telnet" ${TELNET_LIST};;
         3 ) test_main "ntpdate" ${NTP_LIST} "-q";;
         4 ) test_main "ftp" ${FTP_LIST};;
-#        5 ) test_main "lftp" ${LFTP_LIST};;
-        5 ) uc;;
+        5 ) test_main "lftp" ${LFTP_LIST} "-u ${LFTP_USR}";;
+#        5 ) uc;;
         6 ) test_main "dig" ${DNS_LIST} ${DIG_URL};;
         7 ) test_main "proxy" ${PROXY_LIST};;
         8 ) test_main "tail" ${LOG_LIST} "-f";;

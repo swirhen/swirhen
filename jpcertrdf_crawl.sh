@@ -4,6 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
 RSS_RDF=${SCRIPT_DIR}/jpcert.rdf
 RSS_OLD=${SCRIPT_DIR}/jpcert.old
 RESULT_FILE=${SCRIPT_DIR}/jpcert_feed.txt
+RESULT_FILE=~/Dropbox/temp/jpcert_feed.txt
 RESULT_TEMP=${SCRIPT_DIR}/jpcert_feed.tmp
 SETNS_STR="setns x=http://purl.org/rss/1.0/
 setns rdf=http://www.w3.org/1999/02/22-rdf-syntax-ns#

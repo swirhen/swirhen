@@ -23,6 +23,7 @@ manga|リーフィ
 manga|佐々原憂樹
 manga|せいほうけい
 manga|ジャイロウ
+manga|OgataAz
 music|STARLIGHT MASTER
 music|THE@TER GENERATION
 music|M@STER SPARKLE

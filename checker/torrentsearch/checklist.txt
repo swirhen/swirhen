@@ -22,6 +22,7 @@ manga|彦馬ヒロユキ
 manga|リーフィ
 manga|佐々原憂樹
 manga|せいほうけい
+manga|ジャイロウ
 music|STARLIGHT MASTER
 music|THE@TER GENERATION
 music|M@STER SPARKLE

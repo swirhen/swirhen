@@ -41,3 +41,4 @@ doujin|シンデレラガールズ
 doujin|ミリオンライブ
 music|WILD WIND GIRL
 live|MILLION LIVE
+live|CINDERELLA

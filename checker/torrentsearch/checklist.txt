@@ -35,7 +35,6 @@ music|STELLA MASTER
 music|Blooming Clover
 music|CINDERELLA GIRLS
 music|CINDERELLA MASTER
-comic|@インベスターZ
 comic|COMIC REX
 comic|Comic REX
 comic|ハイスコアガール

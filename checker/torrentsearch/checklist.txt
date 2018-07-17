@@ -28,6 +28,7 @@ manga|OgataAz
 manga|師走の翁
 manga|たいぷはてな
 manga|紅村かる
+manga|あかざわRED
 music|STARLIGHT MASTER
 music|THE@TER GENERATION
 music|M@STER SPARKLE

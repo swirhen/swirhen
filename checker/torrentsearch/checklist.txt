@@ -39,6 +39,7 @@ music|CINDERELLA MASTER
 comic|COMIC REX
 comic|Comic REX
 comic|ハイスコアガール
+comic|@ウルトラジャンプ
 doujin|シンデレラガールズ
 doujin|ミリオンライブ
 music|WILD WIND GIRL

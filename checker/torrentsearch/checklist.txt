@@ -39,7 +39,14 @@ music|CINDERELLA MASTER
 comic|COMIC REX
 comic|Comic REX
 comic|ハイスコアガール
-comic|@ウルトラジャンプ
+comic|波よ聞いてくれ
+comic|汚物は消毒です
+comic|魔法使いの嫁
+comic|サバゲっぱなし
+comic|アトム ザ・ビギニング
+comic|アオイホノオ
+comic|未確認で進行形
+comic|亜人ちゃんは語りたい
 doujin|シンデレラガールズ
 doujin|ミリオンライブ
 music|WILD WIND GIRL

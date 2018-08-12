@@ -10,3 +10,4 @@ sudo cp -rp /etc/dhcp/dhcpd.conf ~/Dropbox/config/
 sudo cp -rp /etc/fstab ~/Dropbox/config/
 #sudo cp -rp 
 tar zcvf ~/Dropbox/config/www.tgz /var/www
+tar zcvf ~/Dropbox/config/ssh.tgz ~/.ssh

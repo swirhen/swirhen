@@ -54,6 +54,7 @@ manga|山文京伝
 manga|ダイナマイトmoca
 manga|愛上陸
 manga|スピリタス太郎
+manga|Cuvie
 music|STARLIGHT MASTER
 music|THE@TER BOOST
 music|STELLA MASTER

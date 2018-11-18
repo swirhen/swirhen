@@ -57,6 +57,7 @@ manga|スピリタス太郎
 manga|Cuvie
 manga|サバイバル刃
 manga|軽部ぐり
+manga|杜拓哉
 music|STARLIGHT MASTER
 music|THE@TER BOOST
 music|STELLA MASTER

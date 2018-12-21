@@ -1,2 +1,5 @@
 slackbot_settings.py
 token
+plugins
+__pycache__
+*.pid

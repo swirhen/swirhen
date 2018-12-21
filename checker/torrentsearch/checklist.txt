@@ -77,6 +77,8 @@ comic|アトム ザ・ビギニング
 comic|アオイホノオ
 comic|未確認で進行形
 comic|亜人ちゃんは語りたい
+comic|ゴールデンカムイ
+comic|銀河英雄伝説
 doujin|シンデレラガールズ
 doujin|ミリオンライブ
 music|WILD WIND GIRL

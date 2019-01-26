@@ -62,6 +62,7 @@ manga|サバイバル刃
 manga|軽部ぐり
 manga|杜拓哉
 manga|治屋武しでん
+manga|へんりいだ
 manga|@みだらすいっち
 music|STARLIGHT MASTER
 music|THE@TER BOOST

@@ -28,6 +28,7 @@ doujin|稲荷屋
 doujin|みくろぺえじ
 doujin|オシゴトシアター
 doujin|ILD CAT
+doujin|左藤空気
 manga|秋月伊槻
 manga|新堂エル
 manga|鬼束直
@@ -64,6 +65,7 @@ manga|杜拓哉
 manga|治屋武しでん
 manga|へんりいだ
 manga|山崎かずま
+manga|左藤空気
 music|STARLIGHT MASTER
 music|THE@TER BOOST
 music|STELLA MASTER

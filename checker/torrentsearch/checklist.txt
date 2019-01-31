@@ -66,6 +66,7 @@ manga|治屋武しでん
 manga|へんりいだ
 manga|山崎かずま
 manga|左藤空気
+manga|ムサシマル
 music|STARLIGHT MASTER
 music|THE@TER BOOST
 music|STELLA MASTER

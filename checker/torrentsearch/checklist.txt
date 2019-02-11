@@ -89,6 +89,7 @@ comic|銀河英雄伝説
 comic|乙嫁語り
 comic|黒いセーラー服
 comic|ゆゆ式
+comic|赫のグリモア
 doujin|シンデレラガールズ
 doujin|ミリオンライブ
 music|WILD WIND GIRL

@@ -67,6 +67,7 @@ manga|へんりいだ
 manga|山崎かずま
 manga|左藤空気
 manga|ムサシマル
+manga|嶺本八美
 music|STARLIGHT MASTER
 music|THE@TER BOOST
 music|MILLION THE@TER
@@ -92,6 +93,9 @@ comic|ゆゆ式
 comic|赫のグリモア
 doujin|シンデレラガールズ
 doujin|ミリオンライブ
-music|WILD WIND GIRL
+doujin|CINDERELLA GIRLS
+doujin|MILLION LIVE
 live|MILLION LIVE
 live|CINDERELLA
+live|ミリオンライブ
+live|シンデレラガールズ

@@ -9,7 +9,7 @@ fi
 DATETIME=`date "+%Y/%m/%d %H:%M:%S"`
 DATETIME2=`date "+%Y%m%d%H%M%S"`
 TEMPFILE=${SCRIPT_DIR}/twitterchk_${DATETIME2}.temp
-PYTHON_PATH="/home/swirhen/.pythonbrew/pythons/Python-3.4.3/bin/python"
+PYTHON_PATH="/usr/bin/python3"
 CHANNEL=$1
 SEARCH_WORD=$2
 SEARCH_WORD2=$3

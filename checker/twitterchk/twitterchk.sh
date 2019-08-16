@@ -43,7 +43,7 @@ ${TEXT}"
 done < ${TEMPFILE}
 rm -f ${TEMPFILE}
 
-cnt=1
+cnt=0
 for TEXT in "${TEXT[@]}"
 do
   HIT=`echo "${TEXT}" | grep "${SEARCH_WORD}"`

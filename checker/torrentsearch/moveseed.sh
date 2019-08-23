@@ -8,7 +8,7 @@ if [ "$1" != "" ]; then
         exit 1
     fi
     DATE="$1"
-    TARGET_DIR="/data/share/temp/torrentsearch/${DATE}/"
+    TARGET_DIR="/data/share/temp/torrentsearch/${DATE}"
 else
     echo "# usage: $0 YYYYMMDD"
     exit 1
@@ -18,7 +18,7 @@ if [ "$2" != "" ]; then
     echo "# 指定キーワード ${KEYWORD}"
 fi
 
-if [ `ls ${TARGET_DIR}`*${KEYWORD}*.torrent 2> /dev/null | wc -l` -eq 0 ]; then
+if [ `ls ${TARGET_DIR}/*${KEYWORD}*.torrent 2> /dev/null | wc -l` -eq 0 ]; then
     echo "# 該当ディレクトリにtorrentファイルがありません。終了します"
 else
     echo "# found seed list:"

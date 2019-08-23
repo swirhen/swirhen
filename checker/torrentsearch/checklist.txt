@@ -68,6 +68,7 @@ manga|山崎かずま
 manga|左藤空気
 manga|ムサシマル
 manga|嶺本八美
+manga|えいとまん
 music|STARLIGHT MASTER
 music|THE@TER BOOST
 music|MILLION THE@TER

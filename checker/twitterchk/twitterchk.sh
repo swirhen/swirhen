@@ -10,65 +10,61 @@ DATETIME=`date "+%Y/%m/%d %H:%M:%S"`
 DATETIME2=`date "+%Y%m%d%H%M%S"`
 TEMPFILE=${SCRIPT_DIR}/twitterchk_${DATETIME2}.temp
 PYTHON_PATH="/usr/bin/python3"
-CHANNEL=$1
-SEARCH_WORD=$2
-SEARCH_WORD2=$3
-SEARCH_WORD3=$4
+CHECKLIST_FILE=${SCRIPT_DIR}/checkllist.txt
+CHANNELS=( `awk '{print $1}' ${CHECKLIST_FILE} | sort | uniq` )
 
 cnt=0
 D_T_C_N=()
 TEXT=()
 
-if [ "$5" != "" ]; then
-  DATE=`date -d "$5 day ago" "+%m%d-%Y"`
-  sed -i '/^search: ここまで読んだ/d' /data/share/log/${CHANNEL}/${DATE}.txt
-fi
-if [ "`cat /data/share/log/${CHANNEL}/${DATE}.txt | grep \"^search: ここまで読んだ\"`" = "" ]; then
-  sed -i -e "1i search: ここまで読んだ" /data/share/log/${CHANNEL}/${DATE}.txt
-fi
-
-cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' > ${TEMPFILE}
-while read LOGDATE LOGTIME CHANNEL_AND_NICK TEXT
+for CHANNEL in ${CHANNELS[@]}
 do
-  if [ "${D_T_C_N[${cnt}]}" != "${LOGDATE} ${LOGTIME} ${CHANNEL_AND_NICK}" ]; then
-    (( cnt++ ))
-    D_T_C_N[${cnt}]="${LOGDATE} ${LOGTIME} ${CHANNEL_AND_NICK}"
-  fi
-  if [ "${TEXT[${cnt}]}" != "" ]; then
-    TEXT[${cnt}]+="
-${TEXT}"
-  else
-    TEXT[${cnt}]="${TEXT}"
-  fi
-done < ${TEMPFILE}
-rm -f ${TEMPFILE}
+    # 引数があったら過去ログをチェックする
+    if [ "$1" != "" ]; then
+      DATE=`date -d "$5 day ago" "+%m%d-%Y"`
+      sed -i '/^search: ここまで読んだ/d' /data/share/log/${CHANNEL}/${DATE}.txt
+    fi
+    # ここまで読んだ、が無ければ1行目に追加
+    if [ "`cat /data/share/log/${CHANNEL}/${DATE}.txt | grep \"^search: ここまで読んだ\"`" = "" ]; then
+      sed -i -e "1i search: ここまで読んだ" /data/share/log/${CHANNEL}/${DATE}.txt
+    fi
 
-cnt=0
-for TEXT in "${TEXT[@]}"
-do
-  HIT=`echo "${TEXT}" | grep "${SEARCH_WORD}"`
-  if [ "${SEARCH_WORD2}" != "" ]; then
-    HIT2=`echo "${TEXT}" | grep "${SEARCH_WORD2}"`
-  else
-    HIT2="HIT"
-  fi
-  if [ "${SEARCH_WORD3}" != "" ]; then
-    HIT3=`echo "${TEXT}" | grep "${SEARCH_WORD3}"`
-  else
-    HIT3="HIT"
-  fi
-
-  if [ "${HIT}" != "" -a "${HIT2}" != "" -a "${HIT3}" != "" ]; then
-    HIT_STR="${D_T_C_N[${cnt}]}
+    # ここまで読んだ、以降を簡易DB化
+    cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' > ${TEMPFILE}
+    sed -i '/^search: ここまで読んだ/d' /data/share/log/${CHANNEL}/${DATE}.txt
+    echo "search: ここまで読んだ" >> /data/share/log/${CHANNEL}/${DATE}.txt
+    while read LOGDATE LOGTIME CHANNEL_AND_NICK TEXT
+    do
+      if [ "${D_T_C_N[${cnt}]}" != "${LOGDATE} ${LOGTIME} ${CHANNEL_AND_NICK}" ]; then
+        (( cnt++ ))
+        D_T_C_N[${cnt}]="${LOGDATE} ${LOGTIME} ${CHANNEL_AND_NICK}"
+      fi
+      if [ "${TEXT[${cnt}]}" != "" ]; then
+        TEXT[${cnt}]+="
 ${TEXT}"
-    #/home/swirhen/tiasock/tiasock_common.sh "#Twitter@t2" "d swirhen 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ"
-    ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${SEARCH_WORD} ${SEARCH_WORD2} ${SEARCH_WORD3}にヒットしたよ
+      else
+        TEXT[${cnt}]="${TEXT}"
+      fi
+    done < ${TEMPFILE}
+    rm -f ${TEMPFILE}
+
+    # ツイートログごとにループ
+    cnt=0
+    for TEXT in "${TEXT[@]}"
+    do
+        while read CH WORD
+        do
+            if [ "${CHANNEL}" = ${CH} ]; then
+                HIT=`echo "${TEXT}" | grep "${WORD}"`
+                if [ "${HIT}" != "" ]; then
+                    HIT_STR="${D_T_C_N[${cnt}]}"
+                    ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${WORD} にヒットしたよ！
 \`\`\`
-${HIT_STR}
+${D_T_C_N[${cnt}]}
 \`\`\`"
-  fi
-  (( cnt++ ))
+                fi
+            fi
+            (( cnt++ ))
+        done < ${CHECKLIST_FILE}
+    done
 done
-
-sed -i '/^search: ここまで読んだ/d' /data/share/log/${CHANNEL}/${DATE}.txt
-echo "search: ここまで読んだ" >> /data/share/log/${CHANNEL}/${DATE}.txt

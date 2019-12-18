@@ -13,9 +13,6 @@ PYTHON_PATH="/usr/bin/python3"
 CHECKLIST_FILE=${SCRIPT_DIR}/checklist.txt
 CHANNELS=( `awk '{print $1}' ${CHECKLIST_FILE} | sort | uniq` )
 
-cnt=0
-D_T_C_N=()
-TEXT=()
 
 for CHANNEL in ${CHANNELS[@]}
 do
@@ -33,6 +30,9 @@ do
     cat /data/share/log/${CHANNEL}/${DATE}.txt | sed -n -e '/^search: ここまで読んだ/,$p' > ${TEMPFILE}
     sed -i '/^search: ここまで読んだ/d' /data/share/log/${CHANNEL}/${DATE}.txt
     echo "search: ここまで読んだ" >> /data/share/log/${CHANNEL}/${DATE}.txt
+    cnt=0
+    D_T_C_N=()
+    TEXT=()
     while read LOGDATE LOGTIME CHANNEL_AND_NICK TEXT
     do
       if [ "${D_T_C_N[${cnt}]}" != "${LOGDATE} ${LOGTIME} ${CHANNEL_AND_NICK}" ]; then
@@ -49,7 +49,7 @@ ${TEXT}"
     rm -f ${TEMPFILE}
 
     # ツイートログごとにループ
-    cnt=0
+    cnt=1
     for TEXT in "${TEXT[@]}"
     do
         while read CH WORD
@@ -65,7 +65,7 @@ ${HIT_STR}
 \`\`\`"
                 fi
             fi
-            (( cnt++ ))
         done < ${CHECKLIST_FILE}
+        (( cnt++ ))
     done
 done

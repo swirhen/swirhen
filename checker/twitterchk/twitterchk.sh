@@ -49,9 +49,10 @@ ${TEXT}"
     rm -f ${TEMPFILE}
 
     # ツイートログごとにループ
-    cnt=1
+    cnt=0
     for TEXT in "${TEXT[@]}"
     do
+        echo "cnt: ${cnt} text: ${TEXT}"
         while read CH WORD
         do
             if [ "${CHANNEL}" = ${CH} ]; then

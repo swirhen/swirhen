@@ -57,10 +57,11 @@ ${TEXT}"
             if [ "${CHANNEL}" = ${CH} ]; then
                 HIT=`echo "${TEXT}" | grep "${WORD}"`
                 if [ "${HIT}" != "" ]; then
-                    HIT_STR="${D_T_C_N[${cnt}]}"
+                    HIT_STR="${D_T_C_N[${cnt}]}
+${TEXT}"
                     ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${WORD} にヒットしたよ！
 \`\`\`
-${D_T_C_N[${cnt}]}
+${HIT_STR}
 \`\`\`"
                 fi
             fi

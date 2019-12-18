@@ -10,7 +10,7 @@ DATETIME=`date "+%Y/%m/%d %H:%M:%S"`
 DATETIME2=`date "+%Y%m%d%H%M%S"`
 TEMPFILE=${SCRIPT_DIR}/twitterchk_${DATETIME2}.temp
 PYTHON_PATH="/usr/bin/python3"
-CHECKLIST_FILE=${SCRIPT_DIR}/checkllist.txt
+CHECKLIST_FILE=${SCRIPT_DIR}/checklist.txt
 CHANNELS=( `awk '{print $1}' ${CHECKLIST_FILE} | sort | uniq` )
 
 cnt=0

@@ -2,7 +2,7 @@
 IPFILE='/tmp/globalip'
 
 PREVIP=`cat $IPFILE` 2>/dev/null
-IP=`curl globalip.me` 2>/dev/null
+IP=`curl inet-ip.info` 2>/dev/null
 
 echo "`date`"
 if [ "$IP" != "" ]; then

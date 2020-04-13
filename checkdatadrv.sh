@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # data drive checker
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
-DATETIME=`date "+%Y/%m/%d-%H:%M:%S"`
-DATETIME2=`date "+%Y%m%d%H%M%S"`
 PYTHON_PATH="python3"
 CHANNEL="bot-open"
 #CHANNEL="bot-sandbox"

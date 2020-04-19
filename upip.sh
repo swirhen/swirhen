@@ -19,7 +19,8 @@ if [ "`cat /tmp/myip.txt`" != "`cat /home/swirhen/Dropbox/temp/myip.txt`" ]; the
   slack_post "${TEXT}"
 elif [ "$1" != "" ]; then
   TEXT="@here [INFO] swirhen.tv globalip is: `cat /tmp/myip.txt`"
-  TEXT+="\n"
+  TEXT+="
+"
   TEXT+="dns ip check: ${DOMAIN_IP}"
   slack_post "${TEXT}"
 fi

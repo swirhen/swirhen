@@ -17,7 +17,9 @@ if [ "`cat /tmp/myip.txt`" != "`cat /home/swirhen/Dropbox/temp/myip.txt`" ]; the
   TEXT="@channel [ALERT] chenges globalip on swirhen.tv: `cat /tmp/myip.txt`"
   slack_post "${TEXT}"
 elif [ "$1" != "" ]; then
+  DOMAIN_IP=`dig @8.8.8.8 swirhen.tv | grep ANSWER -A 1 | grep swirhen.tv | awk '{print $5}'`
   TEXT="@here [INFO] swirhen.tv globalip is: `cat /tmp/myip.txt`"
+  TEXT+="dns ip check: ${DOMAIN_IP}"
   slack_post "${TEXT}"
 fi
 

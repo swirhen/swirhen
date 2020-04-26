@@ -14,20 +14,23 @@ slack_upload() {
 
 wget "https://dyn.value-domain.com/cgi-bin/dyn.fcg?ip" -O /tmp/myip.txt
 DOMAIN_IP=`dig @8.8.8.8 swirhen.tv | grep ANSWER -A 1 | grep swirhen.tv | awk '{print $5}'`
-if [ "`cat /tmp/myip.txt`" != "`cat /home/swirhen/Dropbox/temp/myip.txt`" ]; then
-  TEXT="@channel [ALERT] chenges globalip on swirhen.tv: `cat /tmp/myip.txt`"
-  slack_post "${TEXT}"
-elif [ "$1" != "" ]; then
-  TEXT="@here [INFO] swirhen.tv globalip is: `cat /tmp/myip.txt`"
-  TEXT+="
-"
-  TEXT+="dns ip check: ${DOMAIN_IP}"
-  slack_post "${TEXT}"
-fi
-if [ "`cat /tmp/myip.txt`" != "${DOMAIN_IP}" ]; then
-  TEXT="@channel [ALERT] DNS not updates on swirhen.tv: ${DOMAIN_IP}"
-  slack_post "${TEXT}"
-fi
 
-mv /tmp/myip.txt /home/swirhen/Dropbox/temp/
-wget -O - "https://dyn.value-domain.com/cgi-bin/dyn.fcg?d=swirhen.tv&p=irankae1&h=*" > /dev/null 2>&1
+if [ "`cat /tmp/myip.txt`" != "" ]; then
+  if [ "`cat /tmp/myip.txt`" != "`cat /home/swirhen/Dropbox/temp/myip.txt`" ]; then
+    TEXT="@channel [ALERT] chenges globalip on swirhen.tv: `cat /tmp/myip.txt`"
+    slack_post "${TEXT}"
+  elif [ "$1" != "" ]; then
+    TEXT="@here [INFO] swirhen.tv globalip is: `cat /tmp/myip.txt`"
+    TEXT+="
+  "
+    TEXT+="dns ip check: ${DOMAIN_IP}"
+    slack_post "${TEXT}"
+  fi
+  if [ "`cat /tmp/myip.txt`" != "${DOMAIN_IP}" ]; then
+    TEXT="@channel [ALERT] DNS not updates on swirhen.tv: ${DOMAIN_IP}"
+    slack_post "${TEXT}"
+  fi
+
+  mv /tmp/myip.txt /home/swirhen/Dropbox/temp/
+  wget -O - "https://dyn.value-domain.com/cgi-bin/dyn.fcg?d=swirhen.tv&p=irankae1&h=*" > /dev/null 2>&1
+fi

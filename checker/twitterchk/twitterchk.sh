@@ -60,7 +60,7 @@ ${TEXT}"
                 if [ "${HIT}" != "" ]; then
                     HIT_STR="${D_T_C_N[${cnt}]}
 ${TEXT}"
-                    ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${WORD} にヒットしたよ！
+                    ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "twitter-keyword-search" "@here 【log検索 ${DATETIME}】 ${CHANNEL} ログ内で ${WORD} にヒットしたよ！
 \`\`\`
 ${HIT_STR}
 \`\`\`"

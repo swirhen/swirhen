@@ -130,7 +130,7 @@ done
 
 # 報告
 if [ ${hit_flg} -eq 1 ]; then
-  ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "bot-sandbox" "@here 【汎用種調査2 ${DATE}】キーワードヒット: ダウンロードしました
+  ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "torrent-search" "@here 【汎用種調査2 ${DATE}】キーワードヒット: ダウンロードしました
 \`\`\`
 # 結果:
 `cat ${LOG_FILE}`

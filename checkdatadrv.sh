@@ -17,7 +17,18 @@ slack_upload() {
 DRIVES=`df -h | grep data`
 DRIVES_NUM=`echo "${DRIVES}" | wc -l`
 
-if [ ${DRIVES_NUM} -ne ${DRIVES_NUM_CORRECT} ]; then
+error=0
+until [ ${DRIVES_NUM} -eq ${DRIVES_NUM_CORRECT} ];
+do
+  (( error++ ))
+  if [ $error -gt 5 ]; then
+    break;
+  fi
+  DRIVES=`df -h | grep data`
+  DRIVES_NUM=`echo "${DRIVES}" | wc -l`
+done
+
+if [ $error -gt 5 ]; then
   TEXT="@channel [ALERT] logical drives mounted not ${DRIVES_NUM_CORRECT} drives. tring re-mount."
   TEXT+="
 

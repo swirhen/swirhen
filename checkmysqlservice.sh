@@ -27,7 +27,7 @@ else
         slack_post "${TEXT}"
     elif [ "$1" != "" ]; then
         /home/swirhen/sh/tiarrakw.sh
-        TEXT="@here [INFO] mysql service has gone. restart ok and tiarra restarted."
+        TEXT="@here [INFO] mysql service has gone. restart ok and tiarra restarted. irssi must be re-connect."
         slack_post "${TEXT}"
     fi
 fi

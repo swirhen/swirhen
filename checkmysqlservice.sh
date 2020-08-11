@@ -31,5 +31,3 @@ else
         slack_post "${TEXT}"
     fi
 fi
-
-return 0

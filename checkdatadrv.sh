@@ -21,6 +21,7 @@ error=0
 until [ ${DRIVES_NUM} -eq ${DRIVES_NUM_CORRECT} ];
 do
   (( error++ ))
+  sudo /usr/bin/mount -a
   if [ $error -gt 5 ]; then
     break;
   fi
@@ -36,7 +37,6 @@ DRIVES:
 "
   TEXT+="${DRIVES}"
   slack_post "${TEXT}"
-  sudo mount -a
 elif [ "$1" != "" ]; then
   TEXT="@here [INFO] logical drives mounted ${DRIVES_NUM} drives."
   TEXT+="

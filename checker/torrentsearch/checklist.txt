@@ -76,10 +76,12 @@ manga|嶺本八美
 manga|えいとまん
 manga|森島コン
 manga|香月りお
+manga|消火器
 music|STARLIGHT MASTER
 music|THE@TER CHALLENGE
 music|THE@TER BOOST
 music|MILLION THE@TER
+music|THE@TER
 music|Blooming Clover
 music|CINDERELLA GIRLS
 music|CINDERELLA MASTER

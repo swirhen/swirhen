@@ -114,3 +114,5 @@ live|MILLION LIVE
 live|CINDERELLA
 live|ミリオンライブ
 live|シンデレラガールズ
+live|BANDAI NAMCO
+live|バンダイナムコ

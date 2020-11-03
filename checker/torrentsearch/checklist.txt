@@ -80,6 +80,8 @@ manga|消火器
 manga|冬嗣
 manga|猫男爵
 manga|白玉もち
+manga|あいらんどう
+manga|ゆのどん
 music|STARLIGHT MASTER
 music|THE@TER CHALLENGE
 music|THE@TER BOOST

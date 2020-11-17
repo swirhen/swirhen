@@ -29,8 +29,8 @@ if [ "`cat /tmp/myip.txt`" != "" ]; then
   if [ "`cat /tmp/myip.txt`" != "${DOMAIN_IP}" ]; then
     TEXT="@channel [ALERT] DNS not updates on swirhen.tv: ${DOMAIN_IP}"
     slack_post "${TEXT}"
+    curl "https://dyn.value-domain.com/cgi-bin/dyn.fcg?d=swirhen.tv&p=irankae1"
   fi
 
   mv /tmp/myip.txt /home/swirhen/Dropbox/temp/
-  wget -O - "https://dyn.value-domain.com/cgi-bin/dyn.fcg?d=swirhen.tv&p=irankae1&h=*" > /dev/null 2>&1
 fi

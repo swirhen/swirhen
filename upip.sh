@@ -14,6 +14,10 @@ slack_upload() {
 
 wget "https://dyn.value-domain.com/cgi-bin/dyn.fcg?ip" -O /tmp/myip.txt
 DOMAIN_IP=`dig @8.8.8.8 swirhen.tv | grep ANSWER -A 1 | grep swirhen.tv | awk '{print $5}'`
+if [ "${DOMAIN_IP}" = "" ]; then
+    sleep 5
+    DOMAIN_IP=`dig @8.8.4.4 swirhen.tv | grep ANSWER -A 1 | grep swirhen.tv | awk '{print $5}'`
+fi
 
 if [ "`cat /tmp/myip.txt`" != "" ]; then
   if [ "`cat /tmp/myip.txt`" != "`cat /home/swirhen/Dropbox/temp/myip.txt`" ]; then

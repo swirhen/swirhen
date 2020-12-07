@@ -12,7 +12,7 @@ slack_upload() {
   /usr/bin/curl -F channels="${CHANNEL}" -F file="@$1" -F title="$2" -F token=`cat ${SCRIPT_DIR}/token` -F filetype=text https://slack.com/api/files.upload
 }
 
-wget "https://dyn.value-domain.com/cgi-bin/dyn.fcg?ip" -O /tmp/myip.txt
+curl -sS "https://dyn.value-domain.com/cgi-bin/dyn.fcg?ip" | grep ".*\..*\..*\..*" > /tmp/myip.txt
 DOMAIN_IP=`dig @8.8.8.8 swirhen.tv | grep ANSWER -A 1 | grep swirhen.tv | awk '{print $5}'`
 
 if [ "`cat /tmp/myip.txt`" != "" ]; then

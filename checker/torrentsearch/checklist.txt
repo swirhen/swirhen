@@ -91,7 +91,7 @@ music|Blooming Clover
 music|CINDERELLA GIRLS
 music|CINDERELLA MASTER
 music|SHINY COLORS
-music|nano.RIPE
+music|hololive
 comic|COMIC REX
 comic|Comic REX
 comic|ハイスコアガール
@@ -113,6 +113,8 @@ doujin|シンデレラガールズ
 doujin|ミリオンライブ
 doujin|CINDERELLA GIRLS
 doujin|MILLION LIVE
+doujin|ホロライブ
+doujin|hololive
 live|MILLION LIVE
 live|CINDERELLA
 live|ミリオンライブ

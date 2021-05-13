@@ -3,8 +3,7 @@
 # torrent file 汎用クロール
 # リストに指定したキーワードでnyaaおよびsukebei.nyaaをクロールし、ヒットしたらseedをダウンロードしておく
 # import section
-import os.path
-
+import os
 import git
 import pathlib
 import re

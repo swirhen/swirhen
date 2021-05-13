@@ -105,4 +105,3 @@ if __name__ == '__main__':
         repo.git.commit(DL_URL_LIST_FILE, message='download_url.txt update')
         repo.git.pull()
         repo.git.push()
-

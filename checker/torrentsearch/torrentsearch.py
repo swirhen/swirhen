@@ -18,7 +18,7 @@ import swirhentv_util as swiutil
 SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/checklist.txt'
 URL_LIST_FILE = f'{SCRIPT_DIR}/urllist.txt'
-DL_URL_LIST_FILE = f'${SCRIPT_DIR}/download_url.txt'
+DL_URL_LIST_FILE = f'{SCRIPT_DIR}/download_url.txt'
 TDATETIME = dt.now()
 DATETIME = TDATETIME.strftime('%Y/%m/%d %H:%M:%S')
 DATE = TDATETIME.strftime('%Y%m%d')

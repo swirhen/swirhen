@@ -16,6 +16,7 @@ sys.path.append('/data/share/movie/sh/python-lib/')
 import swirhentv_util as swiutil
 
 # argments section
+GIT_ROOT_DIR = '/home/swirhen/sh'
 SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/checklist.txt'
 URL_LIST_FILE = f'{SCRIPT_DIR}/urllist.txt'
@@ -100,8 +101,7 @@ if __name__ == '__main__':
 
         swiutil.slack_post(SLACK_CHANNEL, post_str)
 
-        repo = git.Repo(SCRIPT_DIR)
-        repo.git.commit(CHECKLIST_FILE, message='checklist.txt update')
+        repo = git.Repo(GIT_ROOT_DIR)
         repo.git.commit(DL_URL_LIST_FILE, message='download_url.txt update')
         repo.git.pull()
         repo.git.push()

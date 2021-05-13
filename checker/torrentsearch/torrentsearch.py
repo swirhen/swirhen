@@ -4,6 +4,8 @@
 # リストに指定したキーワードでnyaaおよびsukebei.nyaaをクロールし、ヒットしたらseedをダウンロードしておく
 # import section
 import os
+import pprint
+
 import git
 import pathlib
 import re
@@ -61,11 +63,17 @@ if __name__ == '__main__':
     seedlist = get_seed_list()
 
     # チェックリスト取得
-    check_list = []
+    check_list = dict()
     for checkitem in list(open(CHECKLIST_FILE).read().splitlines()):
         check_category = checkitem.split('|')[0]
+        if not check_category in check_list:
+            check_list[check_category] = []
+
         check_keyword = checkitem.split('|')[1]
-        check_list.append([check_category, check_keyword])
+        check_list[check_category].append(check_keyword)
+
+    pprint.pprint(check_list)
+    exit(0)
 
     hit_flag = 0
     hit_result = []

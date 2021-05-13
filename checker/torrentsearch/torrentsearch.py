@@ -96,6 +96,8 @@ if __name__ == '__main__':
         for result_item in hit_result:
             post_str += f'{result_item[1]}.torrent\n'
 
+        post_str += '```'
+
         swiutil.slack_post(SLACK_CHANNEL, post_str)
 
         repo = git.Repo(SCRIPT_DIR)

@@ -84,6 +84,7 @@ if __name__ == '__main__':
                 hit_flag = 1
                 if not os.path.isdir(DOWNLOAD_DIR):
                     os.mkdir(DOWNLOAD_DIR)
+                item_title = item_title.replace('/', '_')
                 hit_result.append([item_category, item_title, check_keyword])
                 urllib.request.urlretrieve(item_link, f'{DOWNLOAD_DIR}/{item_title}.torrent')
                 swiutil.writefile_append(DL_URL_LIST_FILE, item_link)

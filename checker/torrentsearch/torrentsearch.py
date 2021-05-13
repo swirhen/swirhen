@@ -3,6 +3,8 @@
 # torrent file 汎用クロール
 # リストに指定したキーワードでnyaaおよびsukebei.nyaaをクロールし、ヒットしたらseedをダウンロードしておく
 # import section
+import os.path
+
 import git
 import pathlib
 import re
@@ -80,6 +82,8 @@ if __name__ == '__main__':
                 re.search(check_keyword, item_title) and \
                 swiutil.grep_file(DL_URL_LIST_FILE, item_link) == '':
                 hit_flag = 1
+                if not os.path.isdir(DOWNLOAD_DIR):
+                    os.mkdir(DOWNLOAD_DIR)
                 hit_result.append([item_category, item_title, check_keyword])
                 urllib.request.urlretrieve(item_link, f'{DOWNLOAD_DIR}/{item_title}.torrent')
                 swiutil.writefile_append(DL_URL_LIST_FILE, item_link)

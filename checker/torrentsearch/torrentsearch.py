@@ -4,8 +4,6 @@
 # リストに指定したキーワードでnyaaおよびsukebei.nyaaをクロールし、ヒットしたらseedをダウンロードしておく
 # import section
 import os
-import pprint
-
 import git
 import pathlib
 import re
@@ -72,23 +70,17 @@ if __name__ == '__main__':
         check_keyword = checkitem.split('|')[1]
         check_list[check_category].append(check_keyword)
 
-    pprint.pprint(check_list)
-    exit(0)
-
     hit_flag = 0
     hit_result = []
-    # カテゴリと一致、キーワードと一致、URLリスト内に存在しない場合、ダウンロードしてリストに加える
+    # カテゴリでキーワードリスト検索、キーワードと一致、URLリスト内に存在しない場合、ダウンロードしてリストに加える
     for seed_item in seedlist:
         item_category = seed_item[0]
         item_title = seed_item[1]
         item_link = seed_item[2]
 
-        for check_item in check_list:
-            check_category = check_item[0]
-            check_keyword = check_item[1]
-            if item_category == check_category and \
-                re.search(check_keyword, item_title) and \
-                swiutil.grep_file(DL_URL_LIST_FILE, item_link) == '':
+        for check_keyword in check_list[item_category]:
+            if re.search(check_keyword, item_title) and \
+                len(swiutil.grep_file(DL_URL_LIST_FILE, item_link)) == 0:
                 hit_flag = 1
                 if not os.path.isdir(DOWNLOAD_DIR):
                     os.mkdir(DOWNLOAD_DIR)

@@ -93,7 +93,7 @@ if __name__ == '__main__':
         for result_item in hit_result:
             post_str += f'カテゴリ: {result_item[0]} キーワード: {result_item[2]} タイトル: {result_item[1]}\n'
 
-        post_str += '# ダウンロードしたseedファイル\n'
+        post_str += f'# ダウンロードしたseedファイル ({DOWNLOAD_DIR})\n'
         for result_item in hit_result:
             post_str += f'{result_item[1]}.torrent\n'
 

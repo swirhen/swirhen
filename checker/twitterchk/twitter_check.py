@@ -111,7 +111,7 @@ for channel in check_list.keys():
         text = log[1]
         date = log[2]
         for keyword in check_list[channel]:
-            if re.search(keyword, text):
+            if re.search(keyword, text.replace('\n','_')):
                 result.append(f'チャンネル: {channel} キーワード: {keyword}\n[{date}] <{nick}> {text}')
 
 if len(result) > 0:

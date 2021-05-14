@@ -32,11 +32,12 @@ def get_seed_list():
     # URLリストをループして、すべてのURLから最新フィードを取得
     # カテゴリ名,title,linkを配列に入れる
     all_seed_list = []
-    for line in list(open(URL_LIST_FILE).read().splitlines()):
-        cat = line.split()[0]
-        url = line.split()[1]
-        seed_list = get_seed_list_proc(cat, url)
-        all_seed_list.extend(seed_list)
+    with open(URL_LIST_FILE) as f:
+        for line in list(f.read().splitlines()):
+            cat = line.split()[0]
+            url = line.split()[1]
+            seed_list = get_seed_list_proc(cat, url)
+            all_seed_list.extend(seed_list)
 
     return all_seed_list
 
@@ -62,13 +63,14 @@ if __name__ == '__main__':
 
     # チェックリスト取得
     check_list = dict()
-    for checkitem in list(open(CHECKLIST_FILE).read().splitlines()):
-        check_category = checkitem.split('|')[0]
-        if not check_category in check_list:
-            check_list[check_category] = []
+    with open(CHECKLIST_FILE) as file:
+        for checkitem in list(file.read().splitlines()):
+            check_category = checkitem.split('|')[0]
+            if not check_category in check_list:
+                check_list[check_category] = []
 
-        check_keyword = checkitem.split('|')[1]
-        check_list[check_category].append(check_keyword)
+            check_keyword = checkitem.split('|')[1]
+            check_list[check_category].append(check_keyword)
 
     hit_flag = 0
     hit_result = []

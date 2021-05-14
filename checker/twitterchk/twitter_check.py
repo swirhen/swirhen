@@ -20,7 +20,13 @@ SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/check_list.txt'
 TDATETIME = dt.now()
 DATETIME = TDATETIME.strftime('%Y/%m/%d-%H:%M:%S')
-DATETIME_10MIN_AGO = (TDATETIME - datetime.timedelta(minutes=300)).strftime('%Y/%m/%d-%H:%M:%S')
+playback_minutes = 10
+args = sys.argv
+if len(args) > 1:
+    playback_minutes = args[1]
+DATETIME_QUERY_START = (TDATETIME - datetime.timedelta(minutes=playback_minutes)).strftime('%Y/%m/%d-%H:%M:%S')
+YOUR_NICK = 'swirhen'
+# debug
 YOUR_NICK = 'nobody'
 SLACK_CHANNEL = 'twitter-keyword-search'
 
@@ -37,7 +43,7 @@ select_sql = "select c.name, n.name, l.log, l.created_on" \
              " from channel c,log l ,nick n" \
              " where l.channel_id = c.id" \
              " and l.nick_id = n.id" \
-            f" and l.created_on > '{DATETIME_10MIN_AGO}'" \
+            f" and l.created_on > '{DATETIME_QUERY_START}'" \
             f" and n.name not like '%{YOUR_NICK}%'" \
              " order by l.created_on"
 
@@ -98,7 +104,7 @@ for channel in check_list.keys():
         for keyword in check_list[channel]:
             print(channel, keyword)
             if re.search(keyword, text):
-                result.append(f'チャンネル:{channel} キーワード:{keyword}\n対象ポスト: <{nick}> {text}')
+                result.append(f'チャンネル: {channel} キーワード: {keyword}\n対象ポスト: <{nick}> {text}')
 
 if len(result) > 0:
     post_str = f'@here 【log検索{DATETIME}】ヒットしました:\n' \

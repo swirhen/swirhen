@@ -48,11 +48,13 @@ select_sql = "select c.name, n.name, l.log, l.created_on" \
              " from channel c,log l ,nick n" \
              " where l.channel_id = c.id" \
              " and l.nick_id = n.id" \
-            f" and l.created_on > '{DATETIME_QUERY_START}'" \
-            f" and n.name not like '%{YOUR_NICK}%'" \
+             f" and l.created_on => '{DATETIME_QUERY_START}'" \
+             f" and l.created_on =< '{DATETIME}'" \
+             f" and n.name not like '%{YOUR_NICK}%'" \
              " order by l.created_on"
 
 print(select_sql)
+
 cursor.execute(select_sql)
 
 logs = dict()

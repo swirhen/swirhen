@@ -62,13 +62,15 @@ for row in cursor:
     # 同じ場合はログに改行を加えて追加する
     if nick_p != '' and nick_p != nick and date_p != date:
         logs[channel_p].append([nick_p, log_text_p, date_p])
+        channel_p = channel
+        nick_p = nick
         log_text_p = log_text
+        date_p = date
     else:
+        channel_p = channel
+        nick_p = nick
         log_text_p += f'\n{log_text}'
-
-    channel_p = channel
-    nick_p = nick
-    date_p = date
+        date_p = date
 
 # 最後の行
 logs[channel_p].append([nick_p, log_text_p, date_p])

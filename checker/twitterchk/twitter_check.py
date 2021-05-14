@@ -115,6 +115,6 @@ for channel in check_list.keys():
                 result.append(f'チャンネル: {channel} キーワード: {keyword}\n[{date}] <{nick}> {text}')
 
 if len(result) > 0:
-    post_str = f'@here 【twitter log検索 ({DATETIME})】ヒットしました:\n' \
+    post_str = f'@here 【twitter log検索 ({DATETIME_QUERY_START} - {DATETIME})】keyword hit!:\n' \
                 '```' + '\n'.join(result) + '```'
     swiutil.slack_post(SLACK_CHANNEL, post_str)

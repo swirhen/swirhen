@@ -112,7 +112,7 @@ for channel in check_list.keys():
         date = log[2]
         for keyword in check_list[channel]:
             if re.search(keyword, text):
-                result.append(f'チャンネル: {channel} キーワード: {keyword}\n対象ポスト: <{nick}> {text}')
+                result.append(f'チャンネル: {channel} キーワード: {keyword}\n[{date}] <{nick}> {text}')
 
 if len(result) > 0:
     post_str = f'@here 【log検索{DATETIME}】ヒットしました:\n' \

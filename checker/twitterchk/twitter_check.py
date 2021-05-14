@@ -20,7 +20,7 @@ SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/check_list.txt'
 TDATETIME = dt.now()
 DATETIME = TDATETIME.strftime('%Y/%m/%d-%H:%M:%S')
-DATETIME_10MIN_AGO = (TDATETIME - datetime.timedelta(minutes=100)).strftime('%Y/%m/%d-%H:%M:%S')
+DATETIME_10MIN_AGO = (TDATETIME - datetime.timedelta(minutes=300)).strftime('%Y/%m/%d-%H:%M:%S')
 YOUR_NICK = 'nobody'
 SLACK_CHANNEL = 'twitter-keyword-search'
 

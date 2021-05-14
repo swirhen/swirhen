@@ -74,5 +74,8 @@ for row in cursor:
 # 最後の行
 logs[channel_p].append([nick_p, log_text_p, date_p])
 
-pprint.pprint(logs)
+ch = '#シンデレラ一門@t'
+for log in logs[ch]:
+    print(f'{ch},{log[0]},{log[1]},{log[2]}')
+
 

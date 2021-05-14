@@ -93,6 +93,13 @@ with open(CHECKLIST_FILE) as file:
         check_keyword = checkitem.split('|')[1]
         check_list[check_channel].append(check_keyword)
 
+if len(args) == 4:
+    ch = args[3].split('|')[0]
+    kw = args[3].split('|')[1]
+    if not ch in check_list:
+        check_list[ch] = []
+    check_list[ch].append(kw)
+
 result = []
 for channel in check_list.keys():
     if not channel in logs:

@@ -88,6 +88,9 @@ with open(CHECKLIST_FILE) as file:
 
 result = []
 for channel in check_list.keys():
+    if not channel in logs:
+        continue
+
     for log in logs[channel]:
         nick = log[0]
         text = log[1]

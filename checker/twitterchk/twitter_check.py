@@ -40,7 +40,7 @@ select_sql = "select c.name, n.name, l.log, l.created_on" \
              " and l.nick_id = n.id" \
             f" and l.created_on > '{DATETIME_10MIN_AGO}'" \
             f" and n.name not like '%{YOUR_NICK}%'" \
-             " and c.name like '%ミリオン一座%'"
+             " and c.name like '%ミリオン一座%'" \
              " order by l.created_on"
 
 cursor.execute(select_sql)

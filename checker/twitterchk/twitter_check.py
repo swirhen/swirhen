@@ -39,7 +39,8 @@ select_sql = "select c.name, n.name, l.log, l.created_on" \
              " where l.channel_id = c.id" \
              " and l.nick_id = n.id" \
             f" and l.created_on > '{DATETIME_10MIN_AGO}'" \
-            f" and n.name not like '%{YOUR_NICK}%'"
+            f" and n.name not like '%{YOUR_NICK}%'" \
+             " order by l.created_on"
 
 cursor.execute(select_sql)
 
@@ -59,7 +60,7 @@ for row in cursor:
 
     # 1行前とchannel, nick, 投稿日時が違う場合のみ、1行前のものを配列に加える
     # 同じ場合はログに改行を加えて追加する
-    if channel_p != '' and channel_p != channel and nick_p != nick and date_p != date:
+    if nick_p != '' and nick_p != nick and date_p != date:
         logs[channel_p].append([nick_p, log_text_p, date_p])
         log_text_p = log_text
     else:

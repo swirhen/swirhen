@@ -6,8 +6,6 @@
 # 設定ファイル書式: チャンネル名|キーワード
 # tiarrametro DBに接続するので、DBに取得していないチャンネルは取得不可
 import datetime
-import pprint
-
 import sys
 import pathlib
 import re
@@ -24,6 +22,7 @@ TDATETIME = dt.now()
 DATETIME = TDATETIME.strftime('%Y/%m/%d-%H:%M:%S')
 DATETIME_10MIN_AGO = (TDATETIME - datetime.timedelta(minutes=10)).strftime('%Y/%m/%d-%H:%M:%S')
 YOUR_NICK = 'swirhen'
+SLACK_CHANNEL = 'twitter-keyword-search'
 
 # database connect
 connection = MySQLdb.connect(
@@ -74,6 +73,8 @@ for row in cursor:
 # ループ終了 最後の行
 logs[channel_p].append([nick_p, log_text_p, date_p])
 
+cursor.close()
+
 # チェックリスト取得
 check_list = dict()
 with open(CHECKLIST_FILE) as file:
@@ -85,4 +86,17 @@ with open(CHECKLIST_FILE) as file:
         check_keyword = checkitem.split('|')[1]
         check_list[check_channel].append(check_keyword)
 
-pprint.pprint(check_list)
+result = []
+for channel in check_list.keys():
+    for log in logs[channel]:
+        nick = log[0]
+        text = log[1]
+        date = log[2]
+        for keyword in check_list[channel]:
+            if re.search(keyword, text):
+                result.append(f'チャンネル:{channel} キーワード:{keyword}\n対象ポスト: <{nick}> {text}')
+
+if len(result) > 0:
+    post_str = f'@here 【log検索{DATETIME}】ヒットしました:\n' \
+                '```' + '\n'.join(result) + '```'
+    swiutil.slack_post(SLACK_CHANNEL, post_str)

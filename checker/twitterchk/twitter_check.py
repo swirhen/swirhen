@@ -24,7 +24,7 @@ playback_minutes = 10
 args = sys.argv
 if len(args) > 1:
     playback_minutes = args[1]
-DATETIME_QUERY_START = (TDATETIME - datetime.timedelta(minutes=playback_minutes)).strftime('%Y/%m/%d-%H:%M:%S')
+DATETIME_QUERY_START = (TDATETIME - datetime.timedelta(minutes=int(playback_minutes))).strftime('%Y/%m/%d-%H:%M:%S')
 YOUR_NICK = 'swirhen'
 # debug
 YOUR_NICK = 'nobody'

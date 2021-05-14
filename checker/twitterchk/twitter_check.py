@@ -19,7 +19,7 @@ import swirhentv_util as swiutil
 
 # argments section
 SCRIPT_DIR = str(current_dir)
-LIST_FILE = f'{SCRIPT_DIR}/checklist.txt'
+CHECKLIST_FILE = f'{SCRIPT_DIR}/check_list.txt'
 TDATETIME = dt.now()
 DATETIME = TDATETIME.strftime('%Y/%m/%d-%H:%M:%S')
 DATETIME_10MIN_AGO = (TDATETIME - datetime.timedelta(minutes=10)).strftime('%Y/%m/%d-%H:%M:%S')
@@ -58,8 +58,8 @@ for row in cursor:
     log_text = row[2]
     date = row[3].strftime('%Y/%m/%d %H:%M:%S')
 
-    # 1行前とchannel, nick, 投稿日時が違う場合のみ、1行前のものを配列に加える
-    # 同じ場合はログに改行を加えて追加する
+    # 1行前とchannel, nick, 投稿日時が同じ場合はログに改行を加えて追加する
+    # 違う場合、1行前のものを配列に加える
     if channel_p != '':
         if channel_p == channel and nick_p == nick and date_p == date:
             log_text_p += f'\n{log_text}'
@@ -71,11 +71,18 @@ for row in cursor:
     nick_p = nick
     date_p = date
 
-# 最後の行
+# ループ終了 最後の行
 logs[channel_p].append([nick_p, log_text_p, date_p])
 
-ch = '#シンデレラ一門@t'
-for log in logs[ch]:
-    print(f'{ch},{log[0]},{log[1]},{log[2]}')
+# チェックリスト取得
+check_list = dict()
+with open(CHECKLIST_FILE) as file:
+    for checkitem in list(file.read().splitlines()):
+        check_channel = checkitem.split('|')[0]
+        if not check_channel in check_list:
+            check_list[check_channel] = []
 
+        check_keyword = checkitem.split('|')[1]
+        check_list[check_channel].append(check_keyword)
 
+pprint.pprint(check_list)

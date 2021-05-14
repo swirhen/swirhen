@@ -31,8 +31,8 @@ if len(args) > 2 and args[2] != '':
     YOUR_NICK = 'fasdlkjhsaldkjfhsadlkjfhs'
 # debug 範囲指定
 if len(args) == 6:
-    DATETIME_QUERY_START = args[5]
-    DATETIME = args[6]
+    DATETIME_QUERY_START = args[4]
+    DATETIME = args[5]
 SLACK_CHANNEL = 'twitter-keyword-search'
 
 # database connect

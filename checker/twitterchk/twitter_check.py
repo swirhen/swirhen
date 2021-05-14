@@ -27,7 +27,8 @@ if len(args) > 1:
 DATETIME_QUERY_START = (TDATETIME - datetime.timedelta(minutes=int(playback_minutes))).strftime('%Y/%m/%d-%H:%M:%S')
 YOUR_NICK = 'swirhen'
 # debug
-YOUR_NICK = 'nobody'
+if len(args) > 2:
+    YOUR_NICK = 'nobody'
 SLACK_CHANNEL = 'twitter-keyword-search'
 
 # database connect

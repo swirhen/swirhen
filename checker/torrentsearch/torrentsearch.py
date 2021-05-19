@@ -28,7 +28,7 @@ DOWNLOAD_DIR = f'/data/share/temp/torrentsearch/{DATE}'
 SLACK_CHANNEL = 'torrent-search'
 
 # すべてのフィード取得(ループ親)
-def get_seed_list():
+def get_seed_list(category='all'):
     # URLリストをループして、すべてのURLから最新フィードを取得
     # カテゴリ名,title,linkを配列に入れる
     all_seed_list = []
@@ -36,8 +36,9 @@ def get_seed_list():
         for line in list(f.read().splitlines()):
             cat = line.split()[0]
             url = line.split()[1]
-            seed_list = get_seed_list_proc(cat, url)
-            all_seed_list.extend(seed_list)
+            if category == 'all' or category == cat:
+                seed_list = get_seed_list_proc(cat, url)
+                all_seed_list.extend(seed_list)
 
     return all_seed_list
 

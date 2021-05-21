@@ -33,7 +33,7 @@ if len(args) > 2 and args[2] != '':
 if len(args) == 6:
     DATETIME_QUERY_START = args[4]
     DATETIME = args[5]
-SLACK_CHANNEL = 'twitter-keyword-search'
+SLACK_CHANNEL = 'twitter-search'
 
 # database connect
 connection = MySQLdb.connect(

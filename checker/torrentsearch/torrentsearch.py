@@ -15,7 +15,7 @@ current_dir = pathlib.Path(__file__).resolve().parent
 sys.path.append('/data/share/movie/sh/python-lib/')
 import swirhentv_util as swiutil
 
-# argments section
+# arguments section
 GIT_ROOT_DIR = '/home/swirhen/sh'
 SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/checklist.txt'

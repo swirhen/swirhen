@@ -15,7 +15,7 @@ sys.path.append('/data/share/movie/sh/python-lib/')
 import MySQLdb
 import swirhentv_util as swiutil
 
-# argments section
+# arguments section
 SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/check_list.txt'
 TDATETIME = dt.now()

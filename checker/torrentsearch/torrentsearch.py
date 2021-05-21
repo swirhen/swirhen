@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
         post_str += '```'
 
-        swiutil.slack_post(SLACK_CHANNEL, post_str)
+        swiutil.multi_post(SLACK_CHANNEL, post_str)
 
         repo = git.Repo(GIT_ROOT_DIR)
         repo.git.commit(DL_URL_LIST_FILE, message='download_url.txt update')

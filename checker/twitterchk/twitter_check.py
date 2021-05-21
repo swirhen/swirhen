@@ -122,4 +122,4 @@ for channel in check_list.keys():
 if len(result) > 0:
     post_str = f'@here 【twitter log検索 ({DATETIME_QUERY_START} - {DATETIME})】keyword hit!:\n' \
                 '```' + '\n'.join(result) + '```'
-    swiutil.slack_post(SLACK_CHANNEL, post_str)
+    swiutil.multi_post(SLACK_CHANNEL, post_str)

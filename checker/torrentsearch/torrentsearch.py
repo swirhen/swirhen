@@ -105,7 +105,6 @@ if __name__ == '__main__':
         last_check_date = file.read().splitlines()[0]
     # 今回の取得時刻
     now_date = tdatetime.strftime('%Y-%m-%d %H:%M')
-    swiutil.writefile_new(LAST_CHECK_DATE_FILE, now_date)
 
     # チェックリスト取得(カテゴリごとのキーワード配列)
     check_list = dict()
@@ -138,3 +137,5 @@ if __name__ == '__main__':
         post_str += '```'
 
         swiutil.multi_post(SLACK_CHANNEL, post_str)
+
+    swiutil.writefile_new(LAST_CHECK_DATE_FILE, now_date)

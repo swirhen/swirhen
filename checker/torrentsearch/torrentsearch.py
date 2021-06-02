@@ -39,7 +39,7 @@ def search_seed_list(category, keyword, last_check_date=''):
     if last_check_date != '':
         select_sql += f' and created_at > "{last_check_date}"'
     select_sql += ' and not exists' \
-                 '(select link from download_url d where f.link = u.link)'
+                 '(select link from download_url d where f.link = d.link)'
 
     print(select_sql)
     result = list(CUR.execute(select_sql))

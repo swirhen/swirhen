@@ -83,8 +83,8 @@ def make_nyaa_data(category='all'):
                     f' values{values_str}' \
                     ' on conflict(link) do nothing'
         cur.execute(insert_sql)
+        conn.commit()
 
-    conn.commit()
     conn.close()
 
 

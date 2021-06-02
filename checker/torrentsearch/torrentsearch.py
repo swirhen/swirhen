@@ -30,8 +30,8 @@ SLACK_CHANNEL = 'torrent-search'
 def search_seed_proc(download_flg, category, keyword, last_check_date=''):
     conn = sqlite3.connect(FEED_DB)
     cur = conn.cursor()
-    select_sql = 'select category, title, link' \
-                 ' from feed_data f'
+    select_sql = 'select category, title, link, download_dir' \
+                 ' from feed_data'
     if category != 'all':
         select_sql += f' where category = "{category}"' \
                       f' and title like "%{keyword}%"'
@@ -40,8 +40,7 @@ def search_seed_proc(download_flg, category, keyword, last_check_date=''):
     if last_check_date != '':
         select_sql += f' and created_at > "{last_check_date}"'
     if download_flg:
-        select_sql += ' and not exists' \
-                    '(select link from download_url d where f.link = d.link)'
+        select_sql += ' and download_dir <> ""'
 
     result = list(cur.execute(select_sql))
     conn.close()
@@ -70,28 +69,24 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
     search_result = search_seed_proc(download_flg, category, keyword, last_check_date)
     hit_result = []
     if len(search_result) > 0:
-        download_url_insert_values = []
+        conn = sqlite3.connect(FEED_DB)
+        cur = conn.cursor()
         for search_item in search_result:
             item_category = search_item[0]
             item_title = search_item[1]
             item_link = search_item[2]
             if download_flg:
                 hit_result.append([item_category, item_title, keyword])
-                download_url_insert_values.append(f'("{item_title}", "{item_link}")')
                 if not os.path.isdir(download_dir):
                     os.mkdir(download_dir)
                 item_title = swiutil.truncate(item_title.translate(str.maketrans('/;!','___')), 247)
                 urllib.request.urlretrieve(item_link, f'{download_dir}/{item_title}.torrent')
+                update_sql = f'update feed_data set download_dir = "{download_dir}" where link = "{item_link}"'
+                cur.execute(update_sql)
             else:
                 hit_result.append([item_category, item_title, keyword, item_link])
-        if download_flg:
-            conn = sqlite3.connect(FEED_DB)
-            cur = conn.cursor()
-            values_str = ', '.join(download_url_insert_values)
-            insert_sql = f'insert into download_url(title, link) values{values_str} on conflict(link) do nothing'
-            cur.execute(insert_sql)
-            conn.commit()
-            conn.close()
+        conn.commit()
+        conn.close()
 
     return hit_result
 

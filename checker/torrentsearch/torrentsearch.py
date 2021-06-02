@@ -68,7 +68,7 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
             cur = conn.cursor()
             download_url_insert_values = []
             values_str = ', '.join(download_url_insert_values)
-            cur.execute(f'insert info download_url(title, link) values{values_str} on conflict(link) do nothing')
+            cur.execute(f'insert into download_url(title, link) values{values_str} on conflict(link) do nothing')
             cur.commit()
             conn.close()
 

@@ -87,8 +87,14 @@ def make_nyaa_data(category='all'):
     conn.close()
 
 
+# main section
+if __name__ == '__main__':
+    args = sys.argv
+    arg = ''
+    if len(args) > 1:
+        arg = args[1]
 
-
-
-
-
+    if arg == '':
+        make_nyaa_data()
+    else:
+        make_nyaa_data(arg)

@@ -3,3 +3,6 @@
 *.tmp
 logs/*
 temp/*
+*.db
+last_check_date.txt
+__pycache__

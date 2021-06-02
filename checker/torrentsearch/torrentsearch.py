@@ -54,13 +54,15 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
         for search_item in search_result:
             item_title = search_item[0]
             item_link = search_item[1]
-            hit_result.append([category, item_title, keyword])
             if download_flg:
+                hit_result.append([category, item_title, keyword])
                 download_url_insert_values.append(f'("{item_title}", "{item_link}")')
                 if not os.path.isdir(download_dir):
                     os.mkdir(download_dir)
                 item_title = swiutil.truncate(item_title.translate(str.maketrans('/;!','___')), 247)
                 urllib.request.urlretrieve(item_link, f'{download_dir}/{item_title}.torrent')
+            else:
+                hit_result.append([category, item_title, keyword, item_link])
         if download_flg:
             conn = sqlite3.connect(FEED_DB)
             cur = conn.cursor()

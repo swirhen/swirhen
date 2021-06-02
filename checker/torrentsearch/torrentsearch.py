@@ -69,7 +69,7 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
             values_str = ', '.join(download_url_insert_values)
             insert_sql = f'insert into download_url(title, link) values{values_str} on conflict(link) do nothing'
             cur.execute(insert_sql)
-            cur.commit()
+            conn.commit()
             conn.close()
 
     return hit_result

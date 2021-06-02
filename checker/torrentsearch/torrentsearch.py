@@ -31,12 +31,17 @@ DOWNLOAD_DIR = f'/data/share/temp/torrentsearch/{DATE}'
 SLACK_CHANNEL = 'torrent-search'
 
 # nyaa データベース検索
-def search_seed_list(category, keyword, last_check_date):
+def search_seed_list(category, keyword, last_check_date=''):
     select_sql = 'select title, link' \
-                 ' from feed_data' \
+                 ' from feed_data f' \
                 f' where category = "{category}"' \
-                f' and title like "%{keyword}%"' \
-                f' and created_at > "{last_check_date}"'
+                f' and title like "%{keyword}%"'
+    if last_check_date != '':
+        select_sql += f' and created_at > "{last_check_date}"'
+    select_sql += ' and not exists' \
+                 '(select link from download_url d where f.link = u.link)'
+
+    print(select_sql)
     result = list(CUR.execute(select_sql))
     return result
 
@@ -70,7 +75,7 @@ if __name__ == '__main__':
                 for search_item in search_result:
                     item_title = search_item[0]
                     item_link = search_item[1]
-                    if len(swiutil.grep_file2(DL_URL_LIST_FILE, item_link, True)) == 0:
+                    if len(swiutil.grep_file2(DL_URL_LIST_FILE, item_link)) == 0:
                         hit_flag = True
                         if not os.path.isdir(DOWNLOAD_DIR):
                             os.mkdir(DOWNLOAD_DIR)

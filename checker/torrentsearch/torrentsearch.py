@@ -82,7 +82,7 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
                 item_title = swiutil.truncate(item_title.translate(str.maketrans('/;!','___')), 247)
                 urllib.request.urlretrieve(item_link, f'{download_dir}/{item_title}.torrent')
             else:
-                hit_result.append([category, item_title, keyword, item_link])
+                hit_result.append([item_category, item_title, keyword, item_link])
         if download_flg:
             conn = sqlite3.connect(FEED_DB)
             cur = conn.cursor()

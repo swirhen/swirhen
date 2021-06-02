@@ -27,7 +27,7 @@ DOWNLOAD_DIR_ROOT = '/data/share/temp/torrentsearch'
 SLACK_CHANNEL = 'torrent-search'
 
 # nyaa データベース検索
-def search_seed_proc(category, keyword, last_check_date=''):
+def search_seed_proc(download_flg, category, keyword, last_check_date=''):
     conn = sqlite3.connect(FEED_DB)
     cur = conn.cursor()
     select_sql = 'select category, title, link' \
@@ -39,8 +39,9 @@ def search_seed_proc(category, keyword, last_check_date=''):
         select_sql += f' where title like "%{keyword}%"'
     if last_check_date != '':
         select_sql += f' and created_at > "{last_check_date}"'
-    select_sql += ' and not exists' \
-                  '(select link from download_url d where f.link = d.link)'
+    if download_flg:
+        select_sql += ' and not exists' \
+                    '(select link from download_url d where f.link = d.link)'
 
     result = list(cur.execute(select_sql))
     conn.close()
@@ -66,7 +67,7 @@ def search_seed_resent(category, offset_days):
 def search_seed(download_flg, category, keyword, last_check_date=''):
     date_str = dt.now().strftime('%Y%m%d')
     download_dir = f'/{DOWNLOAD_DIR_ROOT}/{date_str}'
-    search_result = search_seed_proc(category, keyword, last_check_date)
+    search_result = search_seed_proc(download_flg, category, keyword, last_check_date)
     hit_result = []
     if len(search_result) > 0:
         download_url_insert_values = []

@@ -54,7 +54,7 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
         for search_item in search_result:
             item_title = search_item[0]
             item_link = search_item[1]
-            hit_result.append([category, item_title, check_keyword])
+            hit_result.append([category, item_title, keyword])
             if download_flg:
                 download_url_insert_values.append(f'("{item_title}", "{item_link}")')
                 if not os.path.isdir(download_dir):

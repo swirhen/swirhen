@@ -68,9 +68,8 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
     download_dir = f'/{DOWNLOAD_DIR_ROOT}/{date_str}'
     search_result = search_seed_proc(download_flg, category, keyword, last_check_date)
     hit_result = []
+    link_values = []
     if len(search_result) > 0:
-        conn = sqlite3.connect(FEED_DB)
-        cur = conn.cursor()
         for search_item in search_result:
             item_category = search_item[0]
             item_title = search_item[1]
@@ -82,12 +81,18 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
                     os.mkdir(download_dir)
                 item_title = swiutil.truncate(item_title.translate(str.maketrans('/;!','___')), 247)
                 urllib.request.urlretrieve(item_link, f'{download_dir}/{item_title}.torrent')
-                update_sql = f'update feed_data set download_dir = "{download_dir}" where link = "{item_link}"'
-                cur.execute(update_sql)
+                link_values.append(item_link)
             else:
                 hit_result.append([item_category, item_title, keyword, item_link, item_download_dir])
-        conn.commit()
-        conn.close()
+
+        if download_flg:
+            conn = sqlite3.connect(FEED_DB)
+            cur = conn.cursor()
+            str_link_value = '", "'.join(link_values)
+            update_sql = f'update feed_data set download_dir = "{download_dir}" where link in ("{str_link_value}")'
+            cur.execute(update_sql)
+            conn.commit()
+            conn.close()
 
     return hit_result
 

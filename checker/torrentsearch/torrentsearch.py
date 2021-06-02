@@ -65,7 +65,7 @@ def search_seed_resent(category, offset_days):
 # 種検索・ダウンロード
 def search_seed(download_flg, category, keyword, last_check_date=''):
     date_str = dt.now().strftime('%Y%m%d')
-    download_dir = f'/{DOWNLOAD_DIR_ROOT}/{date_str}'
+    download_dir = f'{DOWNLOAD_DIR_ROOT}/{date_str}'
     search_result = search_seed_proc(download_flg, category, keyword, last_check_date)
     hit_result = []
     link_values = []

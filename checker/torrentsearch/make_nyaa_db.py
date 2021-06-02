@@ -50,14 +50,14 @@ def get_seed_list_proc(category, feed_uri):
 def make_nyaa_data(category='all'):
     # URLリストをループして、すべてのURLから最新フィードを取得
     # カテゴリ名,title,link,pubDateを配列に入れる
-    seed_list = []
+    all_seed_list = []
     with open(URL_LIST_FILE) as f:
         for line in list(f.read().splitlines()):
             cat = line.split()[0]
             url = line.split()[1]
             if category == 'all' or category == cat:
                 seed_list = get_seed_list_proc(cat, url)
-                seed_list.extend(seed_list)
+                all_seed_list.extend(seed_list)
 
     conn = sqlite3.connect(FEED_DB)
     cur = conn.cursor()
@@ -72,7 +72,7 @@ def make_nyaa_data(category='all'):
     delete_record_sql = 'delete from feed_data where category'
 
     values = []
-    for seed_item in seed_list:
+    for seed_item in all_seed_list:
         item_category = seed_item[0]
         item_title = seed_item[1]
         item_link = seed_item[2]

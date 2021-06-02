@@ -22,16 +22,13 @@ URL_LIST_FILE = f'{SCRIPT_DIR}/urllist.txt'
 DL_URL_LIST_FILE = f'{SCRIPT_DIR}/download_url.txt'
 LAST_CHECK_DATE_FILE = f'{SCRIPT_DIR}/last_check_date.txt'
 FEED_DB = f'{SCRIPT_DIR}/nyaatorrent_feed.db'
-CONN = sqlite3.connect(FEED_DB)
-CUR = CONN.cursor()
-TDATETIME = dt.now()
-DATETIME = TDATETIME.strftime('%Y/%m/%d %H:%M:%S')
-DATE = TDATETIME.strftime('%Y%m%d')
-DOWNLOAD_DIR = f'/data/share/temp/torrentsearch/{DATE}'
+DOWNLOAD_DIR_ROOT = '/data/share/temp/torrentsearch'
 SLACK_CHANNEL = 'torrent-search'
 
 # nyaa データベース検索
-def search_seed_list(category, keyword, last_check_date=''):
+def search_seed_proc(category, keyword, last_check_date=''):
+    conn = sqlite3.connect(FEED_DB)
+    cur = conn.cursor()
     select_sql = 'select title, link' \
                  ' from feed_data f' \
                 f' where category = "{category}"' \
@@ -39,19 +36,56 @@ def search_seed_list(category, keyword, last_check_date=''):
     if last_check_date != '':
         select_sql += f' and created_at > "{last_check_date}"'
     select_sql += ' and not exists' \
-                 '(select link from download_url d where f.link = d.link)'
+                  '(select link from download_url d where f.link = d.link)'
 
-    print(select_sql)
-    result = list(CUR.execute(select_sql))
+    result = list(cur.execute(select_sql))
+    conn.close()
     return result
 
 
+# 種検索・ダウンロード
+def search_seed(download_flg, category, keyword, last_check_date=''):
+    date_str = dt.now().strftime('%Y%m%d')
+    download_dir = f'/{DOWNLOAD_DIR_ROOT}/{date_str}'
+    search_result = search_seed_proc(category, keyword, last_check_date)
+    hit_result = []
+    if len(search_result) > 0:
+        download_url_insert_values = []
+        for search_item in search_result:
+            item_title = search_item[0]
+            item_link = search_item[1]
+            hit_result.append([category, item_title, check_keyword])
+            if download_flg:
+                download_url_insert_values.append(f'("{item_title}", "{item_link}")')
+                if not os.path.isdir(download_dir):
+                    os.mkdir(download_dir)
+                item_title = swiutil.truncate(item_title.translate(str.maketrans('/;!','___')), 247)
+                urllib.request.urlretrieve(item_link, f'{download_dir}/{item_title}.torrent')
+        if download_flg:
+            conn = sqlite3.connect(FEED_DB)
+            cur = conn.cursor()
+            download_url_insert_values = []
+            values_str = ', '.join(download_url_insert_values)
+            cur.execute(f'insert info download_url(title, link) values{values_str} on conflict(link) do nothing')
+            cur.commit()
+            conn.close()
+
+    return hit_result
+
+
 if __name__ == '__main__':
+    # 報告用日付
+    tdatetime = dt.now()
+    datetime_str = tdatetime.strftime('%Y/%m/%d %H:%M:%S')
+    # ダウンロードディレクトリ
+    date_str = tdatetime.strftime('%Y%m%d')
+    download_dir = f'/{DOWNLOAD_DIR_ROOT}/{date_str}'
+
     # 最終取得時刻
     with open(LAST_CHECK_DATE_FILE) as file:
         last_check_date = file.read().splitlines()[0]
     # 今回の取得時刻
-    now_date = dt.now().strftime('%Y-%m-%d %H:%M')
+    now_date = tdatetime.strftime('%Y-%m-%d %H:%M')
     swiutil.writefile_new(LAST_CHECK_DATE_FILE, now_date)
 
     # チェックリスト取得(カテゴリごとのキーワード配列)
@@ -70,34 +104,18 @@ if __name__ == '__main__':
     # カテゴリ、キーワードでキーワードリスト検索、URLリスト内に存在しない場合、ダウンロードしてリストに加える
     for check_category in check_list:
         for check_keyword in check_list[check_category]:
-            search_result = search_seed_list(check_category, check_keyword, last_check_date)
+            search_result = search_seed(True, check_category, check_keyword, last_check_date)
             if len(search_result) > 0:
-                for search_item in search_result:
-                    item_title = search_item[0]
-                    item_link = search_item[1]
-                    if len(swiutil.grep_file2(DL_URL_LIST_FILE, item_link)) == 0:
-                        hit_flag = True
-                        if not os.path.isdir(DOWNLOAD_DIR):
-                            os.mkdir(DOWNLOAD_DIR)
-                        item_title = swiutil.truncate(item_title.translate(str.maketrans('/;!','___')), 247)
-                        hit_result.append([check_category, item_title, check_keyword])
-                        urllib.request.urlretrieve(item_link, f'{DOWNLOAD_DIR}/{item_title}.torrent')
-                        swiutil.writefile_append(DL_URL_LIST_FILE, item_link)
+                hit_result.extend(search_result)
 
-    if hit_flag:
-        post_str = f'@here 【swirhen.tv 汎用種調査 {DATETIME}】キーワードヒット: ダウンロードしました\n```# 結果\n'
+    if len(hit_result) > 0:
+        post_str = f'@here 【swirhen.tv 汎用種調査 {datetime_str}】キーワードヒット: ダウンロードしました\n```# 結果\n'
         for result_item in hit_result:
             post_str += f'カテゴリ: {result_item[0]} キーワード: {result_item[2]} タイトル: {result_item[1]}\n'
 
-        post_str += f'# ダウンロードしたseedファイル ({DOWNLOAD_DIR})\n'
+        post_str += f'# ダウンロードしたseedファイル ({download_dir})\n'
         for result_item in hit_result:
             post_str += f'{result_item[1]}.torrent\n'
-
         post_str += '```'
 
         swiutil.multi_post(SLACK_CHANNEL, post_str)
-
-        repo = git.Repo(GIT_ROOT_DIR)
-        repo.git.commit(DL_URL_LIST_FILE, message='download_url.txt update')
-        repo.git.pull()
-        repo.git.push()

@@ -69,7 +69,8 @@ def make_nyaa_data(category='all'):
                         ' title string,' \
                         ' link string unique,' \
                         ' pubdate timestamp,' \
-                        ' created_at timestamp default (datetime(\'now\', \'localtime\')))'
+                        ' created_at timestamp default (datetime(\'now\', \'localtime\'))),' \
+                        ' download_dir string'
     delete_record_sql = 'delete from feed_data where category'
 
     values = []

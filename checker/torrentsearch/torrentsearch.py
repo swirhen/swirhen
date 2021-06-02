@@ -40,7 +40,7 @@ def search_seed_proc(download_flg, category, keyword, last_check_date=''):
     if last_check_date != '':
         select_sql += f' and created_at > "{last_check_date}"'
     if download_flg:
-        select_sql += ' and download_dir is not ""'
+        select_sql += ' and download_dir = ""'
 
     result = list(cur.execute(select_sql))
     conn.close()

@@ -30,7 +30,7 @@ SLACK_CHANNEL = 'torrent-search'
 def search_seed_proc(category, keyword, last_check_date=''):
     conn = sqlite3.connect(FEED_DB)
     cur = conn.cursor()
-    select_sql = 'select title, link' \
+    select_sql = 'select category, title, link' \
                  ' from feed_data f'
     if category != 'all':
         select_sql += f' where category = "{category}"' \
@@ -71,10 +71,11 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
     if len(search_result) > 0:
         download_url_insert_values = []
         for search_item in search_result:
-            item_title = search_item[0]
-            item_link = search_item[1]
+            item_category = search_item[0]
+            item_title = search_item[1]
+            item_link = search_item[2]
             if download_flg:
-                hit_result.append([category, item_title, keyword])
+                hit_result.append([item_category, item_title, keyword])
                 download_url_insert_values.append(f'("{item_title}", "{item_link}")')
                 if not os.path.isdir(download_dir):
                     os.mkdir(download_dir)

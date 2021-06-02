@@ -4,6 +4,7 @@
 # import section
 import pathlib
 import sys
+from datetime import datetime as dt
 import urllib.request
 import sqlite3
 import xml.etree.ElementTree as elementTree
@@ -76,7 +77,7 @@ def make_nyaa_data(category='all'):
         item_category = seed_item[0]
         item_title = seed_item[1]
         item_link = seed_item[2]
-        item_pubdate = seed_item[3]
+        item_pubdate =  dt.strptime(seed_item[3], '%a, %d %b %Y %H:%M:%S')
         values.append(f'("{item_category}", "{item_title}", "{item_link}", "{item_pubdate}")')
         values_str = ', '.join(values)
         insert_sql = 'insert into feed_data(category, title, link, pubdate)' \

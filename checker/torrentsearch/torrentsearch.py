@@ -31,9 +31,12 @@ def search_seed_proc(category, keyword, last_check_date=''):
     conn = sqlite3.connect(FEED_DB)
     cur = conn.cursor()
     select_sql = 'select title, link' \
-                 ' from feed_data f' \
-                f' where category = "{category}"' \
-                f' and title like "%{keyword}%"'
+                 ' from feed_data f'
+    if category != 'all':
+        select_sql += f' where category = "{category}"' \
+                      f' and title like "%{keyword}%"'
+    else:
+        select_sql += f' where title like "%{keyword}%"'
     if last_check_date != '':
         select_sql += f' and created_at > "{last_check_date}"'
     select_sql += ' and not exists' \

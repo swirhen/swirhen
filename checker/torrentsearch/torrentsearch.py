@@ -12,6 +12,7 @@ from datetime import datetime as dt
 current_dir = pathlib.Path(__file__).resolve().parent
 sys.path.append('/data/share/movie/sh/python-lib/')
 import swirhentv_util as swiutil
+import bot_util as bu
 import sqlite3
 
 # arguments section
@@ -37,6 +38,21 @@ def search_seed_proc(category, keyword, last_check_date=''):
         select_sql += f' and created_at > "{last_check_date}"'
     select_sql += ' and not exists' \
                   '(select link from download_url d where f.link = d.link)'
+
+    result = list(cur.execute(select_sql))
+    conn.close()
+    return result
+
+
+# nyaa データベース検索(1日以内のリスト)
+def search_seed_resent(category, offset_days):
+    conn = sqlite3.connect(FEED_DB)
+    cur = conn.cursor()
+    fromdate = bu.get_now_datetime_str('YMD_SQL', f'{offset_days}d')
+    select_sql = 'select title, link, pubdate' \
+                 ' from feed_data f' \
+                f' where category = "{category}"' \
+                f' and pubdate > "{fromdate}"'
 
     result = list(cur.execute(select_sql))
     conn.close()

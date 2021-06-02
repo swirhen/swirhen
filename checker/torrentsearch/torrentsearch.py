@@ -75,6 +75,7 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
             item_category = search_item[0]
             item_title = search_item[1]
             item_link = search_item[2]
+            item_download_dir = search_item[3]
             if download_flg:
                 hit_result.append([item_category, item_title, keyword])
                 if not os.path.isdir(download_dir):
@@ -84,7 +85,7 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
                 update_sql = f'update feed_data set download_dir = "{download_dir}" where link = "{item_link}"'
                 cur.execute(update_sql)
             else:
-                hit_result.append([item_category, item_title, keyword, item_link])
+                hit_result.append([item_category, item_title, keyword, item_link, item_download_dir])
         conn.commit()
         conn.close()
 

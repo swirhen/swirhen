@@ -66,12 +66,10 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
         if download_flg:
             conn = sqlite3.connect(FEED_DB)
             cur = conn.cursor()
-            download_url_insert_values = []
             values_str = ', '.join(download_url_insert_values)
             insert_sql = f'insert into download_url(title, link) values{values_str} on conflict(link) do nothing'
-            print(insert_sql)
-            # cur.execute(insert_sql)
-            # cur.commit()
+            cur.execute(insert_sql)
+            cur.commit()
             conn.close()
 
     return hit_result

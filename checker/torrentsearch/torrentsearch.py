@@ -52,7 +52,7 @@ def get_seed_list_proc(category, feed_uri):
     xml_root = elementTree.fromstring(xml_string)
 
     for item in xml_root.findall('./channel/item'):
-        seed_info = [category, item.find('title').text, item.find('link').text]
+        seed_info = [category, item.find('title').text, item.find('link').text, item.find('pubDate').text]
         seed_list.append(seed_info)
 
     return seed_list

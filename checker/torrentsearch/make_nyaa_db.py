@@ -14,5 +14,7 @@ SCRIPT_DIR = str(current_dir)
 FEED_DB = f'{SCRIPT_DIR}/nyaatorrent_feed.db'
 
 
-def make_feed_data(argument=''):
-    # TODO いったんコミット
+def make_nyaa_data():
+    
+    
+

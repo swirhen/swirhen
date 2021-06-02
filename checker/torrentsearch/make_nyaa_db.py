@@ -80,11 +80,12 @@ def make_nyaa_data(category='all'):
         item_link = seed_item[2]
         item_pubdate =  dt.strptime(seed_item[3], '%a, %d %b %Y %H:%M:%S')
         values.append(f'("{item_category}", "{item_title}", "{item_link}", "{item_pubdate}")')
-        values_str = ', '.join(values)
-        insert_sql = 'insert into feed_data(category, title, link, pubdate)' \
-                    f' values{values_str}' \
-                    ' on conflict(link) do nothing'
-        cur.execute(insert_sql)
+
+    values_str = ', '.join(values)
+    insert_sql = 'insert into feed_data(category, title, link, pubdate)' \
+                f' values{values_str}' \
+                ' on conflict(link) do nothing'
+    cur.execute(insert_sql)
 
     conn.commit()
     conn.close()

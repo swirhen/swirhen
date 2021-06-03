@@ -26,28 +26,8 @@ FEED_DB = f'{SCRIPT_DIR}/nyaatorrent_feed.db'
 DOWNLOAD_DIR_ROOT = '/data/share/temp/torrentsearch'
 SLACK_CHANNEL = 'torrent-search'
 
-# nyaa データベース検索
-def search_seed_proc(download_flg, category, keyword, last_check_date=''):
-    conn = sqlite3.connect(FEED_DB)
-    cur = conn.cursor()
-    select_sql = 'select category, title, link, download_dir' \
-                 ' from feed_data'
-    if category != 'all':
-        select_sql += f' where category = "{category}"' \
-                      f' and title like "%{keyword}%"'
-    else:
-        select_sql += f' where title like "%{keyword}%"'
-    if last_check_date != '':
-        select_sql += f' and created_at > "{last_check_date}"'
-    if download_flg:
-        select_sql += ' and download_dir is Null'
 
-    result = list(cur.execute(select_sql))
-    conn.close()
-    return result
-
-
-# nyaa データベース検索(1日以内のリスト)
+# nyaa データベース検索(n日以内のリスト)
 def search_seed_resent(category, offset_days):
     conn = sqlite3.connect(FEED_DB)
     cur = conn.cursor()
@@ -62,11 +42,30 @@ def search_seed_resent(category, offset_days):
     return result
 
 
-# 種検索・ダウンロード
+# nyaa データベース検索・ダウンロード
 def search_seed(download_flg, category, keyword, last_check_date=''):
     date_str = dt.now().strftime('%Y%m%d')
     download_dir = f'{DOWNLOAD_DIR_ROOT}/{date_str}'
-    search_result = search_seed_proc(download_flg, category, keyword, last_check_date)
+
+    # 検索
+    conn = sqlite3.connect(FEED_DB)
+    cur = conn.cursor()
+    select_sql = 'select category, title, link, download_dir' \
+                 ' from feed_data'
+    if category != 'all':
+        select_sql += f' where category = "{category}"' \
+                      f' and title like "%{keyword}%"'
+    else:
+        select_sql += f' where title like "%{keyword}%"'
+    if last_check_date != '':
+        select_sql += f' and created_at > "{last_check_date}"'
+    if download_flg:
+        select_sql += ' and download_dir is Null'
+
+    search_result = list(cur.execute(select_sql))
+    conn.close()
+
+    # ダウンロードしつつ、検索結果を配列へ
     hit_result = []
     link_values = []
     if len(search_result) > 0:
@@ -85,6 +84,7 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
             else:
                 hit_result.append([item_category, item_title, keyword, item_link, item_download_dir])
 
+        # ダウンロード対象の更新
         if download_flg:
             conn = sqlite3.connect(FEED_DB)
             cur = conn.cursor()
@@ -124,7 +124,7 @@ if __name__ == '__main__':
 
     hit_flag = False
     hit_result = []
-    # カテゴリ、キーワードでキーワードリスト検索、URLリスト内に存在しない場合、ダウンロードしてリストに加える
+    # チェックリストごとにカテゴリ、キーワードでキーワードリスト検索、ダウンロード
     for check_category in check_list:
         for check_keyword in check_list[check_category]:
             search_result = search_seed(True, check_category, check_keyword, last_check_date)
@@ -141,6 +141,8 @@ if __name__ == '__main__':
             post_str += f'{result_item[1]}.torrent\n'
         post_str += '```'
 
+        # 報告
         swiutil.multi_post(SLACK_CHANNEL, post_str)
 
+    # 最後に最終取得時刻を記録
     swiutil.writefile_new(LAST_CHECK_DATE_FILE, now_date)

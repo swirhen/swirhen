@@ -34,6 +34,7 @@ if len(args) == 6:
     DATETIME_QUERY_START = args[4]
     DATETIME = args[5]
 SLACK_CHANNEL = 'twitter-search'
+SLACK_CHANNEL2 = 'ztb_twitter-search'
 
 # database connect
 connection = MySQLdb.connect(
@@ -123,3 +124,4 @@ if len(result) > 0:
     post_str = f'@here 【twitter log検索 ({DATETIME_QUERY_START} - {DATETIME})】keyword hit!:\n' \
                 '```' + '\n'.join(result) + '```'
     swiutil.multi_post(SLACK_CHANNEL, post_str)
+    swiutil.discord_post(SLACK_CHANNEL2, post_str.replace('@here ', ''))

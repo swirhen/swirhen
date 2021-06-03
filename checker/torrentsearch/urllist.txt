@@ -4,3 +4,4 @@ music https://nyaa.si/?page=rss&c=2_0
 comic https://nyaa.si/?page=rss&c=3_3
 live https://nyaa.si/?page=rss&c=4_4
 av https://sukebei.nyaa.si/?page=rss&c=2_2
+anime https://nyaa.si/?page=rss&c=1_4

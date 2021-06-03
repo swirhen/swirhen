@@ -4,7 +4,6 @@
 # リストに指定したキーワードでnyaaおよびsukebei.nyaaをクロールしたデータベースを検索し、ヒットしたらseedをダウンロードしておく
 # import section
 import os
-import git
 import pathlib
 import sys
 import urllib.request

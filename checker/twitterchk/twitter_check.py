@@ -5,6 +5,7 @@
 # キーワード設定ファイル: checklist.txt
 # 設定ファイル書式: チャンネル名|キーワード
 # tiarrametro DBに接続するので、DBに取得していないチャンネルは取得不可
+# import section
 import datetime
 import sys
 import pathlib
@@ -15,7 +16,7 @@ sys.path.append('/data/share/movie/sh/python-lib/')
 import MySQLdb
 import swirhentv_util as swiutil
 
-# arguments section
+# argument section
 SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/check_list.txt'
 TDATETIME = dt.now()

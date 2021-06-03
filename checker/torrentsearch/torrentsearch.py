@@ -75,7 +75,7 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
             item_link = search_item[2]
             item_download_dir = search_item[3]
             if download_flg:
-                hit_result.append([item_category, item_title, keyword])
+                hit_result.append([item_category, item_title, keyword, item_link])
                 if not os.path.isdir(download_dir):
                     os.mkdir(download_dir)
                 item_title = swiutil.truncate(item_title.translate(str.maketrans('/;!','___')), 247)

@@ -120,6 +120,7 @@ for channel in check_list.keys():
         for keyword in check_list[channel]:
             if re.search(keyword, text.replace('\n','_')):
                 result.append(f'チャンネル: {channel} キーワード: {keyword}\n[{date}] <{nick}> {text}')
+                break
 
 if len(result) > 0:
     post_str = f'@here 【twitter log検索 ({DATETIME_QUERY_START} - {DATETIME})】keyword hit!:\n' \

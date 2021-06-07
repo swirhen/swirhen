@@ -78,8 +78,12 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
                 if not os.path.isdir(download_dir):
                     os.mkdir(download_dir)
                 item_title = swiutil.truncate(item_title.translate(str.maketrans('/;!','___')), 247)
-                urllib.request.urlretrieve(item_link, f'{download_dir}/{item_title}.torrent')
-                link_values.append(item_link)
+                try:
+                    urllib.request.urlretrieve(item_link, f'{download_dir}/{item_title}.torrent')
+                except Exception as e:
+                    print(e)
+                else:
+                    link_values.append(item_link)
             else:
                 hit_result.append([item_category, item_title, keyword, item_link, item_download_dir])
 

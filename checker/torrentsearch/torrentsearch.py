@@ -106,7 +106,7 @@ if __name__ == '__main__':
     datetime_str = tdatetime.strftime('%Y/%m/%d %H:%M:%S')
     # ダウンロードディレクトリ
     date_str = tdatetime.strftime('%Y%m%d')
-    download_dir = f'/{DOWNLOAD_DIR_ROOT}/{date_str}'
+    download_dir = f'{DOWNLOAD_DIR_ROOT}/{date_str}'
 
     # 最終取得時刻
     with open(LAST_CHECK_DATE_FILE) as file:

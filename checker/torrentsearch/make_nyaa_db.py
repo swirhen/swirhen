@@ -8,6 +8,8 @@ from datetime import datetime as dt
 import urllib.request
 import sqlite3
 import xml.etree.ElementTree as elementTree
+sys.path.append('/data/share/movie/sh/python-lib/')
+import swirhentv_util as swiutil
 
 # argment section
 current_dir = pathlib.Path(__file__).resolve().parent
@@ -45,7 +47,7 @@ def get_seed_list_proc(category, feed_uri):
         xml_root = elementTree.fromstring(xml_string)
 
         for item in xml_root.findall('./channel/item'):
-            seed_info = [category, item.find('title').text.translate(str.maketrans('"','_')), item.find('link').text, item.find('pubDate').text[:-6]]
+            seed_info = [category, item.find('title').text.translate(str.maketrans('"\'','__')), item.find('link').text, item.find('pubDate').text[:-6]]
             seed_list.append(seed_info)
 
     return seed_list
@@ -88,9 +90,12 @@ def make_nyaa_data(category='all'):
     insert_sql = 'insert into feed_data(category, title, link, pubdate)' \
                 f' values{values_str}' \
                 ' on conflict(link) do nothing'
-    cur.execute(insert_sql)
-
-    conn.commit()
+    try:
+        cur.execute(insert_sql)
+    except Exception as e:
+        swiutil.multi_post('torrent-search', f'@channel sql insert error: {e}')
+    else:
+        conn.commit()
     conn.close()
 
 

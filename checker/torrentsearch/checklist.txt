@@ -34,7 +34,7 @@ doujin|リンゴヤ
 doujin|骸骨のスペアリブ
 doujin|カシノ木
 doujin|TTOMM
-douijn|桂あいり
+doujin|桂あいり
 manga|秋月伊槻
 manga|新堂エル
 manga|鬼束直
@@ -117,6 +117,7 @@ doujin|CINDERELLA GIRLS
 doujin|MILLION LIVE
 doujin|ホロライブ
 doujin|hololive
+doujin|バーチャルyoutuber
 live|MILLION LIVE
 live|CINDERELLA
 live|ミリオンライブ

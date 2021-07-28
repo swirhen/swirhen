@@ -19,7 +19,6 @@ import swirhentv_util as swiutil
 # argument section
 SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/ekakisan.txt'
-ART_HASHTAG_FILE = f'{SCRIPT_DIR}/art_hashtag.txt'
 CHECK_CHANNEL = '#Twitter@t3'
 TDATETIME = dt.now()
 DATETIME = TDATETIME.strftime('%Y/%m/%d %H:%M:%S')
@@ -109,15 +108,17 @@ for log in logs[CHECK_CHANNEL]:
     text = log[1]
     date = log[2]
 
-    if re.search('♻', text.replace('\n','_')):
+    if re.search('♻', text.replace('\n','_')) and \
+        re.search(r'#soraArt|#ロボ子Art|#miko_Art|#ほしまちぎゃらりー|#メルArt|#アロ絵|#はあとart|#絵フブキ|#祭絵|#あくあーと|#シオンの書物|#百鬼絵巻|#しょこらーと|#プロテインザスバル|#みおーん絵|#絵かゆ|#できたてころね|#AZKiART|#ぺこらーと|#絵クロマンサー|#しらぬえ|#ノエラート|#マリンのお宝|#かなたーと|#みかじ絵|#つのまきあーと|#TOWART|#ルーナート|#LamyArt|#ねねアルバム|#ししらーと|#絵まる|#GambaRisu|#ioarts|#HoshinovArt|#anyatelier|#Reinessance|#graveyART|#絵ニ ックス|#callillust|#ameliaRT|#いなート|#gawrt|#inART|#artsofashes|#teamates|#callioP|スケベなアロ絵|肌色まつり|まつりは絵っち|エロおにぎり|オークアート|沈没後悔日記|#glAMErous|#IRySart',
+ text.replace('\n','_')):
         rt_nick = re.sub(r'.*RT\ @(.*?):.*', r'\1',text)
-        if swiutil.grep_file(CHECKLIST_FILE, rt_nick) == '':
-
-
-
+        if len(swiutil.grep_file(CHECKLIST_FILE, rt_nick)) == 0:
+            result.append(f'リストに無いホロ絵師ID({rt_nick})がRTされたのでリスト追加:\n[{date}] <{nick}> {text}')
+            swiutil.writefile_append(CHECKLIST_FILE, rt_nick)
+            swiutil.tweeet(f'ie {rt_nick}', '#Console@t')
 
 if len(result) > 0:
     post_str = f'@here 【twitter log検索 ({DATETIME_QUERY_START} - {DATETIME})】keyword hit!:\n' \
                 '```' + '\n'.join(result) + '```'
     swiutil.multi_post(SLACK_CHANNEL, post_str)
-    swiutil.discord_post(SLACK_CHANNEL2, post_str.replace('@here ', ''))
+    # swiutil.discord_post(SLACK_CHANNEL2, post_str.replace('@here ', ''))

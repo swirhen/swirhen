@@ -8,6 +8,7 @@
 # import section
 import datetime
 import sys
+import git
 import pathlib
 import re
 from datetime import datetime as dt
@@ -114,3 +115,7 @@ if len(result) > 0:
                 '```' + '\n'.join(result) + '```'
     swiutil.multi_post(SLACK_CHANNEL, post_str)
     # swiutil.discord_post(SLACK_CHANNEL2, post_str.replace('@here ', ''))
+    repo = git.Repo(SCRIPT_DIR)
+    repo.git.commit(CHECKLIST_FILE, message='ekakisan.txt update')
+    repo.git.pull()
+    repo.git.push()

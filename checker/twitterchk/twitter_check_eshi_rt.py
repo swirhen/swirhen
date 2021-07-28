@@ -57,6 +57,8 @@ select_sql = "select c.name, n.name, l.log, l.created_on" \
             f" and n.name = '{YOUR_NICK}'" \
             " order by l.created_on"
 
+print(select_sql)
+
 cursor.execute(select_sql)
 
 logs = dict()

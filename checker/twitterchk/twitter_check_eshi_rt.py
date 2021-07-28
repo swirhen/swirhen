@@ -20,7 +20,7 @@ import swirhentv_util as swiutil
 # argument section
 SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/ekakisan.txt'
-CHECK_CHANNEL = '#Twitter@t3'
+CHECK_CHANNEL = '#holoart@t'
 TDATETIME = dt.now()
 DATETIME = TDATETIME.strftime('%Y/%m/%d %H:%M:%S')
 playback_minutes = 10
@@ -28,7 +28,6 @@ args = sys.argv
 if len(args) > 1 and args[1] != '':
     playback_minutes = args[1]
 DATETIME_QUERY_START = (TDATETIME - datetime.timedelta(minutes=int(playback_minutes))).strftime('%Y/%m/%d %H:%M:%S')
-YOUR_NICK = 'swirhen'
 # debug(自分も含める)
 if len(args) > 2 and args[2] != '':
     YOUR_NICK = 'fasdlkjhsaldkjfhsadlkjfhs'
@@ -55,7 +54,6 @@ select_sql = "select c.name, n.name, l.log, l.created_on" \
             f" and l.created_on >= '{DATETIME_QUERY_START}'" \
             f" and l.created_on <= '{DATETIME}'" \
             f" and c.name = '{CHECK_CHANNEL}'" \
-            f" and n.name = '{YOUR_NICK}'" \
             " order by l.created_on"
 
 print(select_sql)

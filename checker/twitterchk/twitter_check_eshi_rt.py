@@ -92,16 +92,6 @@ logs[channel_p].append([nick_p, log_text_p, date_p])
 cursor.close()
 
 result = []
-for log in logs[channel]:
-    nick = log[0]
-    text = log[1]
-    date = log[2]
-    # キーワードチェック
-    for keyword in check_list[channel]:
-        if re.search(keyword, text.replace('\n','_')):
-            result.append(f'チャンネル: {channel} キーワード: {keyword}\n[{date}] <{nick}> {text}')
-            break
-
 # 絵師RTリスト追加チェック
 for log in logs[CHECK_CHANNEL]:
     nick = log[0]

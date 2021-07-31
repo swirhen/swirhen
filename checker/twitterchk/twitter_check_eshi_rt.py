@@ -67,10 +67,10 @@ for row in cursor:
     log_text = row[2]
     date = row[3].strftime('%Y/%m/%d %H:%M:%S')
 
-    # 1行前とchannel, nick, 投稿日時が同じ場合はログに改行を加えて追加する
+    # 1行前とchannel, nick, <s>投稿日時</s>が同じ場合はログに改行を加えて追加する
     # 違う場合、1行前のものを配列に加える
     if channel_p != '':
-        if channel_p == channel and nick_p == nick and date_p == date:
+        if channel_p == channel and nick_p == nick:
             log_text_p += f'\n{log_text}'
         else:
             logs[channel_p].append([nick_p, log_text_p, date_p])

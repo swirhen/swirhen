@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# twitter キーワードチェック
-# 特に重要なキーワードが流れてきた場合、slackにおしらせする
-# キーワード設定ファイル: checklist.txt
-# 設定ファイル書式: チャンネル名|キーワード
-# tiarrametro DBに接続するので、DBに取得していないチャンネルは取得不可
+# twitter検索：ホロ絵師RTチェック
+# #Twitter@t3でswirhenがRTしたIDのツイートを精査して、
+# ホロファンアートのハッシュタグがあり、かつリストにIDが無い場合は
+# #twitter絵描きさんのリストに入れる
+# キーワード設定ファイル: ekakisan.txt
 # import section
 import datetime
 import sys
@@ -29,13 +29,6 @@ if len(args) > 1 and args[1] != '':
     playback_minutes = args[1]
 DATETIME_QUERY_START = (TDATETIME - datetime.timedelta(minutes=int(playback_minutes))).strftime('%Y/%m/%d %H:%M:%S')
 YOUR_NICK = 'swirhen'
-# debug(自分も含める)
-if len(args) > 2 and args[2] != '':
-    YOUR_NICK = 'fasdlkjhsaldkjfhsadlkjfhs'
-# debug 範囲指定
-if len(args) == 6:
-    DATETIME_QUERY_START = args[4]
-    DATETIME = args[5]
 SLACK_CHANNEL = 'twitter-search'
 SLACK_CHANNEL2 = 'ztb_twitter-search'
 
@@ -99,19 +92,22 @@ for log in logs[CHECK_CHANNEL]:
     text = log[1]
     date = log[2]
 
-    if re.search('♻', text.replace('\n','_')) and \
-        re.search(r'#soraArt|#ロボ子Art|#miko_Art|#ほしまちぎゃらりー|#メルArt|#アロ絵|#はあとart|#絵フブキ|#祭絵|#あくあーと|#シオンの書物|#百鬼絵巻|#しょこらーと|#プロテインザスバル|#みおーん絵|#絵かゆ|#できたてころね|#AZKiART|#ぺこらーと|#絵クロマンサー|#しらぬえ|#ノエラート|#マリンのお宝|#かなたーと|#みかじ絵|#つのまきあーと|#TOWART|#ルーナート|#LamyArt|#ねねアルバム|#ししらーと|#絵まる|#GambaRisu|#ioarts|#HoshinovArt|#anyatelier|#Reinessance|#graveyART|#絵ニ ックス|#callillust|#ameliaRT|#いなート|#gawrt|#inART|#artsofashes|#teamates|#callioP|スケベなアロ絵|肌色まつり|まつりは絵っち|エロおにぎり|オークアート|沈没後悔日記|#glAMErous|#IRySart', text.replace('\n','_')):
-        rt_nick = re.sub(r'.*RT\ @(.*?):.*', r'\1', text.replace('\n','_'))
-        if len(swiutil.grep_file(CHECKLIST_FILE, rt_nick)) == 0:
-            result.append(f'リストに無いホロ絵師ID({rt_nick})がRTされたのでリスト追加:\n[{date}] <{nick}> {text}')
-            swiutil.writefile_append(CHECKLIST_FILE, rt_nick)
-            swiutil.tweeet(f'ie {rt_nick}', '#Console@t')
+    if re.search('♻', text.replace('\n','_')):
+        # RTマークで発言を分割(複数発言が繋がってしまった場合を考慮)
+        tweets = text.replace('\n','_').split('♻')
+        for tweet in tweets:
+            if re.search(r'#soraArt|#ロボ子Art|#miko_Art|#ほしまちぎゃらりー|#メルArt|#アロ絵|#はあとart|#絵フブキ|#祭絵|#あくあーと|#シオンの書物|#百鬼絵巻|#しょこらーと|#プロテインザスバル|#みおーん絵|#絵かゆ|#できたてころね|#AZKiART|#ぺこらーと|#絵クロマンサー|#しらぬえ|#ノエラート|#マリンのお宝|#かなたーと|#みかじ絵|#つのまきあーと|#TOWART|#ルーナート|#LamyArt|#ねねアルバム|#ししらーと|#絵まる|#GambaRisu|#ioarts|#HoshinovArt|#anyatelier|#Reinessance|#graveyART|#絵ニックス|#callillust|#ameliaRT|#いなート|#gawrt|#inART|#artsofashes|#teamates|#callioP|#スケベなアロ絵|#肌色まつり|#まつりは絵っち|#エロおにぎり|#オークアート|#沈没後悔日記|#glAMErous|#IRySart', tweet):
+                rt_nick = re.sub(r'.*RT\ @(.*?):.*', r'\1', tweet)
+                if len(swiutil.grep_file(CHECKLIST_FILE, rt_nick)) == 0:
+                    result.append(f'リストに無いホロ絵師ID({rt_nick})がRTされたのでリスト追加:\n[{date}] <{nick}> ♻{tweet}')
+                    swiutil.writefile_append(CHECKLIST_FILE, rt_nick)
+                    swiutil.tweeet(f'ie {rt_nick}', '#Console@t')
 
 if len(result) > 0:
-    post_str = f'@here 【twitter log検索(ホロ絵師リスト追加チェック)\n({DATETIME_QUERY_START} - {DATETIME})】:\n' \
+    post_str = f':arrow_forward: @here 【twitter log検索(ホロ絵師リスト追加チェック)\n({DATETIME_QUERY_START} - {DATETIME})】:\n' \
                 '```' + '\n'.join(result) + '```'
     swiutil.multi_post(SLACK_CHANNEL, post_str)
-    # swiutil.discord_post(SLACK_CHANNEL2, post_str.replace('@here ', ''))
+    swiutil.discord_post(SLACK_CHANNEL2, post_str.replace('@here ', ''))
     repo = git.Repo('/home/swirhen/sh')
     repo.git.commit(CHECKLIST_FILE, message='ekakisan.txt update')
     repo.git.pull()

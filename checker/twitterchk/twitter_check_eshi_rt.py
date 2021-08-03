@@ -25,9 +25,12 @@ TDATETIME = dt.now()
 DATETIME = TDATETIME.strftime('%Y/%m/%d %H:%M:%S')
 playback_minutes = 10
 args = sys.argv
-if len(args) > 1 and args[1] != '':
+if len(args) == 2:
     playback_minutes = args[1]
 DATETIME_QUERY_START = (TDATETIME - datetime.timedelta(minutes=int(playback_minutes))).strftime('%Y/%m/%d %H:%M:%S')
+if len(args) == 3:
+    DATETIME_QUERY_START = args[1]
+    DATETIME = args[2]
 YOUR_NICK = 'swirhen'
 SLACK_CHANNEL = 'twitter-search'
 SLACK_CHANNEL2 = 'ztb_twitter-search'
@@ -96,10 +99,10 @@ for log in logs[CHECK_CHANNEL]:
         # RTマークで発言を分割(複数発言が繋がってしまった場合を考慮)
         tweets = text.replace('\n','_').split('♻')
         for tweet in tweets:
-            if re.search('RT', tweet) and \
+            print(f'tw: {tweet}')
+            if re.search(' RT', tweet) and \
                 re.search(r'#soraArt|#ロボ子Art|#miko_Art|#ほしまちぎゃらりー|#メルArt|#アロ絵|#はあとart|#絵フブキ|#祭絵|#あくあーと|#シオンの書物|#百鬼絵巻|#しょこらーと|#プロテインザスバル|#みおーん絵|#絵かゆ|#できたてころね|#AZKiART|#ぺこらーと|#絵クロマンサー|#しらぬえ|#ノエラート|#マリンのお宝|#かなたーと|#みかじ絵|#つのまきあーと|#TOWART|#ルーナート|#LamyArt|#ねねアルバム|#ししらーと|#絵まる|#GambaRisu|#ioarts|#HoshinovArt|#anyatelier|#Reinessance|#graveyART|#絵ニックス|#callillust|#ameliaRT|#いなート|#gawrt|#inART|#artsofashes|#teamates|#callioP|#スケベなアロ絵|#肌色まつり|#まつりは絵っち|#エロおにぎり|#オークアート|#沈没後悔日記|#glAMErous|#IRySart', tweet):
                 rt_nick = re.sub(r'.*RT\ @(.*?):.*', r'\1', tweet)
-                print('rt_nick: ' + rt_nick)
                 if len(swiutil.grep_file(CHECKLIST_FILE, rt_nick)) == 0:
                     result.append(f'リストに無いホロ絵師ID({rt_nick})がRTされたのでリスト追加:\n[{date}] <{nick}> ♻{tweet}')
                     swiutil.writefile_append(CHECKLIST_FILE, rt_nick)

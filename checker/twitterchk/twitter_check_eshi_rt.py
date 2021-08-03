@@ -75,7 +75,8 @@ for row in cursor:
     if channel_p == channel and nick_p == nick:
         log_text_p += f'\n{log_text}'
     else:
-        logs[channel_p].append([nick_p, log_text_p, date_p])
+        if channel_p != '':
+            logs[channel_p].append([nick_p, log_text_p, date_p])
         log_text_p = log_text
 
     channel_p = channel

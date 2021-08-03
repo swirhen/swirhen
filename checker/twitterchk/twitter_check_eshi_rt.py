@@ -78,6 +78,10 @@ for row in cursor:
         else:
             logs[channel_p].append([nick_p, log_text_p, date_p])
             log_text_p = log_text
+    else:
+        logs[channel].append([nick, log_text, date])
+        log_text_p = log_text
+
 
     channel_p = channel
     nick_p = nick

@@ -98,6 +98,8 @@ for log in logs[CHECK_CHANNEL]:
     if re.search('♻', text.replace('\n','_')):
         # RTマークで発言を分割(複数発言が繋がってしまった場合を考慮)
         tweets = text.replace('\n','_').split('♻')
+        import pprint
+        pprint.pprint(tweets)
         for tweet in tweets:
             print(f'tw: {tweet}')
             if re.search(' RT', tweet) and \

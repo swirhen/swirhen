@@ -73,13 +73,11 @@ for row in cursor:
 
     # 1行前とchannel, nick, 投稿日時が同じ場合はログに改行を加えて追加する
     # 違う場合、1行前のものを配列に加える
-    if channel_p != '':
-        if channel_p == channel and nick_p == nick and date_p == date:
-            log_text_p += f'\n{log_text}'
-        else:
-            logs[channel_p].append([nick_p, log_text_p, date_p])
-            log_text_p = log_text
+    if channel_p == channel and nick_p == nick and date_p == date:
+        log_text_p += f'\n{log_text}'
     else:
+        if channel_p != '':
+            logs[channel_p].append([nick_p, log_text_p, date_p])
         log_text_p = log_text
 
     channel_p = channel

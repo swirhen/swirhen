@@ -72,15 +72,11 @@ for row in cursor:
 
     # 1行前とchannel, nick, <s>投稿日時</s>が同じ場合はログに改行を加えて追加する
     # 違う場合、1行前のものを配列に加える
-    if channel_p != '':
-        if channel_p == channel and nick_p == nick:
-            log_text_p += f'\n{log_text}'
-        else:
-            logs[channel_p].append([nick_p, log_text_p, date_p])
-            log_text_p = log_text
+    if channel_p == channel and nick_p == nick:
+        log_text_p += f'\n{log_text}'
     else:
+        logs[channel_p].append([nick_p, log_text_p, date_p])
         log_text_p = log_text
-
 
     channel_p = channel
     nick_p = nick
@@ -104,8 +100,7 @@ for log in logs[CHECK_CHANNEL]:
         import pprint
         pprint.pprint(tweets)
         for tweet in tweets:
-            print(f'tw: {tweet}')
-            if re.search(' RT', tweet) and \
+            if re.search(' RT @', tweet) and \
                 re.search(r'#soraArt|#ロボ子Art|#miko_Art|#ほしまちぎゃらりー|#メルArt|#アロ絵|#はあとart|#絵フブキ|#祭絵|#あくあーと|#シオンの書物|#百鬼絵巻|#しょこらーと|#プロテインザスバル|#みおーん絵|#絵かゆ|#できたてころね|#AZKiART|#ぺこらーと|#絵クロマンサー|#しらぬえ|#ノエラート|#マリンのお宝|#かなたーと|#みかじ絵|#つのまきあーと|#TOWART|#ルーナート|#LamyArt|#ねねアルバム|#ししらーと|#絵まる|#GambaRisu|#ioarts|#HoshinovArt|#anyatelier|#Reinessance|#graveyART|#絵ニックス|#callillust|#ameliaRT|#いなート|#gawrt|#inART|#artsofashes|#teamates|#callioP|#スケベなアロ絵|#肌色まつり|#まつりは絵っち|#エロおにぎり|#オークアート|#沈没後悔日記|#glAMErous|#IRySart', tweet):
                 rt_nick = re.sub(r'.*RT\ @(.*?):.*', r'\1', tweet)
                 if len(swiutil.grep_file(CHECKLIST_FILE, rt_nick)) == 0:

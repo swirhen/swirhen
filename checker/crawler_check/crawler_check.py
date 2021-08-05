@@ -12,16 +12,14 @@ import subprocess
 import pathlib
 import shutil
 import urllib.request
-from datetime import datetime as dt
 current_dir = pathlib.Path(__file__).resolve().parent
 sys.path.append('/data/share/movie/sh/python-lib/')
 import swirhentv_util as swiutil
 
 # argument section
 SCRIPT_DIR = str(current_dir)
-TDATETIME = dt.now()
-DATETIME = TDATETIME.strftime('%Y/%m/%d %H:%M:%S')
 SLACK_CHANNEL = 'bot-open'
+
 
 # main module
 def main(uri, filename, ignore_keywords=''):
@@ -47,7 +45,7 @@ def main(uri, filename, ignore_keywords=''):
                         f'取得URL: {uri}\n' \
                         '差分: \n' \
                         '```' + '\n'.join(diff_result) + '```'
-        swiutil.multi_post(SLACK_CHANNEL, post_str)
+            swiutil.multi_post(SLACK_CHANNEL, post_str)
         shutil.move(temp_filename, true_filename)
     else:
         print('nai node rename dake suru')

@@ -42,8 +42,9 @@ def main(uri, filename, ignore_keywords=''):
         diff_result = subprocess.run(f'diff "{temp_filename}" "{true_filename}" -I "^#"', shell=True, stdout=subprocess.PIPE).stdout.decode().strip().splitlines()
         if len(diff_result):
             post_str = ':earth_asia: @here [swirhen.tv url crawler] 取得したURLの変更を検知\n' \
-                        f'取得URL: {uri}\n' \
-                        '差分: \n' \
+                        f'取得URL: {uri}' \
+            swiutil.multi_post(SLACK_CHANNEL, post_str)
+            post_str = '差分: \n' \
                         '```' + '\n'.join(diff_result) + '```'
             swiutil.multi_post(SLACK_CHANNEL, post_str)
         shutil.move(temp_filename, true_filename)

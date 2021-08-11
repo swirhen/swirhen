@@ -45,7 +45,7 @@ def main(uri, filename, ignore_keywords=''):
                         f'取得URL: {uri}'
             swiutil.multi_post(SLACK_CHANNEL, post_str)
             post_str = '差分: \n' \
-                        '```' + '\n'.join(diff_result) + '```'
+                        '```\n' + '\n'.join(diff_result) + '```'
             swiutil.multi_post(SLACK_CHANNEL, post_str)
         shutil.move(temp_filename, true_filename)
     else:

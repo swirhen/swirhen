@@ -2115,3 +2115,5 @@ tireiden1
 macropolis01
 Shiro_Osushi
 JL_T4N
+08_inoki
+noixen

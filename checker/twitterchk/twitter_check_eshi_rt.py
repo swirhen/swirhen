@@ -103,7 +103,7 @@ for log in logs[CHECK_CHANNEL]:
                 re.search(r'#soraArt|#ロボ子Art|#miko_Art|#ほしまちぎゃらりー|#メルArt|#アロ絵|#はあとart|#絵フブキ|#祭絵|#あくあーと|#シオンの書物|#百鬼絵巻|#しょこらーと|#プロテインザスバル|#みおーん絵|#絵かゆ|#できたてころね|#AZKiART|#ぺこらーと|#絵クロマンサー|#しらぬえ|#ノエラート|#マリンのお宝|#かなたーと|#みかじ絵|#つのまきあーと|#TOWART|#ルーナート|#LamyArt|#ねねアルバム|#ししらーと|#絵まる|#GambaRisu|#ioarts|#HoshinovArt|#anyatelier|#Reinessance|#graveyART|#絵ニックス|#callillust|#ameliaRT|#いなート|#gawrt|#inART|#artsofashes|#teamates|#callioP|#スケベなアロ絵|#肌色まつり|#まつりは絵っち|#エロおにぎり|#オークアート|#沈没後悔日記|#glAMErous|#IRySart|#illustrayBAE|#ベーアート|#faunline|#kronillust|#galaxillust|#クロニーラスト', tweet):
                 rt_nick = re.sub(r'.*RT\ @(.*?):.*', r'\1', tweet)
                 if len(swiutil.grep_file(CHECKLIST_FILE, rt_nick)) == 0:
-                    result.append(f'リストに無いホロ絵師ID({rt_nick})がRTされたのでリスト追加:\n[{date}] <{nick}> ♻{tweet}')
+                    result.append(f'リストに無いホロ絵師ID({rt_nick})がRTされたのでリスト追加:\n[{date}] <{nick}> ♻{tweet.replace("_"," ")}')
                     swiutil.writefile_append(CHECKLIST_FILE, rt_nick)
                     swiutil.tweeet(f'ie {rt_nick}', '#Console@t')
 

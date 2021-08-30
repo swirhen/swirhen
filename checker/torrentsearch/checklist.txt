@@ -35,6 +35,7 @@ doujin|骸骨のスペアリブ
 doujin|カシノ木
 doujin|TTOMM
 doujin|桂あいり
+doujin|ホロケット
 manga|秋月伊槻
 manga|新堂エル
 manga|鬼束直
@@ -84,6 +85,8 @@ manga|白玉もち
 manga|あいらんどう
 manga|ゆのどん
 manga|八尋ぽち
+manga|砂漠
+manga|暮林あさ美
 music|STARLIGHT MASTER
 music|THE@TER CHALLENGE
 music|THE@TER BOOST
@@ -111,6 +114,8 @@ comic|乙嫁語り
 comic|黒いセーラー服
 comic|ゆゆ式
 comic|赫のグリモア
+comic|ブラックラグーン
+comic|Black Lagoon
 doujin|シンデレラガールズ
 doujin|ミリオンライブ
 doujin|CINDERELLA GIRLS

@@ -2395,3 +2395,4 @@ Menomeno_draw
 bt_6924
 cray_illust
 saku2621
+cvmrny

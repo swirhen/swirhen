@@ -3335,3 +3335,5 @@ tetora_teapot
 pentagemon
 lesser_panro
 nagomi_naka
+krs_3939
+kousakus

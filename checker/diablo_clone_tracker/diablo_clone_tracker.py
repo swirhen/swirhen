@@ -90,7 +90,7 @@ def main(force_flg=False):
 if __name__ == "__main__":
     # main section
     args = sys.argv
-    if len(args) == 2 or dt.now().minute == 0:
+    if len(args) == 2 or dt.now().minute == 0 or dt.now().minute == 30:
         main(True)
     else:
         main()

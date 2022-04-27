@@ -80,7 +80,7 @@ def main(force_flg=False):
             post_str += f'US(**変更あり！**)：{p_us} -> {n_us}\n'
         else:
             post_str += f'US：{n_us}\n'
-        if asia_chg_flg:
+        if eu_chg_flg:
             post_str += f'EU(**変更あり！**)：{p_eu} -> {n_eu}\n'
         else:
             post_str += f'EU：{n_eu}\n'

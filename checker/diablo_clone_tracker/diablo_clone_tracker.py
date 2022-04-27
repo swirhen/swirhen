@@ -27,6 +27,9 @@ def main(force_flg=False):
     asia_chg_flg = False
     us_chg_flg = False
     eu_chg_flg = False
+    asia_add_flg = False
+    us_add_flg = False
+    eu_add_flg = False
     with open(PROGRESS_ASIA) as f:
         p_asia = f.readline()[0]
     with open(PROGRESS_US) as f:
@@ -48,21 +51,27 @@ def main(force_flg=False):
             if item['region'] == '1':
                 n_us = item['progress']
                 if n_us != p_us:
-                    us_chg_flg = True
                     swiutil.writefile_new(PROGRESS_US, n_us)
+                    us_chg_flg = True
+                if n_us > p_us:
+                    us_add_flg = True
             elif item['region'] == '2':
                 n_eu = item['progress']
                 if n_eu != p_eu:
-                    eu_chg_flg = True
                     swiutil.writefile_new(PROGRESS_EU, n_eu)
+                    eu_chg_flg = True
+                if n_eu > p_eu:
+                    eu_add_flg = True
             elif item['region'] == '3':
                 n_asia = item['progress']
                 if n_asia != p_asia:
-                    asia_chg_flg = True
                     swiutil.writefile_new(PROGRESS_ASIA, n_asia)
-    
+                    asia_chg_flg = True
+                if n_asia > p_asia:
+                    asia_add_flg = True
+
     if force_flg or us_chg_flg or eu_chg_flg or asia_chg_flg:
-        if us_chg_flg or eu_chg_flg or asia_chg_flg:
+        if us_add_flg or eu_add_flg or asia_add_flg:
             post_str = '@here 【diablo2.io diablo clone tracker】'
         else:
             post_str = '【diablo2.io diablo clone tracker】'
@@ -71,7 +80,7 @@ def main(force_flg=False):
             post_str += '(定時チェック)\n'
         else:
             post_str += '\n'
-        
+
         if asia_chg_flg:
             post_str += f'アジア(**変更あり！**)：{p_asia} -> {n_asia}\n'
         else:
@@ -84,7 +93,7 @@ def main(force_flg=False):
             post_str += f'EU(**変更あり！**)：{p_eu} -> {n_eu}\n'
         else:
             post_str += f'EU：{n_eu}\n'
-        
+
         swiutil.discord_post(DISCORD_CHANNEL, post_str)
 
 if __name__ == "__main__":

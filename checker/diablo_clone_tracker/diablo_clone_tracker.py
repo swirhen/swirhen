@@ -15,7 +15,7 @@ import swirhentv_util as swiutil
 import bot_util as bu
 
 # arguments section
-API_URI='https://diablo2.io/dclone_api.php?ladder=2&hc=2'
+API_URI='https://diablo2.io/dclone_api.php?hc=2'
 SCRIPT_DIR = str(current_dir)
 PROGRESS_ASIA = f'{SCRIPT_DIR}/asia.txt'
 PROGRESS_US = f'{SCRIPT_DIR}/us.txt'

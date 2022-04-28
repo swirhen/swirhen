@@ -21,6 +21,7 @@ PROGRESS_ASIA = f'{SCRIPT_DIR}/asia.txt'
 PROGRESS_US = f'{SCRIPT_DIR}/us.txt'
 PROGRESS_EU = f'{SCRIPT_DIR}/eu.txt'
 DISCORD_CHANNEL = 'diablo-clone-tracker'
+DISCORD_CHANNEL2 = 'diablo-clone-tracker-pub'
 
 # main module
 def main(force_flg=False):
@@ -95,6 +96,7 @@ def main(force_flg=False):
             post_str += f'EU：{n_eu}\n'
 
         swiutil.discord_post(DISCORD_CHANNEL, post_str)
+        swiutil.discord_post(DISCORD_CHANNEL2, post_str)
 
 if __name__ == "__main__":
     # main section

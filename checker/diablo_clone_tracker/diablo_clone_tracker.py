@@ -100,7 +100,7 @@ def main(force_flg=False):
                     if n_eu_l != p_eu_l:
                         swiutil.writefile_new(PROGRESS_EU_L, n_eu_l)
                         eu_chg_flg_l = True
-                    if n_eu_l > p_eu:_l
+                    if n_eu_l > p_eu_l:
                         eu_add_flg_l = True
                 elif item['region'] == '3':
                     n_asia_l = item['progress']

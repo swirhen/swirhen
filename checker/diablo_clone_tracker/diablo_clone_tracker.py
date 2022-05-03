@@ -63,11 +63,11 @@ def main(force_flg=False):
     asia_add_flg_h_l = False
     us_add_flg_h_l = False
     eu_add_flg_h_l = False
-    with open(PROGRESS_ASIA_L) as f:
+    with open(H_PROGRESS_ASIA_L) as f:
         h_p_asia_l = f.readline()[0]
-    with open(PROGRESS_US_L) as f:
+    with open(H_PROGRESS_US_L) as f:
         h_p_us_l = f.readline()[0]
-    with open(PROGRESS_EU_L) as f:
+    with open(H_PROGRESS_EU_L) as f:
         h_p_eu_l = f.readline()[0]
 
     req = urllib.request.Request(API_URI)

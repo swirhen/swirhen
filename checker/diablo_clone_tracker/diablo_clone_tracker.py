@@ -52,6 +52,9 @@ def add_check(p_val, n_val, flag_file):
         else:
             # フラグファイルがない→フラグファイルを作成
             swiutil.writefile_new(flag_file, '1')
+            # 増分が1かつ数値が4以上→報告もする
+            if int(n_val) - int(p_val) == 1 and int(n_val) > 3:
+                return True
     elif p_val > n_val:
         # 減少
         if os.path.isfile(flag_file):
@@ -118,19 +121,19 @@ def main(force_flg=False):
                         if n_us != p_us:
                             swiutil.writefile_new(PROGRESS_US, n_us)
                             us_chg_flg = True
-                        us_add_flg = add_check(p_us, n_us, ADDFLAG_US)                        
+                        us_add_flg = add_check(p_us, n_us, ADDFLAG_US)
                     elif item['region'] == '2':
                         n_eu = item['progress']
                         if n_eu != p_eu:
                             swiutil.writefile_new(PROGRESS_EU, n_eu)
                             eu_chg_flg = True
-                        eu_add_flg = add_check(p_eu, n_eu, ADDFLAG_EU)                        
+                        eu_add_flg = add_check(p_eu, n_eu, ADDFLAG_EU)
                     elif item['region'] == '3':
                         n_asia = item['progress']
                         if n_asia != p_asia:
                             swiutil.writefile_new(PROGRESS_ASIA, n_asia)
                             asia_chg_flg = True
-                        asia_add_flg = add_check(p_asia, n_asia, ADDFLAG_ASIA)                        
+                        asia_add_flg = add_check(p_asia, n_asia, ADDFLAG_ASIA)
                 elif item['ladder'] == '1':
                     if item['region'] == '1':
                         n_us_l = item['progress']

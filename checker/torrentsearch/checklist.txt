@@ -87,6 +87,7 @@ manga|ゆのどん
 manga|八尋ぽち
 manga|砂漠
 manga|暮林あさ美
+manga|COMIC X-EROS (コミックゼロス) #97
 music|STARLIGHT MASTER
 music|THE@TER CHALLENGE
 music|THE@TER BOOST
@@ -124,6 +125,9 @@ doujin|ホロライブ
 doujin|hololive
 doujin|バーチャルyoutuber
 doujin|垂涎の耳
+doujin|らむだ
+live|ホロライブ
+live|hololive
 live|MILLION LIVE
 live|CINDERELLA
 live|ミリオンライブ

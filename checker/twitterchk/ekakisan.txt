@@ -3862,3 +3862,6 @@ mk48torpedo
 Heim_tm
 NatsuMe_ch
 nogia_Ki
+shinomiya_ino
+nagi_kisa
+Sasimi561

@@ -14,8 +14,14 @@ slack_upload() {
   /usr/bin/curl -F channels="${CHANNEL}" -F file="@$1" -F title="$2" -F token=`cat ${SCRIPT_DIR}/token` -F filetype=text https://slack.com/api/files.upload
 }
 
-DRIVES=`df -h | grep data`
-DRIVES_NUM=`echo "${DRIVES}" | wc -l`
+timeout 5 df
+if [ $? -eq 0 ]; then
+    DRIVES=`df -h | grep data`
+    DRIVES_NUM=`echo "${DRIVES}" | wc -l`
+else
+    slack_post "@channel [ALERT] df command timeout: logical drives mount check progress."
+    exit 1
+fi
 
 error=0
 until [ ${DRIVES_NUM} -eq ${DRIVES_NUM_CORRECT} ];

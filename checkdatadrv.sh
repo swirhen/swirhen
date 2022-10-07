@@ -14,7 +14,7 @@ slack_upload() {
   /usr/bin/curl -F channels="${CHANNEL}" -F file="@$1" -F title="$2" -F token=`cat ${SCRIPT_DIR}/token` -F filetype=text https://slack.com/api/files.upload
 }
 
-timeout 5 df
+timeout 5 df | grep data > /dev/null
 if [ $? -eq 0 ]; then
     DRIVES=`df -h | grep data`
     DRIVES_NUM=`echo "${DRIVES}" | wc -l`

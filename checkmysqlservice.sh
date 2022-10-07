@@ -3,7 +3,7 @@ PYTHON_PATH="python3"
 CHANNEL="bot-open"
 
 slack_post() {
-    ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "${CHANNEL}" "$1"
+    ${PYTHON_PATH} /home/swirhen/sh/slack_post.py "${CHANNEL}" "$1"
 }
 
 echo "`date`"

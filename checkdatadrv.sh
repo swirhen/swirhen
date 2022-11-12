@@ -19,8 +19,16 @@ if [ $? -eq 0 ]; then
     DRIVES=`df -h | grep data`
     DRIVES_NUM=`echo "${DRIVES}" | wc -l`
 else
-    slack_post "@channel [ALERT] df command timeout: logical drives mount check progress."
-    exit 1
+    NFS_ISDEAD=`/usr/bin/ssh 192.168.0.109 -p 49880 sudo systemctl status nfs-server | grep Active | grep dead | wc -l`
+    if [ ${NFS_ISDEAD} -eq 1 ]; then
+        /usr/bin/ssh 192.168.0.109 -p 49880 sudo systemctl start nfs-server
+        sleep 10
+    fi
+    timeout 5 df | grep data > /dev/null
+    if [ $? -eq 0 ]; then
+        slack_post "@channel [ALERT] df command timeout: logical drives mount check progress."
+        exit 1
+    fi
 fi
 
 error=0

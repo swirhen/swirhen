@@ -26,6 +26,9 @@ else
     fi
     timeout 5 df | grep data > /dev/null
     if [ $? -eq 0 ]; then
+        DRIVES=`df -h | grep data`
+        DRIVES_NUM=`echo "${DRIVES}" | wc -l`
+    else
         slack_post "@channel [ALERT] df command timeout: logical drives mount check progress."
         exit 1
     fi

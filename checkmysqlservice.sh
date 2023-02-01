@@ -13,7 +13,7 @@ echo "`date`"
 #     echo "mysql live."
 mysqlerror=`tail -10 /home/swirhen/tiarra/tiarra.log | grep "Lost connection to MySQL server"`
 
-if [ "${mysqllive}" != "" ]; then
+if [ "${mysqlerror}" = "" ]; then
     echo "mysql and tiarra connection is normal."
 else
     sudo systemctl restart mysql

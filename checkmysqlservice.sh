@@ -7,27 +7,18 @@ slack_post() {
 }
 
 echo "`date`"
-mysqllive=`systemctl status mysql | grep Active | grep running`
+# mysqllive=`systemctl status mysql | grep Active | grep running`
+
+# if [ "${mysqllive}" != "" ]; then
+#     echo "mysql live."
+mysqlerror=`tail -10 tiarra/tiarra.log | grep "Lost connection to MySQL server"`
 
 if [ "${mysqllive}" != "" ]; then
-    echo "mysql live."
+    echo "mysql and tiarra connection is normal."
 else
-    error=0
-    until [ "${mysqllive}" != "" ];
-    do
-        (( error++ ))
-        if [ $error -gt 5 ]; then
-            break;
-        fi
-        sudo systemctl restart mysql
-        mysqllive=`systemctl status mysql | grep Active | grep running`
-    done
-    if [ $error -gt 5 ]; then
-        TEXT="@channel [ALERT] mysql service has gone and restart failed."
-        slack_post "${TEXT}"
-    elif [ "$1" != "" ]; then
-        /home/swirhen/sh/tiarrakw.sh
-        TEXT="@here [INFO] mysql service has gone. restart ok and tiarra restarted. irssi must be re-connect."
-        slack_post "${TEXT}"
-    fi
+    sudo systemctl restart mysql
+    sleep 5
+    /home/swirhen/sh/tiarrakw.sh
+    TEXT="@here [INFO] mysql and tiarra connection is error. mysql and tiarra restarted. irssi must be re-connect."
+    slack_post "${TEXT}"
 fi

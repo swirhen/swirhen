@@ -11,7 +11,7 @@ echo "`date`"
 
 # if [ "${mysqllive}" != "" ]; then
 #     echo "mysql live."
-mysqlerror=`tail -10 tiarra/tiarra.log | grep "Lost connection to MySQL server"`
+mysqlerror=`tail -10 /home/swirhen/tiarra/tiarra.log | grep "Lost connection to MySQL server"`
 
 if [ "${mysqllive}" != "" ]; then
     echo "mysql and tiarra connection is normal."

@@ -4,7 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)"
 PYTHON_PATH="python3"
 CHANNEL="bot-open"
 #CHANNEL="bot-sandbox"
-DRIVES_NUM_CORRECT=7
+DRIVES_NUM_CORRECT=8
 
 slack_post() {
   ${PYTHON_PATH} /home/swirhen/sh/slack_post.py "${CHANNEL}" "$1"

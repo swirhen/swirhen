@@ -20,6 +20,7 @@ import swirhentv_util as swiutil
 # argument section
 SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/ekakisan.txt'
+TIG_GROUP_XML = '/home/swirhen/dotfile/TIG/Configs/swirhen/Groups.xml'
 CHECK_CHANNEL = '#Twitter@t3'
 TDATETIME = dt.now()
 DATETIME = TDATETIME.strftime('%Y/%m/%d %H:%M:%S')
@@ -116,3 +117,7 @@ if len(result) > 0:
     repo.git.commit(CHECKLIST_FILE, message='ekakisan.txt update')
     repo.git.pull()
     repo.git.push()
+    repo2 = git.Repo('/home/swirhen/dotfile')
+    repo2.git.commit(TIG_GROUP_XML, message='new ekakisan')
+    repo2.git.pull()
+    repo2.git.push()

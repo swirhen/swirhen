@@ -1,5 +1,6 @@
 doujin https://sukebei.nyaa.si/?page=rss&c=1_2
 manga https://sukebei.nyaa.si/?page=rss&c=1_4
+pictures https://sukebei.nyaa.si/?page=rss&c=1_5
 music https://nyaa.si/?page=rss&c=2_0
 comic https://nyaa.si/?page=rss&c=3_3
 live https://nyaa.si/?page=rss&c=4_4

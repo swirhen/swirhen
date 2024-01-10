@@ -1,4 +1,7 @@
 av|ありすほりっく
+av|泉りおん
+av|高野しずか
+av|松本いちか
 comic|Black Lagoon
 comic|ゆゆ式
 comic|アオイホノオ
@@ -24,8 +27,11 @@ doujin|TTOMM
 doujin|TWILIGHT DUSK
 doujin|abgrund
 doujin|bolze
+doujin|Happykeeper
 doujin|hololive
+doujin|ホロライブ
 doujin|vtuber
+doujin|WIREFRAME
 doujin|えいとまん
 doujin|きつね屋
 doujin|じこまんぞく
@@ -44,6 +50,7 @@ doujin|カシノ木
 doujin|サウンドステッカー
 doujin|サルルルル
 doujin|シンデレラガールズ
+doujin|スタジオひとりぼっち
 doujin|セカンドカラー
 doujin|バーチャルyoutuber
 doujin|バス停シャワー
@@ -70,6 +77,35 @@ doujin|垂涎の耳
 doujin|超斬開
 doujin|来つ寝
 doujin|龍企画
+doujin|空中線
+doujin|じゃがぁの～と
+doujin|いちのや
+doujin|みいむい
+doujin|エス書店
+doujin|ソクシコンボ
+doujin|ミルクファーム田中
+doujin|タカハシノヲト
+doujin|なるせずむ
+doujin|研ぎ水
+doujin|狼狽亭
+doujin|ラインアウト
+doujin|パンナコッタ
+doujin|ハチゴ
+doujin|犬居ぬいぬ
+doujin|新生ロリショタ
+doujin|不可不可
+doujin|猫乃またたび
+doujin|まいた計画
+doujin|ナマイタチ
+doujin|乱視と君と
+doujin|とみょー
+doujin|よから
+doujin|陰謀の帝国
+doujin|コデインガール
+doujin|せなか
+doujin|ほかほかおふとんくらぶ
+doujin|焼きたてジャマイカA
+doujin|塩ひとつまみ
 live|BANDAI NAMCO
 live|CINDERELLA
 live|MILLION LIVE
@@ -89,6 +125,7 @@ manga|せいほうけい
 manga|たいぷはてな
 manga|ななもと盈
 manga|へんりいだ
+manga|ほしとラッキー
 manga|ゆのどん
 manga|オオカミうお
 manga|サバイバル刃
@@ -146,3 +183,4 @@ music|THE@TER BOOST
 music|THE@TER CHALLENGE
 music|hololive
 pictures|ふみひこ
+doujin|推しのとなり

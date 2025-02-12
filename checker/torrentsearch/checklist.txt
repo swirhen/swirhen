@@ -2,6 +2,11 @@ av|ありすほりっく
 av|松本いちか
 av|泉りおん
 av|高野しずか
+av|媚薬漬け
+av|露出
+av|男の娘
+av|生徒会長は真性露出狂
+av|SORA-
 comic|Black Lagoon
 comic|ゆゆ式
 comic|アオイホノオ
@@ -45,6 +50,7 @@ doujin|WIREFRAME
 doujin|abgrund
 doujin|blue lung
 doujin|bolze
+doujin|caburibbon
 doujin|candy apricot
 doujin|hololive
 doujin|listless time
@@ -53,10 +59,12 @@ doujin|tabgraphics
 doujin|valssu
 doujin|vtuber
 doujin|white parabellum
+doujin|あらと安里
 doujin|いちのや
 doujin|えいとまん
 doujin|きつね屋
 doujin|ぐりえるも
+doujin|さーき
 doujin|じこまんぞく
 doujin|じゃがぁの～と
 doujin|せなか
@@ -77,6 +85,7 @@ doujin|めんてい
 doujin|よから
 doujin|らむだ
 doujin|りかたん☆
+doujin|りふれぼコミック
 doujin|アレクササンダー
 doujin|エス書店
 doujin|オシゴトシアター
@@ -90,6 +99,7 @@ doujin|セカンドカラー
 doujin|ソクシコンボ
 doujin|タカハシノヲト
 doujin|チーム☆ラッキー
+doujin|トラップダンジョン
 doujin|ナマイタチ
 doujin|ハチゴ
 doujin|バス停シャワー
@@ -140,6 +150,9 @@ doujin|陰謀の帝国
 doujin|雨小雨
 doujin|骸骨のスペアリブ
 doujin|龍企画
+doujin|露出
+doujin|催眠
+doujin|洗脳
 live|BANDAI NAMCO
 live|CINDERELLA
 live|MILLION LIVE
@@ -158,6 +171,7 @@ manga|さつよ
 manga|せいほうけい
 manga|たいぷはてな
 manga|ななもと盈
+manga|ひょうが。
 manga|へんりいだ
 manga|ほしとラッキー
 manga|ゆのどん
@@ -206,6 +220,7 @@ manga|軽部ぐり
 manga|雪雨こん
 manga|香月りお
 manga|鬼束直
+manga|千要よゆち
 music|Blooming Clover
 music|CINDERELLA GIRLS
 music|CINDERELLA MASTER

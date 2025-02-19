@@ -5,7 +5,7 @@ CHANNEL="bot-open"
 DRIVES_NUM_CORRECT=8
 
 slack_post() {
-    ${PYTHON_PATH} /home/swirhen/sh/slackbot/swirhentv/post.py "${CHANNEL}" "$1"
+    ${PYTHON_PATH} /home/swirhen/sh/slack_post.py "${CHANNEL}" "$1"
 }
 
 slack_upload() {

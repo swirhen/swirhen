@@ -102,6 +102,25 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
     return hit_result
 
 
+# nyaa データベース検索(外部利用版)
+def search_seed_ext(category, keyword):
+    # 検索
+    conn = sqlite3.connect(FEED_DB)
+    cur = conn.cursor()
+    select_sql = 'select category, title, link, download_dir' \
+                 ' from feed_data'
+    if category != 'all':
+        select_sql += f' where category = "{category}"' \
+                      f' and title like "%{keyword}%"'
+    else:
+        select_sql += f' where title like "%{keyword}%"'
+
+    search_result = list(cur.execute(select_sql))
+    conn.close()
+
+    return search_result
+
+
 if __name__ == '__main__':
     # 報告用日付
     tdatetime = dt.now()

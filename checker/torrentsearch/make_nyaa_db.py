@@ -84,8 +84,8 @@ def make_nyaa_data(category='all'):
         item_title = seed_item[1]
         item_link = seed_item[2]
         item_pubdate =  dt.strptime(seed_item[3], '%a, %d %b %Y %H:%M:%S')
-        if not swiutil.is_zh(item_title):
-            values.append(f'("{item_category}", "{item_title}", "{item_link}", "{item_pubdate}")')
+#        if not swiutil.is_zh(item_title):
+        values.append(f'("{item_category}", "{item_title}", "{item_link}", "{item_pubdate}")')
 
     values_str = ', '.join(values)
     insert_sql = 'insert into feed_data(category, title, link, pubdate)' \

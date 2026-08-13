@@ -23,6 +23,8 @@ av|💙
 av|💚
 av|🩵
 av|💢
+av|❤︎
+av|❤️
 av|MIMK-253
 comic|Black Lagoon
 comic|ゆゆ式
@@ -80,6 +82,7 @@ doujin|いちのや
 doujin|えいとまん
 doujin|きつね屋
 doujin|ぐりえるも
+doujin|こめ農家
 doujin|さーき
 doujin|じこまんぞく
 doujin|じゃがぁの～と
@@ -88,6 +91,7 @@ doujin|たんぽぽ水産
 doujin|でんぶ腿
 doujin|とみょー
 doujin|なるせずむ
+doujin|うらぶいせいかつ
 doujin|ふわとろ☆まりんぽりす
 doujin|ぺろめっくす
 doujin|ほかほかおふとんくらぶ
@@ -203,6 +207,8 @@ manga|ひょうが。
 manga|へんりいだ
 manga|ほしとラッキー
 manga|ゆのどん
+manga|りーあんく
+manga|るるえぱ
 manga|オオカミうお
 manga|サバイバル刃
 manga|ジャイロウ

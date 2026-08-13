@@ -19,7 +19,6 @@ GIT_ROOT_DIR = '/home/swirhen/sh'
 SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/checklist.txt'
 URL_LIST_FILE = f'{SCRIPT_DIR}/urllist.txt'
-DL_URL_LIST_FILE = f'{SCRIPT_DIR}/download_url.txt'
 LAST_CHECK_DATE_FILE = f'{SCRIPT_DIR}/last_check_date.txt'
 FEED_DB = f'{SCRIPT_DIR}/nyaatorrent_feed.db'
 DOWNLOAD_DIR_ROOT = '/data/share/temp/torrentsearch'

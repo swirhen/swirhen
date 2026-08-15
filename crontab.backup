@@ -1,0 +1,41 @@
+# m h  dom mon dow   command
+MAILTO=""
+PATH=/home/swirhen/.rbenv/shims:/home/swirhen/.rbenv/bin:/home/swirhen/perl5/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/swirhen/.rvm/bin
+5-50/15 * * * * /home/swirhen/sh/upip.sh
+0 0 * * * /home/swirhen/sh/upip.sh f
+#*/15 * * * * /home/swirhen/sh/checkdatadrv.sh
+#*/5 * * * * /home/swirhen/sh/checkmysqlservice.sh
+@reboot sleep 30; /home/swirhen/sh/tiarrakw.sh
+@reboot mkdir /tmp/vga
+#@reboot nohup python /data/share/movie/sh/python-lib/slackbot_run.py > /dev/null &
+#@reboot nohup python /data/share/movie/sh/python-lib/discord_bot.py > /dev/null &
+#@reboot nohup python /data/share/movie/sh/python-lib/discord_bot_ztb.py > /dev/null &
+0 1 * * * /home/swirhen/sh/backup.sh
+0 1 * * * /data/share/movie/sh/cron_backup.sh
+#0 0 * * * python /data/share/movie/sh/python-lib/make_feed_list.py
+0 0-2,6-23 * * * python /data/share/movie/sh/python-lib/jihou.py
+
+#* * 1-7 * * [ "$(date '+\%w')" -eq 1 ] && echo "だいいちげつようび～"
+#* * 8-14 * * [ "$(date '+\%w')" -eq 1 ] && echo "だいにかようび～"
+#* * 15-21 * * [ "$(date '+\%w')" -eq 4 ] && echo "だいさんもくようび～"
+#* * 22-28 * * [ "$(date '+\%w')" -eq 3 ] && echo "だいよんすいようび～"
+#* * 29-31 * * [ "$(date '+\%w')" -eq 5 ] && echo "だいごきんようび～"
+
+# 汎用 torrent seed check
+55 * * * * python /home/swirhen/sh/checker/torrentsearch/make_nyaa_db.py
+0 * * * * python /home/swirhen/sh/checker/torrentsearch/torrentsearch.py
+
+# swirhentv auto download
+55 5,11,17,23 * * * python /data/share/movie/sh/make_nyaa_movie_db.py
+#0 0,6,12,18 * * * python /data/share/movie/sh/auto_publish.py
+
+# agqr プレイリストURLチェック
+#25,55 * * * * python /data/share/movie/sh/radio_record.py ca
+#5 0 * * * python /data/share/movie/sh/radio_record.py ca force
+# radiko プレイリストURL＆地域判定チェック
+##15,45 * * * * python /data/share/movie/sh/radio_record.py crl
+##5,35 * * * * python /data/share/movie/sh/radio_record.py cr
+##6 0 * * * python /data/share/movie/sh/radio_record.py cr force
+
+# きょうのいちまい
+0 9,12,15,18,21 * * * python /data/share/movie/sh/python-lib/today_picture.py

@@ -18,7 +18,7 @@ import sqlite3
 GIT_ROOT_DIR = '/home/swirhen/sh'
 SCRIPT_DIR = str(current_dir)
 CHECKLIST_FILE = f'{SCRIPT_DIR}/checklist.txt'
-URL_LIST_FILE = f'{SCRIPT_DIR}/urllist.txt'
+IGNOREWORD_LIST_FILE = f'{SCRIPT_DIR}/igword.txt'
 LAST_CHECK_DATE_FILE = f'{SCRIPT_DIR}/last_check_date.txt'
 FEED_DB = f'{SCRIPT_DIR}/nyaatorrent_feed.db'
 DOWNLOAD_DIR_ROOT = '/data/share/temp/torrentsearch'
@@ -41,7 +41,7 @@ def search_seed_resent(category, offset_days):
 
 
 # nyaa データベース検索・ダウンロード
-def search_seed(download_flg, category, keyword, last_check_date=''):
+def search_seed(download_flg, category, keyword, last_check_date='', ignore_word_list=[]):
     date_str = dt.now().strftime('%Y%m%d')
     download_dir = f'{DOWNLOAD_DIR_ROOT}/{date_str}'
 
@@ -72,21 +72,24 @@ def search_seed(download_flg, category, keyword, last_check_date=''):
             item_title = search_item[1]
             item_link = search_item[2]
             item_download_dir = search_item[3]
-            if download_flg:
-                hit_result.append([item_category, item_title, keyword, item_link])
-                if not os.path.isdir(download_dir):
-                    os.mkdir(download_dir)
-                item_title = swiutil.truncate(item_title.translate(str.maketrans('/;!','___')), 247)
-                try:
-                    data = urllib.request.urlopen(item_link).read()
-                except Exception as e:
-                    print(e)
-                else:
-                    with open(f'{download_dir}/{item_title}.torrent', mode='wb') as file:
-                        file.write(data)
-                    link_values.append(item_link)
+            if any(word in item_title for word in ignore_word_list):
+                continue
             else:
-                hit_result.append([item_category, item_title, keyword, item_link, item_download_dir])
+                if download_flg:
+                    hit_result.append([item_category, item_title, keyword, item_link])
+                    if not os.path.isdir(download_dir):
+                        os.mkdir(download_dir)
+                    item_title = swiutil.truncate(item_title.translate(str.maketrans('/;!','___')), 247)
+                    try:
+                        data = urllib.request.urlopen(item_link).read()
+                    except Exception as e:
+                        print(e)
+                    else:
+                        with open(f'{download_dir}/{item_title}.torrent', mode='wb') as file:
+                            file.write(data)
+                        link_values.append(item_link)
+                else:
+                    hit_result.append([item_category, item_title, keyword, item_link, item_download_dir])
 
         # ダウンロード対象の更新
         if download_flg:
@@ -134,6 +137,11 @@ if __name__ == '__main__':
     # 今回の取得時刻
     now_date = tdatetime.strftime('%Y-%m-%d %H:%M')
 
+    # 無視ワードリスト取得(1行1ワード)
+    ignore_word_list = []
+    with open(IGNOREWORD_LIST_FILE) as file:
+        ignore_word_list = file.read().splitlines()
+
     # チェックリスト取得(カテゴリごとのキーワード配列)
     check_list = dict()
     with open(CHECKLIST_FILE) as file:
@@ -150,7 +158,7 @@ if __name__ == '__main__':
     # チェックリストごとにカテゴリ、キーワードでキーワードリスト検索、ダウンロード
     for check_category in check_list:
         for check_keyword in check_list[check_category]:
-            search_result = search_seed(True, check_category, check_keyword, last_check_date)
+            search_result = search_seed(True, check_category, check_keyword, last_check_date, ignore_word_list)
             if len(search_result) > 0:
                 hit_result.extend(search_result)
 

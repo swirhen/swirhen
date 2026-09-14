@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # cronのバックアップ
-cd /home/swirhen/sh1
+cd /home/swirhen/sh
 crontab -l > crontab.backup
 
 git commit -m 'crontab backup' crontab.backup

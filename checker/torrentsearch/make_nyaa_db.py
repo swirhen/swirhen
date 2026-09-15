@@ -8,14 +8,15 @@ from datetime import datetime as dt
 import urllib.request
 import sqlite3
 import xml.etree.ElementTree as elementTree
-sys.path.append('/data/share/movie/sh/python-lib/')
-import swirhentv_util as swiutil
+current_dir = pathlib.Path(__file__).resolve().parent
+sys.path.append(str(current_dir))
+import torrent_search_common as tsc
 
 # argment section
-current_dir = pathlib.Path(__file__).resolve().parent
 SCRIPT_DIR = str(current_dir)
 URL_LIST_FILE = f'{SCRIPT_DIR}/urllist.txt'
 FEED_DB = f'{SCRIPT_DIR}/nyaatorrent_feed.db'
+RSS_FETCH_TIMEOUT_SECONDS = 20
 
 
 # すべてのフィード取得(ループ親)
@@ -39,7 +40,7 @@ def get_seed_list_proc(category, feed_uri):
     seed_list = []
     req = urllib.request.Request(feed_uri)
     try:
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, timeout=RSS_FETCH_TIMEOUT_SECONDS) as response:
             xml_string = response.read()
     except Exception as e:
         print(e)
@@ -47,7 +48,7 @@ def get_seed_list_proc(category, feed_uri):
         xml_root = elementTree.fromstring(xml_string)
 
         for item in xml_root.findall('./channel/item'):
-            seed_info = [category, item.find('title').text.translate(str.maketrans('"\'','__')), item.find('link').text, item.find('pubDate').text[:-6]]
+            seed_info = [category, item.find('title').text, item.find('link').text, item.find('pubDate').text[:-6]]
             seed_list.append(seed_info)
 
     return seed_list
@@ -67,16 +68,20 @@ def make_nyaa_data(category='all'):
 
     conn = sqlite3.connect(FEED_DB)
     cur = conn.cursor()
-    # 参考SQL
-    drop_table_sql = 'drop table if exists feed_data'
-    create_table_sql = 'create table if not exists feed_data(' \
-                        ' category string,' \
-                        ' title string,' \
-                        ' link string unique,' \
-                        ' pubdate timestamp,' \
-                        ' created_at timestamp default (datetime(\'now\', \'localtime\'))),' \
-                        ' download_dir string'
-    delete_record_sql = 'delete from feed_data where category'
+    # 参考SQL(テーブルは手動作成する前提。環境構築時にsqlite3 CLIへ貼り付けて使用)
+    """
+    drop table if exists feed_data;
+    create table if not exists feed_data(
+        category string,
+        title string,
+        link string unique,
+        pubdate timestamp,
+        created_at timestamp default (datetime('now', 'localtime')),
+        download_dir string,
+        download_failed_at timestamp
+    );
+    delete from feed_data where category = '';
+    """
 
     values = []
     for seed_item in all_seed_list:
@@ -84,19 +89,18 @@ def make_nyaa_data(category='all'):
         item_title = seed_item[1]
         item_link = seed_item[2]
         item_pubdate =  dt.strptime(seed_item[3], '%a, %d %b %Y %H:%M:%S')
-        if item_category == 'av' and swiutil.is_zh(item_title):
+        if item_category == 'av' and tsc.is_zh(item_title):
             continue
         else:
-            values.append(f'("{item_category}", "{item_title}", "{item_link}", "{item_pubdate}")')
+            values.append((item_category, item_title, item_link, str(item_pubdate)))
 
-    values_str = ', '.join(values)
     insert_sql = 'insert into feed_data(category, title, link, pubdate)' \
-                f' values{values_str}' \
-                ' on conflict(link) do nothing'
+                 ' values (?, ?, ?, ?)' \
+                 ' on conflict(link) do nothing'
     try:
-        cur.execute(insert_sql)
+        cur.executemany(insert_sql, values)
     except Exception as e:
-        swiutil.multi_post('torrent-search', f'@channel sql insert error: {e}')
+        tsc.discord_post('torrent-search', f'@channel sql insert error: {e}')
     else:
         conn.commit()
     conn.close()

@@ -5,4 +5,5 @@ logs/*
 temp/*
 *.db
 last_check_date.txt
+discord_webhook_url
 __pycache__

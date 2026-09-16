@@ -341,7 +341,18 @@ function App() {
 		else url.searchParams.delete('c')
 		window.history.replaceState(null, '', url)
 	}
-	const savedSearches = <div className="pagination-saved-searches"><button type="button" onClick={saveSearchCondition}>検索条件保存</button><select value={selectedSearchCondition} onChange={event => applySearchCondition(event.target.value)} aria-label="保存した検索条件"><option value="">保存した検索条件</option>{searchConditions.map((condition, index) => <option key={`${condition.category}-${condition.keyword}-${index}`} value={index}>{condition.category || 'all'}: {condition.keyword}</option>)}</select></div>
+	const deleteSearchCondition = async () => {
+		if (selectedSearchCondition === '') return
+		try {
+			const response = await fetch(`${base}/search-conditions/${selectedSearchCondition}`, { method: 'DELETE' })
+			if (!response.ok) throw Error('検索条件の削除に失敗しました')
+			setSearchConditions(await response.json() as SearchCondition[])
+			setSelectedSearchCondition('')
+		} catch (error) {
+			window.alert(error instanceof Error ? error.message : '検索条件の削除に失敗しました')
+		}
+	}
+	const savedSearches = <div className="pagination-saved-searches"><button type="button" onClick={saveSearchCondition}>検索条件保存</button><select value={selectedSearchCondition} onChange={event => applySearchCondition(event.target.value)} aria-label="保存した検索条件"><option value="">保存した検索条件</option>{searchConditions.map((condition, index) => <option key={`${condition.category}-${condition.keyword}-${index}`} value={index}>{condition.category || 'all'}: {condition.keyword}</option>)}</select><button type="button" disabled={selectedSearchCondition === ''} onClick={deleteSearchCondition}>削除</button></div>
 	const pagination = <div className="pagination-controls"><button disabled={page === 1} onClick={() => setPage(1)}>最初へ</button><button disabled={page === 1} onClick={() => setPage(page - 1)}>前へ</button><b>{rangeStart}-{rangeEnd} / {total}</b><button disabled={page === pages} onClick={() => setPage(page + 1)}>次へ</button><button disabled={page === pages} onClick={() => setPage(pages)}>最後へ</button><select value={pageSize} onChange={event => updatePageSize(Number(event.target.value))} aria-label="表示件数"><option value="10">10件</option><option value="20">20件</option><option value="50">50件</option><option value="100">100件</option></select></div>
 
 	return <main>

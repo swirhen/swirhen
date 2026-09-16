@@ -157,6 +157,21 @@ def save_search_condition(payload: SearchCondition, _auth=Depends(require_auth))
         temporary.replace(SEARCH_CONDITIONS_FILE)
     return saved
 
+@app.delete('/api/search-conditions/{index}')
+def delete_search_condition(index: int, _auth=Depends(require_auth)):
+    try:
+        conditions=json.loads(SEARCH_CONDITIONS_FILE.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError):
+        conditions=[]
+    saved=[SearchCondition(**item).model_dump() for item in conditions]
+    if index < 0 or index >= len(saved):
+        raise HTTPException(status_code=404, detail='指定した検索条件が見つかりません')
+    del saved[index]
+    temporary=SEARCH_CONDITIONS_FILE.with_suffix('.json.tmp')
+    temporary.write_text(json.dumps(saved, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    temporary.replace(SEARCH_CONDITIONS_FILE)
+    return saved
+
 @app.post('/api/feed-data/download')
 def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
     if payload.source not in ('current', 'archive'):

@@ -80,7 +80,14 @@ def make_nyaa_data(category='all'):
         download_dir string,
         download_failed_at timestamp
     );
-    delete from feed_data where category = '';
+    create index if not exists idx_feed_data_category_download_created_at
+        on feed_data(category, download_dir, created_at);
+    create index if not exists idx_feed_data_category_download_failed_at
+        on feed_data(category, download_dir, download_failed_at);
+    create index if not exists idx_feed_data_download_created_at
+        on feed_data(download_dir, created_at);
+    create index if not exists idx_feed_data_category_pubdate
+        on feed_data(category, pubdate);
     """
 
     values = []

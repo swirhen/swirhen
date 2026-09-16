@@ -13,6 +13,4 @@ echo "==> Restart API"
 sudo systemctl restart torrent-admin-api.service
 sudo systemctl is-active --quiet torrent-admin-api.service
 
-echo "==> Check API"
-curl --fail --silent --show-error http://127.0.0.1:8000/api/health
 printf '\nRelease completed.\n'

@@ -78,7 +78,7 @@ function App() {
 		await fetch(`${base}/logout`, { method: 'POST' })
 		setAuthenticated(false)
 	}
-	if (!authenticated) return <main className="login-page"><form className="login-form" onSubmit={login} method="post" autoComplete="on"><h2>た、種ぇぇ</h2><label>ユーザー名<input name="username" value={username} onChange={event => setUsername(event.target.value)} autoComplete="username"/></label><label>パスワード<input name="password" type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password"/></label>{loginError && <p className="login-error">{loginError}</p>}<button type="submit">ログイン</button></form></main>
+	if (!authenticated) return <main className="login-page"><form className="login-form" onSubmit={login} method="post" autoComplete="on"><h2>おれたちの　あいことば</h2><label>ユーザー名<input name="username" value={username} onChange={event => setUsername(event.target.value)} onKeyDown={event => { if (event.key === 'Tab' && !username) setUsername('dankogai') }} autoComplete="username" placeholder="dankogai"/></label><label>パスワード<input name="password" type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" placeholder="kog"/></label>{loginError && <p className="login-error">{loginError}</p>}<button type="submit">ログイン</button></form></main>
 	const pages = Math.max(1, Math.ceil((data.data?.total ?? 0) / pageSize))
 	const total = data.data?.total ?? 0
 	const categories = data.data?.categories ?? []

@@ -18,6 +18,14 @@ cd web
 
 開発サーバーは `npm run dev`。本番は `VITE_BASE_PATH=/torrent-admin/ npm run build` とし、httpdで `dist/` を配信、`/torrent-admin/api/` を `http://127.0.0.1:8000/api/` へProxyPassします。
 
+ローカルで管理画面を起動する場合:
+
+```powershell
+cd web
+$env:Path = "C:\Program Files\nodejs;$env:Path"
+npm run dev
+```
+
 本番APIは付属の `torrent-admin-api.service` をsystemdへ登録して起動します。
 
 ```bash

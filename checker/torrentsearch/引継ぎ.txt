@@ -59,4 +59,9 @@ DB切り替え
   TORRENT_ADMIN_USERNAME / TORRENT_ADMIN_PASSWORD / TORRENT_ADMIN_SECRET。
 - ローカルデバッグではtorrentsearch/idpass.txtの1行目をID、2行目をパスワードとして読める。
 - idpass.txtは.gitignore対象。実際の認証情報はコミットしないこと。
+- ローカルデバッグ開始時は、まずtorrentsearch/idpass.txtが存在することだけ確認する。内容は表示・ログ出力しない。
+- API起動（ターミナル1）: `cd checker/torrentsearch/web` → `python -m uvicorn api:app --reload --host 127.0.0.1 --port 8000`
+- Vite起動（ターミナル2）: `cd checker/torrentsearch/web` → `npm.cmd run dev`
+- ブラウザ: `http://127.0.0.1:5173/`。Viteが/apiを8000番へプロキシする。
+- 終了時はAPIとViteの各ターミナルでCtrl+C。デバッグ開始前にidpass.txtの実値を確認して入力する。
 - 変更後はnpm.cmd run buildとpython -m py_compile api.pyを実行する。

@@ -57,4 +57,6 @@ DB切り替え
 - release.shはVITE_BASE_PATH=/torrent-admin/でビルドする。
 - 認証環境変数は/etc/default/torrent-admin-apiの
   TORRENT_ADMIN_USERNAME / TORRENT_ADMIN_PASSWORD / TORRENT_ADMIN_SECRET。
+- ローカルデバッグではtorrentsearch/idpass.txtの1行目をID、2行目をパスワードとして読める。
+- idpass.txtは.gitignore対象。実際の認証情報はコミットしないこと。
 - 変更後はnpm.cmd run buildとpython -m py_compile api.pyを実行する。

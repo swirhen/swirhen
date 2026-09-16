@@ -10,11 +10,20 @@ from pydantic import BaseModel
 app=FastAPI(title='Torrent Feed Admin API')
 DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed.db'
 ARCHIVE_DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed_before_2023.db'
+IDPASS_FILE=Path(__file__).resolve().parents[1]/'idpass.txt'
 deleted_batches: dict[str, list[dict]] = {}
 AUTH_COOKIE='torrent_admin_session'
 SESSION_TTL=60 * 60 * 24 * 180
-USERNAME=os.getenv('TORRENT_ADMIN_USERNAME', 'dankogai')
-PASSWORD=os.getenv('TORRENT_ADMIN_PASSWORD', '')
+def load_local_credentials():
+    try:
+        lines=IDPASS_FILE.read_text(encoding='utf-8').splitlines()
+    except OSError:
+        return 'dankogai', ''
+    return (lines[0].strip() if lines else 'dankogai', lines[1].strip() if len(lines) > 1 else '')
+
+LOCAL_USERNAME, LOCAL_PASSWORD=load_local_credentials()
+USERNAME=os.getenv('TORRENT_ADMIN_USERNAME', LOCAL_USERNAME)
+PASSWORD=os.getenv('TORRENT_ADMIN_PASSWORD', LOCAL_PASSWORD)
 SECRET=os.getenv('TORRENT_ADMIN_SECRET', '')
 
 class FeedDeleteRequest(BaseModel):

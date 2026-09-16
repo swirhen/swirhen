@@ -23,6 +23,7 @@ type PasswordCredentialConstructor = new (data: { id: string; password: string }
 
 const base = `${import.meta.env.BASE_URL}api`
 const client = new QueryClient()
+const initialCategory = new URLSearchParams(window.location.search).get('c') ?? ''
 
 function App() {
 	const [q, setQ] = React.useState('')
@@ -31,7 +32,7 @@ function App() {
 	const [username, setUsername] = React.useState('')
 	const [password, setPassword] = React.useState('')
 	const [loginError, setLoginError] = React.useState('')
-	const [category, setCategory] = React.useState('')
+	const [category, setCategory] = React.useState(initialCategory)
 	const [dateFrom, setDateFrom] = React.useState('')
 	const [dateTo, setDateTo] = React.useState('')
 	const [downloadedOnly, setDownloadedOnly] = React.useState(false)
@@ -126,6 +127,10 @@ function App() {
 	const selectCategory = (value: string) => {
 		setCategory(value)
 		setPage(1)
+		const url = new URL(window.location.href)
+		if (value) url.searchParams.set('c', value)
+		else url.searchParams.delete('c')
+		window.history.replaceState(null, '', url)
 	}
 	const toggleDownloadedOnly = () => {
 		setDownloadedOnly(current => !current)

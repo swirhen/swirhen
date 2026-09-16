@@ -210,7 +210,7 @@ def get_db(source: str):
         return ARCHIVE_DB
     return DB
 @app.get('/api/feed-data')
-def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100), source:str=Query('current', pattern='^(current|archive)$')):
+def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), not_downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100), source:str=Query('current', pattern='^(current|archive)$')):
     conditions=[]; args=[]
     if q:
         search_condition, search_args=build_title_search(q)
@@ -228,6 +228,8 @@ def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='
         args.append(date_to)
     if downloaded:
         conditions.append('download_dir IS NOT NULL')
+    elif not_downloaded:
+        conditions.append('download_dir IS NULL')
     where=f" WHERE {' AND '.join(conditions)}" if conditions else ''
     off=(page-1)*page_size
     with sqlite3.connect(get_db(source)) as c:

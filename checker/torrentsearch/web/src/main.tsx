@@ -59,6 +59,7 @@ function App() {
 	const dateFromPickerRef = React.useRef<HTMLInputElement>(null)
 	const dateToPickerRef = React.useRef<HTMLInputElement>(null)
 	const [downloadedOnly, setDownloadedOnly] = React.useState(false)
+	const [notDownloadedOnly, setNotDownloadedOnly] = React.useState(false)
 	const [page, setPage] = React.useState(1)
 	const [pageSize, setPageSize] = React.useState(50)
 	const [selectedLinks, setSelectedLinks] = React.useState<Set<string>>(new Set())
@@ -117,6 +118,7 @@ function App() {
 	if (dateFrom) params.set('date_from', dateFrom)
 	if (dateTo) params.set('date_to', dateTo)
 	if (downloadedOnly) params.set('downloaded', '1')
+	else if (notDownloadedOnly) params.set('not_downloaded', '1')
 
 	const data = useQuery({
 		queryKey: ['feed', params.toString()],
@@ -212,6 +214,13 @@ function App() {
 	}
 	const toggleDownloadedOnly = () => {
 		setDownloadedOnly(current => !current)
+		setNotDownloadedOnly(false)
+		setPage(1)
+		setSelectedLinks(new Set())
+	}
+	const toggleNotDownloadedOnly = () => {
+		setNotDownloadedOnly(current => !current)
+		setDownloadedOnly(false)
 		setPage(1)
 		setSelectedLinks(new Set())
 	}
@@ -365,7 +374,7 @@ function App() {
 		<div className="pagination pagination-top">{savedSearches}{pagination}</div>
 		{restoreToken && <div className="undo-banner">{deletedCount}件削除しました<button onClick={handleRestore}>元に戻す</button></div>}
 		<section>
-			<div className="table-toolbar"><button className="download-settings-link" type="button" onClick={openSettings}>ダウンロード先設定</button><button className="action-download" disabled={!selectedLinks.size} onClick={handleDownload}>一括ダウンロード</button><button className="action-delete" disabled={source === 'archive' || !selectedLinks.size} onClick={handleDelete}>削除</button><button className={downloadedOnly ? 'action-downloaded active' : 'action-downloaded'} onClick={toggleDownloadedOnly}>DL済み</button></div>
+			<div className="table-toolbar"><button className="download-settings-link" type="button" onClick={openSettings}>ダウンロード先設定</button><button className="action-download" disabled={!selectedLinks.size} onClick={handleDownload}>一括ダウンロード</button><button className="action-delete" disabled={source === 'archive' || !selectedLinks.size} onClick={handleDelete}>削除</button><button className={notDownloadedOnly ? 'action-downloaded action-downloaded-group active' : 'action-downloaded action-downloaded-group'} onClick={toggleNotDownloadedOnly}>未DL</button><button className={downloadedOnly ? 'action-downloaded active' : 'action-downloaded'} onClick={toggleDownloadedOnly}>DL済み</button></div>
 			{data.isLoading ? '読み込み中...' : data.isError ? '取得に失敗しました' : <table>
 				<thead><tr><th className="select-column"><input type="checkbox" checked={allPageItemsSelected} onChange={event => togglePageSelection(event.target.checked)} aria-label="このページの全行を選択"/></th><th>カテゴリ</th><th>タイトル</th><th>URL</th><th>取得日時</th><th className="download-column">DL</th></tr></thead>
 				<tbody>{data.data?.items.map(item => <tr key={item.link} className={selectedLinks.has(item.link) ? 'selected' : ''} onClick={() => toggleSelected(item.link)}>

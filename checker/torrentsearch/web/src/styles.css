@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Space+Grotesk:wght@400;600;700&display=swap");
+﻿@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Space+Grotesk:wght@400;600;700&display=swap");
 
 :root {
   font-family: "Space Grotesk", sans-serif;
@@ -342,7 +342,7 @@ td {
 .action-delete:not(:disabled):hover {
   background: #d13f49;
 }
-.action-downloaded {
+.action-downloaded-group {
   margin-left: auto;
 }
 .action-downloaded.active {
@@ -1112,7 +1112,7 @@ h2 {
 .action-delete:not(:disabled):hover {
   background: #d13f49;
 }
-.action-downloaded {
+.action-downloaded-group {
   margin-left: auto;
 }
 .action-downloaded.active {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { Download, Search } from 'lucide-react'
+import { Download, LogOut, Search } from 'lucide-react'
 import './styles.css'
 
 type Item = {
@@ -27,6 +27,7 @@ const client = new QueryClient()
 function App() {
 	const [q, setQ] = React.useState('')
 	const [authenticated, setAuthenticated] = React.useState(false)
+	const [authChecking, setAuthChecking] = React.useState(true)
 	const [username, setUsername] = React.useState('')
 	const [password, setPassword] = React.useState('')
 	const [loginError, setLoginError] = React.useState('')
@@ -39,6 +40,20 @@ function App() {
 	const [selectedLinks, setSelectedLinks] = React.useState<Set<string>>(new Set())
 	const [restoreToken, setRestoreToken] = React.useState<string | null>(null)
 	const [deletedCount, setDeletedCount] = React.useState(0)
+	React.useEffect(() => {
+		let active = true
+		fetch(`${base}/session`)
+			.then(response => {
+				if (active && response.ok) setAuthenticated(true)
+			})
+			.catch(() => undefined)
+			.finally(() => {
+				if (active) setAuthChecking(false)
+			})
+		return () => {
+			active = false
+		}
+	}, [])
 	const params = new URLSearchParams({ q, page: String(page), page_size: String(pageSize) })
 
 	if (category) params.set('category', category)
@@ -78,6 +93,7 @@ function App() {
 		await fetch(`${base}/logout`, { method: 'POST' })
 		setAuthenticated(false)
 	}
+	if (authChecking) return <main className="login-page" aria-busy="true">読み込み中...</main>
 	if (!authenticated) return <main className="login-page"><form className="login-form" onSubmit={login} method="post" autoComplete="on"><h2>おれたちの　あいことば</h2><label>ユーザー名<input name="username" value={username} onChange={event => setUsername(event.target.value)} onKeyDown={event => { if (event.key === 'Tab' && !username) setUsername('dankogai') }} autoComplete="username" placeholder="dankogai"/></label><label>パスワード<input name="password" type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" placeholder="kog"/></label>{loginError && <p className="login-error">{loginError}</p>}<button type="submit">ログイン</button></form></main>
 	const pages = Math.max(1, Math.ceil((data.data?.total ?? 0) / pageSize))
 	const total = data.data?.total ?? 0
@@ -179,7 +195,7 @@ function App() {
 				</div>
 			</div>
 		</header>
-		<div className="session-toolbar"><button onClick={logout}>ログアウト</button></div>
+		<div className="search-row">
 		<div className="search">
 			<Search size={18}/>
 			<input value={q} onChange={event => { setQ(event.target.value); setPage(1) }} placeholder="タイトルまたはリンクを検索"/><button className="clear-keyword" onClick={clearKeyword} aria-label="検索キーワードを全消去">×</button>
@@ -187,6 +203,8 @@ function App() {
 			<label className="date-field"><span>開始日</span><input type="date" value={dateFrom} onChange={event => updateDateFrom(event.target.value)} aria-label="取得日時の開始日"/></label>
 			<span>～</span>
 			<label className="date-field"><span>終了日</span><input type="date" value={dateTo} onChange={event => { setDateTo(event.target.value); setPage(1) }} aria-label="取得日時の終了日"/></label><button className="clear-date" onClick={clearDateRange}>クリア</button>
+		</div>
+		<div className="session-toolbar"><button onClick={logout} aria-label="ログアウト" title="ログアウト"><LogOut size={16}/></button></div>
 		</div>
 		{pagination}
 		{restoreToken && <div className="undo-banner">{deletedCount}件削除しました<button onClick={handleRestore}>元に戻す</button></div>}

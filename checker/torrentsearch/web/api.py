@@ -11,7 +11,7 @@ app=FastAPI(title='Torrent Feed Admin API')
 DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed.db'
 deleted_batches: dict[str, list[dict]] = {}
 AUTH_COOKIE='torrent_admin_session'
-SESSION_TTL=60 * 60 * 12
+SESSION_TTL=60 * 60 * 24 * 180
 USERNAME=os.getenv('TORRENT_ADMIN_USERNAME', 'dankogai')
 PASSWORD=os.getenv('TORRENT_ADMIN_PASSWORD', '')
 SECRET=os.getenv('TORRENT_ADMIN_SECRET', '')
@@ -40,6 +40,10 @@ def require_auth(session: str | None = Cookie(default=None, alias=AUTH_COOKIE)):
 
 @app.get('/api/health')
 def health(): return {'status':'ok'}
+
+@app.get('/api/session')
+def session(_auth=Depends(require_auth)):
+    return {'authenticated': True}
 
 @app.post('/api/login')
 def login(payload: LoginRequest, response: Response):

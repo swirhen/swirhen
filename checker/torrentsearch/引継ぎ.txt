@@ -1,0 +1,60 @@
+torrentsearch 管理画面 引継ぎメモ
+
+最終コミット
+- f1f62d1 torrent管理画面の過去DB切り替えとUI調整
+- origin/master へpush済み
+
+概要
+- FastAPI + React/Vite のtorrent管理画面。
+- Apache配下の /torrent-admin/ から配信。
+- APIはsystemdの torrent-admin-api.service で稼働。
+- 認証はFastAPIのログイン画面。Cookieセッションは180日保持。
+
+主なファイル
+- web/api.py: 認証、feed取得、削除、Undo、DB切り替え。
+- web/src/main.tsx: React画面、検索、カテゴリ、日付、選択、削除、Google検索。
+- web/src/styles.css: 画面スタイル。
+- web/release.sh: フロントビルドとAPI再起動。
+
+現在の機能
+- URLの ?c=av でカテゴリ初期絞り込み。
+- カテゴリボタン選択時にURLのcも再読み込みなしで同期。
+- カテゴリ順: av, doujin, manga, pictures, anime, comic, music, live。
+- av/doujin/manga/picturesは薄いピンク。それ以外は緑。
+- 表中カテゴリもクリックで絞り込み可能。
+- 表タイトル横の小さいGボタンでタイトルをGoogle検索。タイトル文字自体は検索ボタンではない。
+- URLリンクは現在のタブで開く。
+- 開始日・終了日は個別入力、各欄のxで個別クリア。
+- 取得日時は画面上では秒を表示せず分まで。
+- 最新DBと過去DBをヘッダーのリンクで切り替え。
+  - 「2023年-」: nyaatorrent_feed.db
+  - 「それ以前」: nyaatorrent_feed_before_2023.db
+- 過去DB表示中は削除ボタンを無効化。
+
+DB切り替え
+- api.pyのDB配置先はwebディレクトリの親、torrentsearch/。
+- 現在DB: nyaatorrent_feed.db
+- 過去DB: nyaatorrent_feed_before_2023.db
+- 過去DBが存在しない環境で「それ以前」を押すと取得エラーになる。
+- 現在の開発環境には過去DBがないため、過去DB切り替えは未実機確認。
+- 本番サーバーに過去DBを配置してから動作確認すること。
+
+確認済み
+- npm.cmd run build 成功。
+- python -m py_compile api.py 成功。
+- CSSの@import警告は解消済み。
+
+本番反映
+1. 本番でリポジトリを更新
+   cd /home/swirhen/sh/checker
+   git pull --ff-only
+2. フロントビルド/API再起動
+   cd torrentsearch/web
+   ./release.sh
+3. ブラウザでCtrl+F5。必要ならsystemctl status torrent-admin-api.serviceで確認。
+
+注意
+- release.shはVITE_BASE_PATH=/torrent-admin/でビルドする。
+- 認証環境変数は/etc/default/torrent-admin-apiの
+  TORRENT_ADMIN_USERNAME / TORRENT_ADMIN_PASSWORD / TORRENT_ADMIN_SECRET。
+- 変更後はnpm.cmd run buildとpython -m py_compile api.pyを実行する。

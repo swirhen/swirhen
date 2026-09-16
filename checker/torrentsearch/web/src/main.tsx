@@ -24,6 +24,10 @@ const client = new QueryClient()
 
 function App() {
 	const [q, setQ] = React.useState('')
+	const [authenticated, setAuthenticated] = React.useState(false)
+	const [username, setUsername] = React.useState('')
+	const [password, setPassword] = React.useState('')
+	const [loginError, setLoginError] = React.useState('')
 	const [category, setCategory] = React.useState('')
 	const [dateFrom, setDateFrom] = React.useState('')
 	const [dateTo, setDateTo] = React.useState('')
@@ -42,12 +46,29 @@ function App() {
 
 	const data = useQuery({
 		queryKey: ['feed', params.toString()],
+		enabled: authenticated,
 		queryFn: async () => {
 			const response = await fetch(`${base}/feed-data?${params}`)
 			if (!response.ok) throw Error('取得に失敗しました')
 			return response.json() as Promise<FeedResponse>
 		},
 	})
+	const login = async (event: React.FormEvent) => {
+		event.preventDefault()
+		setLoginError('')
+		const response = await fetch(`${base}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) })
+		if (!response.ok) {
+			setLoginError('ユーザー名またはパスワードが違います')
+			return
+		}
+		setPassword('')
+		setAuthenticated(true)
+	}
+	const logout = async () => {
+		await fetch(`${base}/logout`, { method: 'POST' })
+		setAuthenticated(false)
+	}
+	if (!authenticated) return <main className="login-page"><form className="login-form" onSubmit={login}><h2>た、種ぇぇ</h2><label>ユーザー名<input value={username} onChange={event => setUsername(event.target.value)} autoComplete="username"/></label><label>パスワード<input type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password"/></label>{loginError && <p className="login-error">{loginError}</p>}<button type="submit">ログイン</button></form></main>
 	const pages = Math.max(1, Math.ceil((data.data?.total ?? 0) / pageSize))
 	const total = data.data?.total ?? 0
 	const categories = data.data?.categories ?? []
@@ -148,6 +169,7 @@ function App() {
 				</div>
 			</div>
 		</header>
+		<div className="session-toolbar"><button onClick={logout}>ログアウト</button></div>
 		<div className="search">
 			<Search size={18}/>
 			<input value={q} onChange={event => { setQ(event.target.value); setPage(1) }} placeholder="タイトルまたはリンクを検索"/><button className="clear-keyword" onClick={clearKeyword} aria-label="検索キーワードを全消去">×</button>

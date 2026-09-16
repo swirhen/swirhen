@@ -28,6 +28,17 @@ npm run dev
 
 本番APIは付属の `torrent-admin-api.service` をsystemdへ登録して起動します。
 
+API認証用の環境ファイルを実環境に作成します。値はGitへ登録しません。
+
+```bash
+sudo install -m 0600 /dev/null /etc/default/torrent-admin-api
+sudo sh -c 'cat > /etc/default/torrent-admin-api <<EOF
+TORRENT_ADMIN_USERNAME=dankogai
+TORRENT_ADMIN_PASSWORD=変更してください
+TORRENT_ADMIN_SECRET=十分に長いランダムな秘密文字列
+EOF'
+```
+
 ```bash
 cd /home/swirhen/sh/checker/torrentsearch/web
 sudo install -m 0644 torrent-admin-api.service /etc/systemd/system/torrent-admin-api.service

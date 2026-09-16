@@ -50,3 +50,13 @@ VITE_BASE_PATH=/torrent-admin/ npm run build
 sudo systemctl restart torrent-admin-api.service
 sudo systemctl reload apache2
 ```
+
+実環境でgit pull後にフロントエンドの再ビルドとAPI再起動をまとめて行う場合:
+
+```bash
+cd /home/swirhen/sh/checker
+git pull --ff-only
+cd torrentsearch/web
+chmod +x release.sh
+./release.sh
+```

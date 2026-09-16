@@ -16,6 +16,14 @@ cd web
 .venv\Scripts\python.exe -m uvicorn api:app --reload --port 8000
 ```
 
+完了モーダルだけをローカルで確認する場合は、実際のダウンロード・ファイル作成・DB更新を行わないドライランを有効にします。
+
+```powershell
+cd web
+$env:TORRENT_ADMIN_DOWNLOAD_DRY_RUN = "1"
+.venv\Scripts\python.exe -m uvicorn api:app --reload --port 8000
+```
+
 開発サーバーは `npm run dev`。本番は `VITE_BASE_PATH=/torrent-admin/ npm run build` とし、httpdで `dist/` を配信、`/torrent-admin/api/` を `http://127.0.0.1:8000/api/` へProxyPassします。
 
 ローカルで管理画面を起動する場合:

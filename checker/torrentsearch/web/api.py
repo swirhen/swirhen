@@ -31,6 +31,7 @@ LOCAL_USERNAME, LOCAL_PASSWORD=load_local_credentials()
 USERNAME=os.getenv('TORRENT_ADMIN_USERNAME', LOCAL_USERNAME)
 PASSWORD=os.getenv('TORRENT_ADMIN_PASSWORD', LOCAL_PASSWORD)
 SECRET=os.getenv('TORRENT_ADMIN_SECRET', 'local-debug-secret' if IDPASS_FILE.is_file() else '')
+DOWNLOAD_DRY_RUN=os.getenv('TORRENT_ADMIN_DOWNLOAD_DRY_RUN', '').lower() in ('1', 'true', 'yes')
 
 class FeedDeleteRequest(BaseModel):
     links: list[str]
@@ -136,15 +137,15 @@ def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
         if category_dir:
             destination /= category_dir
         filename=f'{tsc.sanitize_filename(title)}.torrent'
+        if DOWNLOAD_DRY_RUN:
+            downloaded.append({'category': category, 'title': title, 'filename': filename, 'path': str(destination / filename)})
+            continue
         try:
             destination.mkdir(parents=True, exist_ok=True)
             torrent_data=tsc.download_torrent(item_link)
             if torrent_data is None:
                 raise OSError('ダウンロードに失敗しました')
             (destination / filename).write_bytes(torrent_data)
-            with sqlite3.connect(get_db(payload.source)) as c:
-                c.execute('UPDATE feed_data SET download_dir = ?, download_failed_at = NULL WHERE link = ?', (str(destination), item_link))
-                c.commit()
             downloaded.append({'category': category, 'title': title, 'filename': filename, 'path': str(destination / filename)})
         except OSError as error:
             failed.append({'category': category, 'title': title, 'link': item_link, 'reason': str(error)})

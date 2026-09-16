@@ -256,10 +256,36 @@ td {
 }
 .pagination {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   gap: 8px;
   padding: 6px 0;
+}
+.pagination-saved-searches,
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pagination-saved-searches select {
+  min-width: 220px;
+  max-width: 32vw;
+}
+.pagination-top {
+  width: 100%;
+}
+.pagination-top .pagination-saved-searches {
+  margin-right: auto;
+}
+.pagination-top .pagination-controls {
+  margin-left: auto;
+}
+.pagination-bottom {
+  display: flex;
+  justify-content: flex-end;
+}
+.pagination-bottom .pagination-controls {
+  margin-left: auto;
 }
 .pagination button {
   padding: 4px 8px;
@@ -461,6 +487,37 @@ td a.download-link {
   text-align: center;
   display: flex;
   justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 5px;
+  border: 1px solid transparent;
+}
+td a.download-link:hover {
+  border-color: var(--green);
+}
+.download-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+}
+.download-actions .server-download-link {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: #e7c56b;
+  background: transparent;
+  border-color: transparent;
+}
+.download-actions .server-download-link:hover {
+  color: #ffe29a;
+  border-color: #e7c56b;
+  background: #2d2818;
 }
 a {
   color: var(--link);
@@ -491,6 +548,37 @@ button:disabled {
   header {
     align-items: start;
     flex-direction: column;
+  }
+}
+
+.pagination {
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+}
+.pagination-saved-searches,
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pagination-saved-searches select {
+  min-width: 220px;
+  max-width: 32vw;
+}
+@media (max-width: 620px) {
+  .pagination {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+  .pagination-saved-searches,
+  .pagination-controls {
+    width: 100%;
+  }
+  .pagination-saved-searches select {
+    min-width: 0;
+    max-width: none;
+    flex: 1;
   }
 }
 
@@ -535,8 +623,9 @@ button:disabled {
   font-size: 11px;
 }
 .session-toolbar {
-  width: var(--toolbar-height);
-  min-width: var(--toolbar-height);
+  display: flex;
+  width: calc(var(--toolbar-height) * 2);
+  min-width: calc(var(--toolbar-height) * 2);
   height: var(--toolbar-height);
 }
 .session-toolbar button {
@@ -556,6 +645,19 @@ button:disabled {
   .pagination,
   .search-row .search {
     height: auto;
+  }
+  .pagination {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+  .pagination-saved-searches,
+  .pagination-controls {
+    width: 100%;
+  }
+  .pagination-saved-searches select {
+    max-width: none;
+    min-width: 0;
+    flex: 1;
   }
 }
 .login-page {
@@ -624,6 +726,14 @@ button:disabled {
   color: #fff;
   border-color: var(--muted);
 }
+.session-toolbar .refreshing {
+  animation: refresh-spin 800ms linear infinite;
+}
+@keyframes refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 .download-settings-link {
   color: var(--muted);
   background: transparent;
@@ -677,6 +787,57 @@ button:disabled {
 .download-result-modal h3 {
   color: #ff8d8d;
   font-size: 14px;
+}
+.server-download-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  width: min(460px, calc(100vw - 40px));
+  padding: 14px 16px;
+  color: #fff;
+  background: #171717;
+  border: 1px solid #e7c56b;
+  box-shadow: 0 12px 36px #000b;
+  opacity: 1;
+  transition: opacity 600ms ease-out;
+}
+.server-download-toast.fading {
+  opacity: 0;
+}
+.toast-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.toast-header button {
+  padding: 2px 6px;
+  color: var(--muted);
+  background: transparent;
+  border-color: transparent;
+}
+.toast-header button:hover {
+  color: #fff;
+}
+.server-download-toast p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.server-download-toast ul {
+  max-height: 180px;
+  overflow: auto;
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font: 11px "IBM Plex Mono";
+}
+.server-download-toast li {
+  margin: 4px 0;
+  overflow-wrap: anywhere;
+}
+.server-download-toast .toast-error {
+  color: #ff8d8d;
 }
 .settings-header,
 .settings-actions {

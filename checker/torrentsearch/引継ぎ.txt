@@ -1,7 +1,7 @@
 torrentsearch 管理画面 引継ぎメモ
 
 最終コミット
-- f1f62d1 torrent管理画面の過去DB切り替えとUI調整
+- 次回コミットで更新予定（現在の実装をpushする）
 - origin/master へpush済み
 
 概要
@@ -15,6 +15,7 @@ torrentsearch 管理画面 引継ぎメモ
 - web/src/main.tsx: React画面、検索、カテゴリ、日付、選択、削除、Google検索。
 - web/src/styles.css: 画面スタイル。
 - web/release.sh: フロントビルドとAPI再起動。
+- web/requirements.txt: FastAPI実行に必要な依存関係。requestsを追加済み。
 
 現在の機能
 - URLの ?c=av でカテゴリ初期絞り込み。
@@ -30,6 +31,16 @@ torrentsearch 管理画面 引継ぎメモ
   - 「2023年-」: nyaatorrent_feed.db
   - 「それ以前」: nyaatorrent_feed_before_2023.db
 - 過去DB表示中は削除ボタンを無効化。
+- 検索ボックスは半角スペースでAND、|でOR。先頭が-の語は除外。
+- 検索キーワードはURLの?q=へ同期し、特殊文字はURLエンコード。
+- 保存した検索条件をJSONへ保存し、上部ページネーション左側のプルダウンから呼び出せる。
+- ページネーション上部は保存操作を左、ページ操作を右に配置。下部はページ操作のみ。
+- 画面右上に手動更新ボタンを配置。検索条件を維持して一覧を再取得する。
+- URL列にブラウザ用ダウンロードとサーバー保存の2ボタンを配置。
+- サーバー保存は確認なしで実行し、結果を右上トーストへ表示。6秒後にフェードアウトして消える。
+- トースト表示中に続けて保存すると、ファイルリストへ結果を追記する。
+- 一括ダウンロードは選択項目をサーバー側でカテゴリ別に保存し、完了モーダルへ結果を表示する。
+- 一括ダウンロードではDBのdownload_dirおよびdownload_failed_atを更新しない。
 
 DB切り替え
 - api.pyのDB配置先はwebディレクトリの親、torrentsearch/。
@@ -39,10 +50,19 @@ DB切り替え
 - 現在の開発環境には過去DBがないため、過去DB切り替えは未実機確認。
 - 本番サーバーに過去DBを配置してから動作確認すること。
 
+設定ファイル
+- web/download_settings.json: ルートディレクトリとカテゴリ別保存先。個人設定のためGit管理外。
+- web/search_conditions.json: 保存した検索条件。個人設定のためGit管理外。存在しなければAPIが作成する。
+- カテゴリ別保存先が空欄の場合はルートディレクトリへ保存する。
+- 保存先は `root_dir / category_dirs[category]`。パスはPythonのPathで処理するため半角スペースを含められる。
+
 確認済み
 - npm.cmd run build 成功。
 - python -m py_compile api.py 成功。
 - CSSの@import警告は解消済み。
+- 検索条件のAND/OR/除外指定を一時SQLiteで検証済み。
+- 保存先設定・検索条件保存を一時JSONで検証済み。
+- ローカルの一括ダウンロードは `TORRENT_ADMIN_DOWNLOAD_DRY_RUN=1` で実ダウンロード、ファイル作成、DB更新なしに結果モーダルを確認できる。
 
 本番反映
 1. 本番でリポジトリを更新
@@ -57,6 +77,7 @@ DB切り替え
 - release.shはVITE_BASE_PATH=/torrent-admin/でビルドする。
 - 認証環境変数は/etc/default/torrent-admin-apiの
   TORRENT_ADMIN_USERNAME / TORRENT_ADMIN_PASSWORD / TORRENT_ADMIN_SECRET。
+- 実環境へ反映する前に、`requests`を含むrequirements.txtを本番仮想環境へインストールすること。
 - ローカルデバッグではtorrentsearch/idpass.txtの1行目をID、2行目をパスワードとして読める。
 - idpass.txtは.gitignore対象。実際の認証情報はコミットしないこと。
 - ローカルデバッグ開始時は、まずtorrentsearch/idpass.txtが存在することだけ確認する。内容は表示・ログ出力しない。
@@ -65,3 +86,4 @@ DB切り替え
 - ブラウザ: `http://127.0.0.1:5173/`。Viteが/apiを8000番へプロキシする。
 - 終了時はAPIとViteの各ターミナルでCtrl+C。デバッグ開始前にidpass.txtの実値を確認して入力する。
 - 変更後はnpm.cmd run buildとpython -m py_compile api.pyを実行する。
+- 現在の変更は未コミット。検証後にコミット・pushしてから実環境でテストすること。

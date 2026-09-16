@@ -1,7 +1,7 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { Download, LogOut, Search } from 'lucide-react'
+import { Download, HardDriveDownload, LogOut, RefreshCw, Search } from 'lucide-react'
 import './styles.css'
 
 type Item = {
@@ -20,6 +20,11 @@ type FeedResponse = {
 	source: 'current' | 'archive'
 }
 
+type SearchCondition = {
+	category: string
+	keyword: string
+}
+
 type DownloadResult = {
 	downloaded: { category: string; title: string; filename: string; path: string }[]
 	failed: { category?: string; title?: string; link: string; reason: string }[]
@@ -29,7 +34,9 @@ type PasswordCredentialConstructor = new (data: { id: string; password: string }
 
 const base = `${import.meta.env.BASE_URL}api`
 const client = new QueryClient()
-const initialCategory = new URLSearchParams(window.location.search).get('c') ?? ''
+const initialSearchParams = new URLSearchParams(window.location.search)
+const initialCategory = initialSearchParams.get('c') ?? ''
+const initialKeyword = initialSearchParams.get('q') ?? ''
 const categoryOrder = ['av', 'doujin', 'manga', 'pictures', 'anime', 'comic', 'music', 'live']
 const pinkCategories = new Set(['av', 'doujin', 'manga', 'pictures'])
 const downloadCategories = ['av', 'doujin', 'manga', 'pictures', 'anime', 'comic', 'music', 'live']
@@ -39,7 +46,7 @@ function formatCreatedAt(value: string | null) {
 }
 
 function App() {
-	const [q, setQ] = React.useState('')
+	const [q, setQ] = React.useState(initialKeyword)
 	const [authenticated, setAuthenticated] = React.useState(false)
 	const [authChecking, setAuthChecking] = React.useState(true)
 	const [username, setUsername] = React.useState('')
@@ -62,6 +69,21 @@ function App() {
 	const [categoryDirs, setCategoryDirs] = React.useState<Record<string, string>>({})
 	const [settingsMessage, setSettingsMessage] = React.useState('')
 	const [downloadResult, setDownloadResult] = React.useState<DownloadResult | null>(null)
+	const [serverDownloadResult, setServerDownloadResult] = React.useState<DownloadResult | null>(null)
+	const [serverDownloadToastFading, setServerDownloadToastFading] = React.useState(false)
+	const [searchConditions, setSearchConditions] = React.useState<SearchCondition[]>([])
+	const [selectedSearchCondition, setSelectedSearchCondition] = React.useState('')
+	const [refreshing, setRefreshing] = React.useState(false)
+	React.useEffect(() => {
+		if (!serverDownloadResult) return
+		setServerDownloadToastFading(false)
+		const fadeTimer = window.setTimeout(() => setServerDownloadToastFading(true), 5400)
+		const removeTimer = window.setTimeout(() => setServerDownloadResult(null), 6000)
+		return () => {
+			window.clearTimeout(fadeTimer)
+			window.clearTimeout(removeTimer)
+		}
+	}, [serverDownloadResult])
 	React.useEffect(() => {
 		let active = true
 		fetch(`${base}/session`)
@@ -76,6 +98,19 @@ function App() {
 			active = false
 		}
 	}, [])
+	React.useEffect(() => {
+		if (!authenticated) return
+		fetch(`${base}/search-conditions`)
+			.then(response => response.ok ? response.json() as Promise<SearchCondition[]> : [])
+			.then(setSearchConditions)
+			.catch(() => undefined)
+	}, [authenticated])
+	React.useEffect(() => {
+		const url = new URL(window.location.href)
+		if (q) url.searchParams.set('q', q)
+		else url.searchParams.delete('q')
+		window.history.replaceState(null, '', url)
+	}, [q])
 	const params = new URLSearchParams({ q, page: String(page), page_size: String(pageSize), source })
 
 	if (category) params.set('category', category)
@@ -115,6 +150,14 @@ function App() {
 		await fetch(`${base}/logout`, { method: 'POST' })
 		setAuthenticated(false)
 	}
+	const refreshData = async () => {
+		setRefreshing(true)
+		try {
+			await data.refetch()
+		} finally {
+			setRefreshing(false)
+		}
+	}
 	if (authChecking) return <main className="login-page" aria-busy="true">読み込み中...</main>
 	if (!authenticated) return <main className="login-page"><form className="login-form" onSubmit={login} method="post" autoComplete="on"><h2>おれたちの　あいことば</h2><label>ユーザー名<input name="username" value={username} onChange={event => setUsername(event.target.value)} onKeyDown={event => { if (event.key === 'Tab' && !username) setUsername('dankogai') }} autoComplete="username" placeholder="dankogai"/></label><label>パスワード<input name="password" type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" placeholder="kog"/></label>{loginError && <p className="login-error">{loginError}</p>}<button type="submit">ログイン</button></form></main>
 	const pages = Math.max(1, Math.ceil((data.data?.total ?? 0) / pageSize))
@@ -151,6 +194,8 @@ function App() {
 	}
 	const selectCategory = (value: string) => {
 		setCategory(value)
+		setSelectedSearchCondition('')
+		clearKeyword()
 		setPage(1)
 		const url = new URL(window.location.href)
 		if (value) url.searchParams.set('c', value)
@@ -196,6 +241,20 @@ function App() {
 			if (!response.ok) throw Error('detail' in result && result.detail ? result.detail : 'ダウンロードに失敗しました')
 			setDownloadResult(result as DownloadResult)
 			setSelectedLinks(new Set())
+			await data.refetch()
+		} catch (error) {
+			window.alert(error instanceof Error ? error.message : 'ダウンロードに失敗しました')
+		}
+	}
+	const handleServerDownload = async (item: Item) => {
+		try {
+			const response = await fetch(`${base}/feed-data/download`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: [item.link], source }) })
+			const result = await response.json() as DownloadResult | { detail?: string }
+			if (!response.ok) throw Error('detail' in result && result.detail ? result.detail : 'ダウンロードに失敗しました')
+			setServerDownloadResult(current => {
+				const next = result as DownloadResult
+				return current ? { downloaded: [...current.downloaded, ...next.downloaded], failed: [...current.failed, ...next.failed] } : next
+			})
 			await data.refetch()
 		} catch (error) {
 			window.alert(error instanceof Error ? error.message : 'ダウンロードに失敗しました')
@@ -250,9 +309,34 @@ function App() {
 			setSettingsMessage(error instanceof Error ? error.message : '設定の保存に失敗しました')
 		}
 	}
-	const pagination = <div className="pagination"><button disabled={page === 1} onClick={() => setPage(1)}>最初へ</button><button disabled={page === 1} onClick={() => setPage(page - 1)}>前へ</button><b>{rangeStart}-{rangeEnd} / {total}</b><button disabled={page === pages} onClick={() => setPage(page + 1)}>次へ</button><button disabled={page === pages} onClick={() => setPage(pages)}>最後へ</button><select value={pageSize} onChange={event => updatePageSize(Number(event.target.value))} aria-label="表示件数"><option value="10">10件</option><option value="20">20件</option><option value="50">50件</option><option value="100">100件</option></select></div>
+	const saveSearchCondition = async () => {
+		try {
+			const response = await fetch(`${base}/search-conditions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ category, keyword: q }) })
+			if (!response.ok) throw Error('検索条件の保存に失敗しました')
+			setSearchConditions(await response.json() as SearchCondition[])
+		} catch (error) {
+			window.alert(error instanceof Error ? error.message : '検索条件の保存に失敗しました')
+		}
+	}
+	const applySearchCondition = (index: string) => {
+		if (index === '') return
+		const condition = searchConditions[Number(index)]
+		if (!condition) return
+		setSelectedSearchCondition(index)
+		setQ(condition.keyword)
+		setCategory(condition.category)
+		setPage(1)
+		setSelectedLinks(new Set())
+		const url = new URL(window.location.href)
+		if (condition.category) url.searchParams.set('c', condition.category)
+		else url.searchParams.delete('c')
+		window.history.replaceState(null, '', url)
+	}
+	const savedSearches = <div className="pagination-saved-searches"><button type="button" onClick={saveSearchCondition}>検索条件保存</button><select value={selectedSearchCondition} onChange={event => applySearchCondition(event.target.value)} aria-label="保存した検索条件"><option value="">保存した検索条件</option>{searchConditions.map((condition, index) => <option key={`${condition.category}-${condition.keyword}-${index}`} value={index}>{condition.category || 'all'}: {condition.keyword}</option>)}</select></div>
+	const pagination = <div className="pagination-controls"><button disabled={page === 1} onClick={() => setPage(1)}>最初へ</button><button disabled={page === 1} onClick={() => setPage(page - 1)}>前へ</button><b>{rangeStart}-{rangeEnd} / {total}</b><button disabled={page === pages} onClick={() => setPage(page + 1)}>次へ</button><button disabled={page === pages} onClick={() => setPage(pages)}>最後へ</button><select value={pageSize} onChange={event => updatePageSize(Number(event.target.value))} aria-label="表示件数"><option value="10">10件</option><option value="20">20件</option><option value="50">50件</option><option value="100">100件</option></select></div>
 
 	return <main>
+		{serverDownloadResult && <div className={`server-download-toast${serverDownloadToastFading ? ' fading' : ''}`} role="status"><div className="toast-header"><strong>サーバー保存結果</strong><button type="button" onClick={() => setServerDownloadResult(null)} aria-label="通知を閉じる">×</button></div><p>{serverDownloadResult.downloaded.length}件保存しました。</p>{serverDownloadResult.downloaded.length > 0 && <ul>{serverDownloadResult.downloaded.map(item => <li key={`${item.category}-${item.filename}`}>{item.path}</li>)}</ul>}{serverDownloadResult.failed.length > 0 && <p className="toast-error">失敗: {serverDownloadResult.failed.map(item => item.title ?? item.link).join(', ')}</p>}</div>}
 		<header>
 			<div>
 				<div className="title-row">
@@ -276,9 +360,9 @@ function App() {
 				<label className="date-field"><span>終了日</span><span className={dateTo ? 'date-input date-display' : 'date-input date-display empty'} onClick={() => { const input = dateToPickerRef.current; if (!input) return; try { input.showPicker?.() } catch { input.click() } }}>{dateTo || 'YYYY-MM-DD'}</span><button className="date-clear" type="button" onClick={clearDateTo} aria-label="終了日をクリア" title="終了日をクリア">×</button><input ref={dateToPickerRef} className="date-picker" type="date" value={dateTo} onChange={event => { setDateTo(event.target.value); setPage(1) }} aria-label="取得日時の終了日"/></label>
 			</div>
 		</div>
-		<div className="session-toolbar"><button onClick={logout} aria-label="ログアウト" title="ログアウト"><LogOut size={16}/></button></div>
+		<div className="session-toolbar"><button onClick={refreshData} aria-label="一覧を更新" title="一覧を更新" disabled={refreshing}><RefreshCw className={refreshing ? 'refreshing' : ''} size={16}/></button><button onClick={logout} aria-label="ログアウト" title="ログアウト"><LogOut size={16}/></button></div>
 		</div>
-		{pagination}
+		<div className="pagination pagination-top">{savedSearches}{pagination}</div>
 		{restoreToken && <div className="undo-banner">{deletedCount}件削除しました<button onClick={handleRestore}>元に戻す</button></div>}
 		<section>
 			<div className="table-toolbar"><button className="download-settings-link" type="button" onClick={openSettings}>ダウンロード先設定</button><button className="action-download" disabled={!selectedLinks.size} onClick={handleDownload}>ダウンロード</button><button className="action-delete" disabled={source === 'archive' || !selectedLinks.size} onClick={handleDelete}>削除</button><button className={downloadedOnly ? 'action-downloaded active' : 'action-downloaded'} onClick={toggleDownloadedOnly}>DL済み</button></div>
@@ -288,7 +372,7 @@ function App() {
 					<td className="select-column"><input type="checkbox" checked={selectedLinks.has(item.link)} onChange={() => toggleSelected(item.link)} onClick={event => event.stopPropagation()} aria-label={`${item.title}を選択`}/></td>
 					<td><button type="button" className={pinkCategories.has(item.category) ? 'category-tag pink-category-tag' : 'category-tag'} onClick={event => { event.stopPropagation(); selectCategory(item.category) }}>{item.category}</button></td>
 					<td className="title-column"><span className="title-content"><button type="button" className="title-search" title="Googleで検索" aria-label={`${item.title}をGoogleで検索`} onClick={event => { event.stopPropagation(); searchTitle(item.title) }}>G</button><b>{item.title}</b></span></td>
-					<td><a className="download-link" href={item.link} aria-label={`${item.title}をダウンロード`} title="ダウンロード" onClick={event => event.stopPropagation()}><Download size={16}/></a></td>
+					<td><span className="download-actions"><a className="download-link" href={item.link} aria-label={`${item.title}をダウンロード`} title="ブラウザでダウンロード" onClick={event => event.stopPropagation()}><Download size={16}/></a><button type="button" className="server-download-link" aria-label={`${item.title}をサーバーに保存`} title="サーバーに保存" onClick={event => { event.stopPropagation(); handleServerDownload(item) }}><HardDriveDownload size={16}/></button></span></td>
 					<td className="date-column">{formatCreatedAt(item.created_at)}</td>
 					<td className="download-status" title={item.download_dir ?? undefined}>{item.download_dir ? '○' : ''}</td>
 				</tr>)}</tbody>
@@ -296,7 +380,7 @@ function App() {
 		</section>
 		{settingsOpen && <div className="settings-backdrop" role="presentation"><div className="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title"><div className="settings-header"><h2 id="settings-title">ダウンロード先設定</h2><button type="button" onClick={() => setSettingsOpen(false)} aria-label="設定を閉じる">×</button></div><form onSubmit={saveSettings} className="settings-form"><label>ルートディレクトリ<input value={rootDir} onChange={event => setRootDir(event.target.value)} /></label><fieldset><legend>カテゴリ別保存ディレクトリ</legend>{downloadCategories.map(item => <label className="category-setting-row" key={item}><span className={`category-button${pinkCategories.has(item) ? ' pink-category' : ''}`}>{item}</span><input value={categoryDirs[item] ?? ''} onChange={event => setCategoryDirs(current => ({ ...current, [item]: event.target.value }))} /></label>)}</fieldset><div className="settings-actions"><button type="submit">保存</button>{settingsMessage && <span>{settingsMessage}</span>}</div></form></div></div>}
 		{downloadResult && <div className="settings-backdrop" role="presentation"><div className="download-result-modal" role="dialog" aria-modal="true" aria-labelledby="download-result-title"><div className="settings-header"><h2 id="download-result-title">ダウンロード結果</h2></div><p>{downloadResult.downloaded.length}件ダウンロードしました。</p>{downloadResult.downloaded.length > 0 && <ul>{downloadResult.downloaded.map(item => <li key={`${item.category}-${item.filename}`}>{item.path}</li>)}</ul>}{downloadResult.failed.length > 0 && <><h3>失敗</h3><ul>{downloadResult.failed.map(item => <li key={item.link}>{item.title ?? item.link}: {item.reason}</li>)}</ul></>}<div className="settings-actions"><button type="button" onClick={() => setDownloadResult(null)}>OK</button></div></div></div>}
-		<footer>{pagination}</footer>
+		<footer className="pagination pagination-bottom">{pagination}</footer>
 	</main>
 }
 

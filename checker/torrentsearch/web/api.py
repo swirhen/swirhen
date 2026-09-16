@@ -16,7 +16,8 @@ app=FastAPI(title='Torrent Feed Admin API')
 DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed.db'
 ARCHIVE_DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed_before_2023.db'
 IDPASS_FILE=Path(__file__).resolve().parents[1]/'idpass.txt'
-DOWNLOAD_SETTINGS_FILE=Path(__file__).resolve().parents[1]/'download_settings.json'
+DOWNLOAD_SETTINGS_FILE=Path(__file__).resolve().parent/'download_settings.json'
+SEARCH_CONDITIONS_FILE=Path(__file__).resolve().parent/'search_conditions.json'
 deleted_batches: dict[str, list[dict]] = {}
 AUTH_COOKIE='torrent_admin_session'
 SESSION_TTL=60 * 60 * 24 * 180
@@ -50,6 +51,36 @@ class DownloadSettings(BaseModel):
 class FeedDownloadRequest(BaseModel):
     links: list[str]
     source: str = 'current'
+
+class SearchCondition(BaseModel):
+    category: str = ''
+    keyword: str = ''
+
+def build_title_search(query: str):
+    positive_clauses=[]
+    excluded_terms=[]
+    for clause in query.split('|'):
+        positive_terms=[]
+        for term in clause.split():
+            if term.startswith('-') and len(term) > 1:
+                excluded_terms.append(term[1:])
+            elif term:
+                positive_terms.append(term)
+        if positive_terms:
+            positive_clauses.append(positive_terms)
+
+    conditions=[]
+    parameters=[]
+    if positive_clauses:
+        clause_conditions=[]
+        for terms in positive_clauses:
+            clause_conditions.append('(' + ' AND '.join('title LIKE ?' for _ in terms) + ')')
+            parameters.extend(f'%{term}%' for term in terms)
+        conditions.append('(' + ' OR '.join(clause_conditions) + ')')
+    for term in excluded_terms:
+        conditions.append('title NOT LIKE ?')
+        parameters.append(f'%{term}%')
+    return ' AND '.join(conditions), parameters
 
 def require_auth(session: str | None = Cookie(default=None, alias=AUTH_COOKIE)):
     if not PASSWORD or not SECRET or not session:
@@ -102,6 +133,29 @@ def update_download_settings(payload: DownloadSettings, _auth=Depends(require_au
     temporary.write_text(json.dumps(settings, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     temporary.replace(DOWNLOAD_SETTINGS_FILE)
     return settings
+
+@app.get('/api/search-conditions')
+def get_search_conditions(_auth=Depends(require_auth)):
+    try:
+        conditions=json.loads(SEARCH_CONDITIONS_FILE.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError):
+        conditions=[]
+    return [SearchCondition(**condition).model_dump() for condition in conditions]
+
+@app.post('/api/search-conditions')
+def save_search_condition(payload: SearchCondition, _auth=Depends(require_auth)):
+    condition={'category': payload.category.strip(), 'keyword': payload.keyword.strip()}
+    try:
+        conditions=json.loads(SEARCH_CONDITIONS_FILE.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError):
+        conditions=[]
+    saved=[SearchCondition(**item).model_dump() for item in conditions]
+    if condition not in saved:
+        saved.append(condition)
+        temporary=SEARCH_CONDITIONS_FILE.with_suffix('.json.tmp')
+        temporary.write_text(json.dumps(saved, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        temporary.replace(SEARCH_CONDITIONS_FILE)
+    return saved
 
 @app.post('/api/feed-data/download')
 def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
@@ -159,8 +213,10 @@ def get_db(source: str):
 def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100), source:str=Query('current', pattern='^(current|archive)$')):
     conditions=[]; args=[]
     if q:
-        conditions.append('title LIKE ?')
-        args.append(f'%{q}%')
+        search_condition, search_args=build_title_search(q)
+        if search_condition:
+            conditions.append(search_condition)
+            args.extend(search_args)
     if category:
         conditions.append('category = ?')
         args.append(category)

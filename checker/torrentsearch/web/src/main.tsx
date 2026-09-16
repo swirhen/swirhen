@@ -19,6 +19,8 @@ type FeedResponse = {
 	categories: string[]
 }
 
+type PasswordCredentialConstructor = new (data: { id: string; password: string }) => Credential
+
 const base = `${import.meta.env.BASE_URL}api`
 const client = new QueryClient()
 
@@ -61,6 +63,14 @@ function App() {
 			setLoginError('ユーザー名またはパスワードが違います')
 			return
 		}
+		const PasswordCredential = (window as Window & { PasswordCredential?: PasswordCredentialConstructor }).PasswordCredential
+		if (window.isSecureContext && 'credentials' in navigator && PasswordCredential) {
+			try {
+				await navigator.credentials.store(new PasswordCredential({ id: username, password }))
+			} catch {
+				// Credential storage can be unavailable even after a successful login.
+			}
+		}
 		setPassword('')
 		setAuthenticated(true)
 	}
@@ -68,7 +78,7 @@ function App() {
 		await fetch(`${base}/logout`, { method: 'POST' })
 		setAuthenticated(false)
 	}
-	if (!authenticated) return <main className="login-page"><form className="login-form" onSubmit={login}><h2>た、種ぇぇ</h2><label>ユーザー名<input value={username} onChange={event => setUsername(event.target.value)} autoComplete="username"/></label><label>パスワード<input type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password"/></label>{loginError && <p className="login-error">{loginError}</p>}<button type="submit">ログイン</button></form></main>
+	if (!authenticated) return <main className="login-page"><form className="login-form" onSubmit={login} method="post" autoComplete="on"><h2>た、種ぇぇ</h2><label>ユーザー名<input name="username" value={username} onChange={event => setUsername(event.target.value)} autoComplete="username"/></label><label>パスワード<input name="password" type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password"/></label>{loginError && <p className="login-error">{loginError}</p>}<button type="submit">ログイン</button></form></main>
 	const pages = Math.max(1, Math.ceil((data.data?.total ?? 0) / pageSize))
 	const total = data.data?.total ?? 0
 	const categories = data.data?.categories ?? []

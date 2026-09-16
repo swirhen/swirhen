@@ -722,6 +722,23 @@ button:disabled {
   color: var(--muted);
   font: 12px "IBM Plex Mono";
 }
+.category-setting-row {
+  display: grid !important;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 10px !important;
+}
+.category-setting-row .category-button {
+  cursor: default;
+  color: #000;
+  background: var(--green);
+  border-color: var(--green);
+}
+.category-setting-row .category-button.pink-category {
+  color: #000;
+  background: #f6b6c8;
+  border-color: #f6b6c8;
+}
 .settings-actions {
   margin-top: 18px;
 }

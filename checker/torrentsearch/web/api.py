@@ -132,7 +132,9 @@ def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
             continue
         category, title, item_link=item
         category_dir=category_dirs.get(category, '').strip()
-        destination=Path(download_settings.root_dir.strip()) / category_dir
+        destination=Path(download_settings.root_dir.strip())
+        if category_dir:
+            destination /= category_dir
         filename=f'{tsc.sanitize_filename(title)}.torrent'
         try:
             destination.mkdir(parents=True, exist_ok=True)

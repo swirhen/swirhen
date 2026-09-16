@@ -24,7 +24,7 @@ def load_local_credentials():
 LOCAL_USERNAME, LOCAL_PASSWORD=load_local_credentials()
 USERNAME=os.getenv('TORRENT_ADMIN_USERNAME', LOCAL_USERNAME)
 PASSWORD=os.getenv('TORRENT_ADMIN_PASSWORD', LOCAL_PASSWORD)
-SECRET=os.getenv('TORRENT_ADMIN_SECRET', '')
+SECRET=os.getenv('TORRENT_ADMIN_SECRET', 'local-debug-secret' if IDPASS_FILE.is_file() else '')
 
 class FeedDeleteRequest(BaseModel):
     links: list[str]

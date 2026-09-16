@@ -24,10 +24,10 @@ def feed(q:str='', category:str='', date_from:str='', date_to:str='', page:int=Q
         conditions.append('category = ?')
         args.append(category)
     if date_from:
-        conditions.append('date(pubdate) >= date(?)')
+        conditions.append('date(created_at) >= date(?)')
         args.append(date_from)
     if date_to:
-        conditions.append('date(pubdate) <= date(?)')
+        conditions.append('date(created_at) <= date(?)')
         args.append(date_to)
     where=f" WHERE {' AND '.join(conditions)}" if conditions else ''
     off=(page-1)*page_size

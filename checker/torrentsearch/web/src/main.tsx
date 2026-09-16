@@ -125,22 +125,22 @@ function App() {
 			<Search size={18}/>
 			<input value={q} onChange={event => { setQ(event.target.value); setPage(1) }} placeholder="タイトルまたはリンクを検索"/>
 			<span className="date-range-label">日付範囲指定</span>
-			<label className="date-field"><span>開始日</span><input type="date" value={dateFrom} onChange={event => updateDateFrom(event.target.value)} aria-label="公開日時の開始日"/></label>
+			<label className="date-field"><span>開始日</span><input type="date" value={dateFrom} onChange={event => updateDateFrom(event.target.value)} aria-label="取得日時の開始日"/></label>
 			<span>～</span>
-			<label className="date-field"><span>終了日</span><input type="date" value={dateTo} onChange={event => { setDateTo(event.target.value); setPage(1) }} aria-label="公開日時の終了日"/></label>
+			<label className="date-field"><span>終了日</span><input type="date" value={dateTo} onChange={event => { setDateTo(event.target.value); setPage(1) }} aria-label="取得日時の終了日"/></label>
 		</div>
 		{pagination}
 		{restoreToken && <div className="undo-banner">{deletedCount}件削除しました<button onClick={handleRestore}>元に戻す</button></div>}
 		<section>
 			<div className="table-toolbar"><button className="action-download" disabled={!selectedLinks.size} onClick={handleDownload}>ダウンロード</button><button className="action-delete" disabled={!selectedLinks.size} onClick={handleDelete}>削除</button></div>
 			{data.isLoading ? '読み込み中...' : data.isError ? '取得に失敗しました' : <table>
-				<thead><tr><th className="select-column"><input type="checkbox" checked={allPageItemsSelected} onChange={event => togglePageSelection(event.target.checked)} aria-label="このページの全行を選択"/></th><th>カテゴリ</th><th>タイトル</th><th>URL</th><th>公開日時</th><th>状態</th></tr></thead>
+				<thead><tr><th className="select-column"><input type="checkbox" checked={allPageItemsSelected} onChange={event => togglePageSelection(event.target.checked)} aria-label="このページの全行を選択"/></th><th>カテゴリ</th><th>タイトル</th><th>URL</th><th>取得日時</th><th>状態</th></tr></thead>
 				<tbody>{data.data?.items.map(item => <tr key={item.link} className={selectedLinks.has(item.link) ? 'selected' : ''} onClick={() => toggleSelected(item.link)}>
 					<td className="select-column"><input type="checkbox" checked={selectedLinks.has(item.link)} onChange={() => toggleSelected(item.link)} onClick={event => event.stopPropagation()} aria-label={`${item.title}を選択`}/></td>
 					<td><span>{item.category}</span></td>
 					<td><b>{item.title}</b></td>
 					<td><a href={item.link} target="_blank" rel="noreferrer" aria-label={`${item.title}をダウンロード`}>DL</a></td>
-					<td>{item.pubdate ?? '-'}</td>
+					<td>{item.created_at ?? '-'}</td>
 					<td>{item.download_dir ? '済み' : '未取得'}</td>
 				</tr>)}</tbody>
 			</table>}

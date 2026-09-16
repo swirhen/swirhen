@@ -15,7 +15,7 @@ class FeedRestoreRequest(BaseModel):
 @app.get('/api/health')
 def health(): return {'status':'ok'}
 @app.get('/api/feed-data')
-def feed(q:str='', category:str='', date_from:str='', date_to:str='', page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=200)):
+def feed(q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100)):
     conditions=[]; args=[]
     if q:
         conditions.append('(title LIKE ? OR link LIKE ?)')
@@ -29,6 +29,8 @@ def feed(q:str='', category:str='', date_from:str='', date_to:str='', page:int=Q
     if date_to:
         conditions.append('date(created_at) <= date(?)')
         args.append(date_to)
+    if downloaded:
+        conditions.append('download_dir IS NOT NULL')
     where=f" WHERE {' AND '.join(conditions)}" if conditions else ''
     off=(page-1)*page_size
     with sqlite3.connect(DB) as c:

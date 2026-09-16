@@ -1,0 +1,9 @@
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { Search } from 'lucide-react'
+import './styles.css'
+type Item={category:string;title:string;link:string;pubdate:string|null;created_at:string|null;download_dir:string|null}
+const base=`${import.meta.env.BASE_URL}api`, client=new QueryClient()
+function App(){const [q,setQ]=React.useState(''),[page,setPage]=React.useState(1);const params=new URLSearchParams({q,page:String(page),page_size:'50'});const data=useQuery({queryKey:['feed',params.toString()],queryFn:async()=>{const r=await fetch(`${base}/feed-data?${params}`);if(!r.ok)throw Error('取得に失敗しました');return r.json() as Promise<{items:Item[];total:number}>}});const pages=Math.max(1,Math.ceil((data.data?.total??0)/50));return <main><header><div><small>TORRENTSEARCH / FEED DATA</small><h1>Feed control room</h1><p>RSSで収集した種データを検索・編集します。</p></div><strong>{data.data?.total?.toLocaleString()??'...'}</strong></header><label className="search"><Search size={18}/><input value={q} onChange={e=>{setQ(e.target.value);setPage(1)}} placeholder="タイトルまたはリンクを検索"/></label><section>{data.isLoading?'読み込み中...':data.isError?'取得に失敗しました':<table><thead><tr><th>カテゴリ</th><th>タイトル</th><th>公開日時</th><th>状態</th></tr></thead><tbody>{data.data?.items.map(x=><tr key={x.link}><td><span>{x.category}</span></td><td><b>{x.title}</b><a href={x.link} target="_blank" rel="noreferrer">{x.link}</a></td><td>{x.pubdate??'-'}</td><td>{x.download_dir?'済み':'未取得'}</td></tr>)}</tbody></table>}</section><footer><button disabled={page===1} onClick={()=>setPage(page-1)}>前へ</button><b>{page} / {pages}</b><button disabled={page===pages} onClick={()=>setPage(page+1)}>次へ</button></footer></main>}
+createRoot(document.getElementById('root')!).render(<QueryClientProvider client={client}><App/></QueryClientProvider>)

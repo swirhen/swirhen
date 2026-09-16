@@ -37,9 +37,9 @@ const client = new QueryClient()
 const initialSearchParams = new URLSearchParams(window.location.search)
 const initialCategory = initialSearchParams.get('c') ?? ''
 const initialKeyword = initialSearchParams.get('q') ?? ''
-const categoryOrder = ['av', 'doujin', 'manga', 'pictures', 'anime', 'comic', 'music', 'live']
-const pinkCategories = new Set(['av', 'doujin', 'manga', 'pictures'])
-const downloadCategories = ['av', 'doujin', 'manga', 'pictures', 'anime', 'comic', 'music', 'live']
+const categoryOrder = ['av', 'doujin', 'manga', 'pictures', 'game', 'anime', 'comic', 'music', 'live']
+const pinkCategories = new Set(['av', 'doujin', 'manga', 'pictures', 'game'])
+const downloadCategories = ['av', 'doujin', 'manga', 'pictures', 'game', 'anime', 'comic', 'music', 'live']
 
 function formatCreatedAt(value: string | null) {
 	return value ? value.replace('T', ' ').slice(0, 16) : '-'

@@ -20,8 +20,8 @@ torrentsearch 管理画面 引継ぎメモ
 現在の機能
 - URLの ?c=av でカテゴリ初期絞り込み。
 - カテゴリボタン選択時にURLのcも再読み込みなしで同期。
-- カテゴリ順: av, doujin, manga, pictures, anime, comic, music, live。
-- av/doujin/manga/picturesは薄いピンク。それ以外は緑。
+- カテゴリ順: av, doujin, manga, pictures, game, anime, comic, music, live。
+- av/doujin/manga/pictures/gameは薄いピンク。それ以外は緑。
 - 表中カテゴリもクリックで絞り込み可能。
 - 表タイトル横の小さいGボタンでタイトルをGoogle検索。タイトル文字自体は検索ボタンではない。
 - URLリンクは現在のタブで開く。

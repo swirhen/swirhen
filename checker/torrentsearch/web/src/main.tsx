@@ -17,6 +17,7 @@ type FeedResponse = {
 	items: Item[]
 	total: number
 	categories: string[]
+	source: 'current' | 'archive'
 }
 
 type PasswordCredentialConstructor = new (data: { id: string; password: string }) => Credential
@@ -24,6 +25,12 @@ type PasswordCredentialConstructor = new (data: { id: string; password: string }
 const base = `${import.meta.env.BASE_URL}api`
 const client = new QueryClient()
 const initialCategory = new URLSearchParams(window.location.search).get('c') ?? ''
+const categoryOrder = ['av', 'doujin', 'manga', 'pictures', 'anime', 'comic', 'music', 'live']
+const pinkCategories = new Set(['av', 'doujin', 'manga', 'pictures'])
+
+function formatCreatedAt(value: string | null) {
+	return value ? value.replace('T', ' ').slice(0, 16) : '-'
+}
 
 function App() {
 	const [q, setQ] = React.useState('')
@@ -33,8 +40,11 @@ function App() {
 	const [password, setPassword] = React.useState('')
 	const [loginError, setLoginError] = React.useState('')
 	const [category, setCategory] = React.useState(initialCategory)
+	const [source, setSource] = React.useState<'current' | 'archive'>('current')
 	const [dateFrom, setDateFrom] = React.useState('')
 	const [dateTo, setDateTo] = React.useState('')
+	const dateFromPickerRef = React.useRef<HTMLInputElement>(null)
+	const dateToPickerRef = React.useRef<HTMLInputElement>(null)
 	const [downloadedOnly, setDownloadedOnly] = React.useState(false)
 	const [page, setPage] = React.useState(1)
 	const [pageSize, setPageSize] = React.useState(50)
@@ -55,7 +65,7 @@ function App() {
 			active = false
 		}
 	}, [])
-	const params = new URLSearchParams({ q, page: String(page), page_size: String(pageSize) })
+	const params = new URLSearchParams({ q, page: String(page), page_size: String(pageSize), source })
 
 	if (category) params.set('category', category)
 	if (dateFrom) params.set('date_from', dateFrom)
@@ -99,17 +109,21 @@ function App() {
 	const pages = Math.max(1, Math.ceil((data.data?.total ?? 0) / pageSize))
 	const total = data.data?.total ?? 0
 	const categories = data.data?.categories ?? []
+	const orderedCategories = [...categoryOrder.filter(item => categories.includes(item)), ...categories.filter(item => !categoryOrder.includes(item))]
 	const pageItems = data.data?.items ?? []
 	const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1
 	const rangeEnd = Math.min(page * pageSize, total)
 	const allPageItemsSelected = pageItems.length > 0 && pageItems.every(item => selectedLinks.has(item.link))
 	const updateDateFrom = (value: string) => {
 		setDateFrom(value)
-		setDateTo(value)
 		setPage(1)
 	}
-	const clearDateRange = () => {
+	const clearDateFrom = () => {
 		setDateFrom('')
+		setPage(1)
+		setSelectedLinks(new Set())
+	}
+	const clearDateTo = () => {
 		setDateTo('')
 		setPage(1)
 		setSelectedLinks(new Set())
@@ -131,6 +145,14 @@ function App() {
 		if (value) url.searchParams.set('c', value)
 		else url.searchParams.delete('c')
 		window.history.replaceState(null, '', url)
+	}
+	const selectSource = (value: 'current' | 'archive') => {
+		setSource(value)
+		setPage(1)
+		setSelectedLinks(new Set())
+	}
+	const searchTitle = (title: string) => {
+		window.open(`https://www.google.com/search?q=${encodeURIComponent(title)}`, '_blank', 'noopener,noreferrer')
 	}
 	const toggleDownloadedOnly = () => {
 		setDownloadedOnly(current => !current)
@@ -161,7 +183,7 @@ function App() {
 		setSelectedLinks(new Set())
 	}
 	const handleDelete = async () => {
-		if (!selectedLinks.size || !window.confirm(`選択した${selectedLinks.size}件を削除しますか？`)) return
+		if (source === 'archive' || !selectedLinks.size || !window.confirm(`選択した${selectedLinks.size}件を削除しますか？`)) return
 		try {
 			const response = await fetch(`${base}/feed-data`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: Array.from(selectedLinks) }) })
 			if (!response.ok) throw Error('削除に失敗しました')
@@ -193,9 +215,10 @@ function App() {
 			<div>
 				<div className="title-row">
 					<h2>た、種ぇぇ</h2>
+					<nav className="source-links" aria-label="データソース切り替え"><button type="button" className={source === 'current' ? 'source-link active' : 'source-link'} onClick={() => selectSource('current')}>2023年-</button><button type="button" className={source === 'archive' ? 'source-link active' : 'source-link'} onClick={() => selectSource('archive')}>それ以前</button></nav>
 					<nav className="category-filters" aria-label="カテゴリ絞り込み">
 						<button className={category === '' ? 'category-button active' : 'category-button'} onClick={() => selectCategory('')}>all</button>
-						{categories.map(item => <button key={item} className={category === item ? 'category-button active' : 'category-button'} onClick={() => selectCategory(item)}>{item}</button>)}
+						{orderedCategories.map(item => <button key={item} className={`category-button${pinkCategories.has(item) ? ' pink-category' : ''}${category === item ? ' active' : ''}`} onClick={() => selectCategory(item)}>{item}</button>)}
 					</nav>
 				</div>
 			</div>
@@ -203,26 +226,28 @@ function App() {
 		<div className="search-row">
 		<div className="search">
 			<Search size={18}/>
-			<input value={q} onChange={event => { setQ(event.target.value); setPage(1) }} placeholder="タイトルまたはリンクを検索"/><button className="clear-keyword" onClick={clearKeyword} aria-label="検索キーワードを全消去">×</button>
-			<span className="date-range-label">取得日時で絞り込み</span>
-			<label className="date-field"><span>開始日</span><input type="date" value={dateFrom} onChange={event => updateDateFrom(event.target.value)} aria-label="取得日時の開始日"/></label>
-			<span>～</span>
-			<label className="date-field"><span>終了日</span><input type="date" value={dateTo} onChange={event => { setDateTo(event.target.value); setPage(1) }} aria-label="取得日時の終了日"/></label><button className="clear-date" onClick={clearDateRange}>クリア</button>
+			<input value={q} onChange={event => { setQ(event.target.value); setPage(1) }} placeholder="Search..."/><button className="clear-keyword" onClick={clearKeyword} aria-label="検索キーワードを全消去">×</button>
+			<span className="date-range-label">取得日時</span>
+			<div className="date-range">
+				<label className="date-field"><span>開始日</span><span className={dateFrom ? 'date-input date-display' : 'date-input date-display empty'} onClick={() => { const input = dateFromPickerRef.current; if (!input) return; try { input.showPicker?.() } catch { input.click() } }}>{dateFrom || 'YYYY-MM-DD'}</span><button className="date-clear" type="button" onClick={clearDateFrom} aria-label="開始日をクリア" title="開始日をクリア">×</button><input ref={dateFromPickerRef} className="date-picker" type="date" value={dateFrom} onChange={event => updateDateFrom(event.target.value)} aria-label="取得日時の開始日"/></label>
+				<span>～</span>
+				<label className="date-field"><span>終了日</span><span className={dateTo ? 'date-input date-display' : 'date-input date-display empty'} onClick={() => { const input = dateToPickerRef.current; if (!input) return; try { input.showPicker?.() } catch { input.click() } }}>{dateTo || 'YYYY-MM-DD'}</span><button className="date-clear" type="button" onClick={clearDateTo} aria-label="終了日をクリア" title="終了日をクリア">×</button><input ref={dateToPickerRef} className="date-picker" type="date" value={dateTo} onChange={event => { setDateTo(event.target.value); setPage(1) }} aria-label="取得日時の終了日"/></label>
+			</div>
 		</div>
 		<div className="session-toolbar"><button onClick={logout} aria-label="ログアウト" title="ログアウト"><LogOut size={16}/></button></div>
 		</div>
 		{pagination}
 		{restoreToken && <div className="undo-banner">{deletedCount}件削除しました<button onClick={handleRestore}>元に戻す</button></div>}
 		<section>
-			<div className="table-toolbar"><button className="action-download" disabled={!selectedLinks.size} onClick={handleDownload}>ダウンロード</button><button className="action-delete" disabled={!selectedLinks.size} onClick={handleDelete}>削除</button><button className={downloadedOnly ? 'action-downloaded active' : 'action-downloaded'} onClick={toggleDownloadedOnly}>DL済み</button></div>
+			<div className="table-toolbar"><button className="action-download" disabled={!selectedLinks.size} onClick={handleDownload}>ダウンロード</button><button className="action-delete" disabled={source === 'archive' || !selectedLinks.size} onClick={handleDelete}>削除</button><button className={downloadedOnly ? 'action-downloaded active' : 'action-downloaded'} onClick={toggleDownloadedOnly}>DL済み</button></div>
 			{data.isLoading ? '読み込み中...' : data.isError ? '取得に失敗しました' : <table>
-				<thead><tr><th className="select-column"><input type="checkbox" checked={allPageItemsSelected} onChange={event => togglePageSelection(event.target.checked)} aria-label="このページの全行を選択"/></th><th>カテゴリ</th><th>タイトル</th><th>URL</th><th>取得日時</th><th>DL</th></tr></thead>
+				<thead><tr><th className="select-column"><input type="checkbox" checked={allPageItemsSelected} onChange={event => togglePageSelection(event.target.checked)} aria-label="このページの全行を選択"/></th><th>カテゴリ</th><th>タイトル</th><th>URL</th><th>取得日時</th><th className="download-column">DL</th></tr></thead>
 				<tbody>{data.data?.items.map(item => <tr key={item.link} className={selectedLinks.has(item.link) ? 'selected' : ''} onClick={() => toggleSelected(item.link)}>
 					<td className="select-column"><input type="checkbox" checked={selectedLinks.has(item.link)} onChange={() => toggleSelected(item.link)} onClick={event => event.stopPropagation()} aria-label={`${item.title}を選択`}/></td>
-					<td><span>{item.category}</span></td>
-					<td><b>{item.title}</b></td>
-					<td><a className="download-link" href={item.link} target="_blank" rel="noreferrer" aria-label={`${item.title}をダウンロード`} title="ダウンロード"><Download size={16}/></a></td>
-					<td>{item.created_at ?? '-'}</td>
+					<td><button type="button" className={pinkCategories.has(item.category) ? 'category-tag pink-category-tag' : 'category-tag'} onClick={event => { event.stopPropagation(); selectCategory(item.category) }}>{item.category}</button></td>
+					<td className="title-column"><span className="title-content"><button type="button" className="title-search" title="Googleで検索" aria-label={`${item.title}をGoogleで検索`} onClick={event => { event.stopPropagation(); searchTitle(item.title) }}>G</button><b>{item.title}</b></span></td>
+					<td><a className="download-link" href={item.link} aria-label={`${item.title}をダウンロード`} title="ダウンロード" onClick={event => event.stopPropagation()}><Download size={16}/></a></td>
+					<td className="date-column">{formatCreatedAt(item.created_at)}</td>
 					<td className="download-status" title={item.download_dir ?? undefined}>{item.download_dir ? '○' : ''}</td>
 				</tr>)}</tbody>
 			</table>}

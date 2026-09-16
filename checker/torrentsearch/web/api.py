@@ -9,6 +9,7 @@ from fastapi import Cookie, Depends, FastAPI, HTTPException, Query, Response
 from pydantic import BaseModel
 app=FastAPI(title='Torrent Feed Admin API')
 DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed.db'
+ARCHIVE_DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed_before_2023.db'
 deleted_batches: dict[str, list[dict]] = {}
 AUTH_COOKIE='torrent_admin_session'
 SESSION_TTL=60 * 60 * 24 * 180
@@ -58,12 +59,16 @@ def login(payload: LoginRequest, response: Response):
 def logout(response: Response):
     response.delete_cookie(AUTH_COOKIE)
     return {'authenticated': False}
+def get_db(source: str):
+    if source == 'archive':
+        return ARCHIVE_DB
+    return DB
 @app.get('/api/feed-data')
-def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100)):
+def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100), source:str=Query('current', pattern='^(current|archive)$')):
     conditions=[]; args=[]
     if q:
-        conditions.append('(title LIKE ? OR link LIKE ?)')
-        args.extend([f'%{q}%',f'%{q}%'])
+        conditions.append('title LIKE ?')
+        args.append(f'%{q}%')
     if category:
         conditions.append('category = ?')
         args.append(category)
@@ -77,11 +82,11 @@ def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='
         conditions.append('download_dir IS NOT NULL')
     where=f" WHERE {' AND '.join(conditions)}" if conditions else ''
     off=(page-1)*page_size
-    with sqlite3.connect(DB) as c:
+    with sqlite3.connect(get_db(source)) as c:
         categories=[row[0] for row in c.execute('SELECT DISTINCT category FROM feed_data WHERE category IS NOT NULL ORDER BY category')]
         total=c.execute('SELECT COUNT(*) FROM feed_data'+where,args).fetchone()[0]
         rows=c.execute('SELECT category,title,link,pubdate,created_at,download_dir FROM feed_data'+where+' ORDER BY created_at DESC LIMIT ? OFFSET ?',args+[page_size,off]).fetchall()
-    return {'items':[dict(zip(('category','title','link','pubdate','created_at','download_dir'),r)) for r in rows],'total':total,'categories':categories}
+    return {'items':[dict(zip(('category','title','link','pubdate','created_at','download_dir'),r)) for r in rows],'total':total,'categories':categories,'source':source}
 
 @app.delete('/api/feed-data')
 def delete_feed(payload: FeedDeleteRequest, _auth=Depends(require_auth)):

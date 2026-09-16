@@ -1,16 +1,22 @@
 from pathlib import Path
 import hashlib
 import hmac
+import json
 import os
 import sqlite3
 import time
 from uuid import uuid4
+from typing import Dict
+import sys
 from fastapi import Cookie, Depends, FastAPI, HTTPException, Query, Response
 from pydantic import BaseModel
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import torrent_search_common as tsc
 app=FastAPI(title='Torrent Feed Admin API')
 DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed.db'
 ARCHIVE_DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed_before_2023.db'
 IDPASS_FILE=Path(__file__).resolve().parents[1]/'idpass.txt'
+DOWNLOAD_SETTINGS_FILE=Path(__file__).resolve().parents[1]/'download_settings.json'
 deleted_batches: dict[str, list[dict]] = {}
 AUTH_COOKIE='torrent_admin_session'
 SESSION_TTL=60 * 60 * 24 * 180
@@ -35,6 +41,14 @@ class FeedRestoreRequest(BaseModel):
 class LoginRequest(BaseModel):
     username: str
     password: str
+
+class DownloadSettings(BaseModel):
+    root_dir: str = ''
+    category_dirs: Dict[str, str] = {}
+
+class FeedDownloadRequest(BaseModel):
+    links: list[str]
+    source: str = 'current'
 
 def require_auth(session: str | None = Cookie(default=None, alias=AUTH_COOKIE)):
     if not PASSWORD or not SECRET or not session:
@@ -68,6 +82,72 @@ def login(payload: LoginRequest, response: Response):
 def logout(response: Response):
     response.delete_cookie(AUTH_COOKIE)
     return {'authenticated': False}
+
+@app.get('/api/download-settings')
+def get_download_settings(_auth=Depends(require_auth)):
+    try:
+        settings=json.loads(DOWNLOAD_SETTINGS_FILE.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError):
+        settings={}
+    return DownloadSettings(**settings).model_dump()
+
+@app.put('/api/download-settings')
+def update_download_settings(payload: DownloadSettings, _auth=Depends(require_auth)):
+    settings={
+        'root_dir': payload.root_dir.strip(),
+        'category_dirs': {category: path.strip() for category, path in payload.category_dirs.items()},
+    }
+    temporary=DOWNLOAD_SETTINGS_FILE.with_suffix('.json.tmp')
+    temporary.write_text(json.dumps(settings, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    temporary.replace(DOWNLOAD_SETTINGS_FILE)
+    return settings
+
+@app.post('/api/feed-data/download')
+def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
+    if payload.source not in ('current', 'archive'):
+        raise HTTPException(status_code=422, detail='invalid source')
+    if not payload.links:
+        return {'downloaded': [], 'failed': []}
+    try:
+        settings=json.loads(DOWNLOAD_SETTINGS_FILE.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError):
+        settings={}
+    download_settings=DownloadSettings(**settings)
+    if not download_settings.root_dir.strip():
+        raise HTTPException(status_code=422, detail='ルートディレクトリが設定されていません')
+    category_dirs=download_settings.category_dirs
+    placeholders=','.join('?' for _ in payload.links)
+    with sqlite3.connect(get_db(payload.source)) as c:
+        rows=c.execute(
+            f'SELECT category, title, link FROM feed_data WHERE link IN ({placeholders})',
+            payload.links,
+        ).fetchall()
+    items={row[2]: row for row in rows}
+    downloaded=[]
+    failed=[]
+    for link in payload.links:
+        item=items.get(link)
+        if item is None:
+            failed.append({'link': link, 'reason': 'データが見つかりません'})
+            continue
+        category, title, item_link=item
+        category_dir=category_dirs.get(category, '').strip()
+        destination=Path(download_settings.root_dir.strip()) / category_dir
+        filename=f'{tsc.sanitize_filename(title)}.torrent'
+        try:
+            destination.mkdir(parents=True, exist_ok=True)
+            torrent_data=tsc.download_torrent(item_link)
+            if torrent_data is None:
+                raise OSError('ダウンロードに失敗しました')
+            (destination / filename).write_bytes(torrent_data)
+            with sqlite3.connect(get_db(payload.source)) as c:
+                c.execute('UPDATE feed_data SET download_dir = ?, download_failed_at = NULL WHERE link = ?', (str(destination), item_link))
+                c.commit()
+            downloaded.append({'category': category, 'title': title, 'filename': filename, 'path': str(destination / filename)})
+        except OSError as error:
+            failed.append({'category': category, 'title': title, 'link': item_link, 'reason': str(error)})
+    return {'downloaded': downloaded, 'failed': failed}
+
 def get_db(source: str):
     if source == 'archive':
         return ARCHIVE_DB

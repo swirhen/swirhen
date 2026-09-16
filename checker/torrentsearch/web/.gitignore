@@ -2,3 +2,4 @@ node_modules/
 dist/
 .venv/
 __pycache__/
+download_settings.json

@@ -20,6 +20,11 @@ type FeedResponse = {
 	source: 'current' | 'archive'
 }
 
+type DownloadResult = {
+	downloaded: { category: string; title: string; filename: string; path: string }[]
+	failed: { category?: string; title?: string; link: string; reason: string }[]
+}
+
 type PasswordCredentialConstructor = new (data: { id: string; password: string }) => Credential
 
 const base = `${import.meta.env.BASE_URL}api`
@@ -27,6 +32,7 @@ const client = new QueryClient()
 const initialCategory = new URLSearchParams(window.location.search).get('c') ?? ''
 const categoryOrder = ['av', 'doujin', 'manga', 'pictures', 'anime', 'comic', 'music', 'live']
 const pinkCategories = new Set(['av', 'doujin', 'manga', 'pictures'])
+const downloadCategories = ['av', 'doujin', 'manga', 'pictures', 'anime', 'comic', 'music', 'live']
 
 function formatCreatedAt(value: string | null) {
 	return value ? value.replace('T', ' ').slice(0, 16) : '-'
@@ -51,6 +57,11 @@ function App() {
 	const [selectedLinks, setSelectedLinks] = React.useState<Set<string>>(new Set())
 	const [restoreToken, setRestoreToken] = React.useState<string | null>(null)
 	const [deletedCount, setDeletedCount] = React.useState(0)
+	const [settingsOpen, setSettingsOpen] = React.useState(false)
+	const [rootDir, setRootDir] = React.useState('')
+	const [categoryDirs, setCategoryDirs] = React.useState<Record<string, string>>({})
+	const [settingsMessage, setSettingsMessage] = React.useState('')
+	const [downloadResult, setDownloadResult] = React.useState<DownloadResult | null>(null)
 	React.useEffect(() => {
 		let active = true
 		fetch(`${base}/session`)
@@ -177,10 +188,18 @@ function App() {
 			return next
 		})
 	}
-	const handleDownload = () => {
+	const handleDownload = async () => {
 		if (!selectedLinks.size || !window.confirm(`選択した${selectedLinks.size}件をダウンロードしますか？`)) return
-		data.data?.items.filter(item => selectedLinks.has(item.link)).forEach(item => window.open(item.link, '_blank', 'noopener,noreferrer'))
-		setSelectedLinks(new Set())
+		try {
+			const response = await fetch(`${base}/feed-data/download`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: Array.from(selectedLinks), source }) })
+			const result = await response.json() as DownloadResult | { detail?: string }
+			if (!response.ok) throw Error('detail' in result && result.detail ? result.detail : 'ダウンロードに失敗しました')
+			setDownloadResult(result as DownloadResult)
+			setSelectedLinks(new Set())
+			await data.refetch()
+		} catch (error) {
+			window.alert(error instanceof Error ? error.message : 'ダウンロードに失敗しました')
+		}
 	}
 	const handleDelete = async () => {
 		if (source === 'archive' || !selectedLinks.size || !window.confirm(`選択した${selectedLinks.size}件を削除しますか？`)) return
@@ -206,6 +225,29 @@ function App() {
 			await data.refetch()
 		} catch (error) {
 			window.alert(error instanceof Error ? error.message : '復元に失敗しました')
+		}
+	}
+	const openSettings = async () => {
+		setSettingsOpen(true)
+		setSettingsMessage('')
+		try {
+			const response = await fetch(`${base}/download-settings`)
+			if (!response.ok) throw Error('設定の取得に失敗しました')
+			const settings = await response.json() as { root_dir: string; category_dirs: Record<string, string> }
+			setRootDir(settings.root_dir)
+			setCategoryDirs(settings.category_dirs)
+		} catch (error) {
+			setSettingsMessage(error instanceof Error ? error.message : '設定の取得に失敗しました')
+		}
+	}
+	const saveSettings = async (event: React.FormEvent) => {
+		event.preventDefault()
+		try {
+			const response = await fetch(`${base}/download-settings`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ root_dir: rootDir, category_dirs: categoryDirs }) })
+			if (!response.ok) throw Error('設定の保存に失敗しました')
+			setSettingsMessage('保存しました')
+		} catch (error) {
+			setSettingsMessage(error instanceof Error ? error.message : '設定の保存に失敗しました')
 		}
 	}
 	const pagination = <div className="pagination"><button disabled={page === 1} onClick={() => setPage(1)}>最初へ</button><button disabled={page === 1} onClick={() => setPage(page - 1)}>前へ</button><b>{rangeStart}-{rangeEnd} / {total}</b><button disabled={page === pages} onClick={() => setPage(page + 1)}>次へ</button><button disabled={page === pages} onClick={() => setPage(pages)}>最後へ</button><select value={pageSize} onChange={event => updatePageSize(Number(event.target.value))} aria-label="表示件数"><option value="10">10件</option><option value="20">20件</option><option value="50">50件</option><option value="100">100件</option></select></div>
@@ -239,7 +281,7 @@ function App() {
 		{pagination}
 		{restoreToken && <div className="undo-banner">{deletedCount}件削除しました<button onClick={handleRestore}>元に戻す</button></div>}
 		<section>
-			<div className="table-toolbar"><button className="action-download" disabled={!selectedLinks.size} onClick={handleDownload}>ダウンロード</button><button className="action-delete" disabled={source === 'archive' || !selectedLinks.size} onClick={handleDelete}>削除</button><button className={downloadedOnly ? 'action-downloaded active' : 'action-downloaded'} onClick={toggleDownloadedOnly}>DL済み</button></div>
+			<div className="table-toolbar"><button className="download-settings-link" type="button" onClick={openSettings}>ダウンロード先設定</button><button className="action-download" disabled={!selectedLinks.size} onClick={handleDownload}>ダウンロード</button><button className="action-delete" disabled={source === 'archive' || !selectedLinks.size} onClick={handleDelete}>削除</button><button className={downloadedOnly ? 'action-downloaded active' : 'action-downloaded'} onClick={toggleDownloadedOnly}>DL済み</button></div>
 			{data.isLoading ? '読み込み中...' : data.isError ? '取得に失敗しました' : <table>
 				<thead><tr><th className="select-column"><input type="checkbox" checked={allPageItemsSelected} onChange={event => togglePageSelection(event.target.checked)} aria-label="このページの全行を選択"/></th><th>カテゴリ</th><th>タイトル</th><th>URL</th><th>取得日時</th><th className="download-column">DL</th></tr></thead>
 				<tbody>{data.data?.items.map(item => <tr key={item.link} className={selectedLinks.has(item.link) ? 'selected' : ''} onClick={() => toggleSelected(item.link)}>
@@ -252,6 +294,8 @@ function App() {
 				</tr>)}</tbody>
 			</table>}
 		</section>
+		{settingsOpen && <div className="settings-backdrop" role="presentation"><div className="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title"><div className="settings-header"><h2 id="settings-title">ダウンロード先設定</h2><button type="button" onClick={() => setSettingsOpen(false)} aria-label="設定を閉じる">×</button></div><form onSubmit={saveSettings} className="settings-form"><label>ルートディレクトリ<input value={rootDir} onChange={event => setRootDir(event.target.value)} /></label><fieldset><legend>カテゴリ別保存ディレクトリ</legend>{downloadCategories.map(item => <label key={item}>{item}<input value={categoryDirs[item] ?? ''} onChange={event => setCategoryDirs(current => ({ ...current, [item]: event.target.value }))} /></label>)}</fieldset><div className="settings-actions"><button type="submit">保存</button>{settingsMessage && <span>{settingsMessage}</span>}</div></form></div></div>}
+		{downloadResult && <div className="settings-backdrop" role="presentation"><div className="download-result-modal" role="dialog" aria-modal="true" aria-labelledby="download-result-title"><div className="settings-header"><h2 id="download-result-title">ダウンロード結果</h2></div><p>{downloadResult.downloaded.length}件ダウンロードしました。</p>{downloadResult.downloaded.length > 0 && <ul>{downloadResult.downloaded.map(item => <li key={`${item.category}-${item.filename}`}>{item.category}: {item.filename}</li>)}</ul>}{downloadResult.failed.length > 0 && <><h3>失敗</h3><ul>{downloadResult.failed.map(item => <li key={item.link}>{item.title ?? item.link}: {item.reason}</li>)}</ul></>}<div className="settings-actions"><button type="button" onClick={() => setDownloadResult(null)}>OK</button></div></div></div>}
 		<footer>{pagination}</footer>
 	</main>
 }

@@ -624,6 +624,121 @@ button:disabled {
   color: #fff;
   border-color: var(--muted);
 }
+.download-settings-link {
+  color: var(--muted);
+  background: transparent;
+  border-color: transparent;
+}
+.download-settings-link:hover {
+  color: var(--green);
+  border-color: var(--line);
+}
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: #000b;
+}
+.settings-modal {
+  width: min(680px, 100%);
+  max-height: min(760px, 90vh);
+  overflow: auto;
+  padding: 24px;
+  background: #111;
+  border: 1px solid var(--green);
+  box-shadow: 0 20px 70px #000;
+}
+.download-result-modal {
+  width: min(680px, 100%);
+  max-height: min(760px, 90vh);
+  overflow: auto;
+  padding: 24px;
+  background: #111;
+  border: 1px solid var(--green);
+  box-shadow: 0 20px 70px #000;
+}
+.download-result-modal p {
+  color: var(--muted);
+}
+.download-result-modal ul {
+  max-height: 360px;
+  overflow: auto;
+  padding-left: 20px;
+  color: #fff;
+  font: 12px "IBM Plex Mono";
+}
+.download-result-modal li {
+  margin: 6px 0;
+  overflow-wrap: anywhere;
+}
+.download-result-modal h3 {
+  color: #ff8d8d;
+  font-size: 14px;
+}
+.settings-header,
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.settings-header {
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+}
+.settings-header h2 {
+  margin: 0;
+}
+.settings-form {
+  margin-top: 28px;
+}
+.settings-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font: 12px "IBM Plex Mono";
+}
+.settings-form input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  color: #fff;
+  background: var(--panel);
+  font: 14px "Space Grotesk";
+}
+.settings-form fieldset {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+  margin: 24px 0 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+}
+.settings-form legend {
+  padding: 0 6px;
+  color: var(--muted);
+  font: 12px "IBM Plex Mono";
+}
+.settings-actions {
+  margin-top: 18px;
+}
+.settings-actions button {
+  color: #000;
+  background: var(--green);
+  border-color: var(--green);
+}
+.settings-actions span {
+  color: var(--muted);
+  font-size: 12px;
+}
+@media (max-width: 620px) {
+  .settings-form fieldset {
+    grid-template-columns: 1fr;
+  }
+}
 :root {
   font-family: "Space Grotesk", sans-serif;
   color: #fff;

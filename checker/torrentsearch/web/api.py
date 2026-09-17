@@ -60,11 +60,13 @@ class YearFilter(BaseModel):
 
 def get_available_years():
     with sqlite3.connect(DB) as c:
-        bounds=c.execute('SELECT MIN(created_at), MAX(created_at) FROM feed_data').fetchone()
-        if not bounds or not bounds[0] or not bounds[1]:
+        # MIN/MAXを1クエリで同時取得するとSQLiteのMIN/MAX最適化が効かず全件スキャンになるため分離する
+        min_created_at=c.execute('SELECT MIN(created_at) FROM feed_data').fetchone()[0]
+        max_created_at=c.execute('SELECT MAX(created_at) FROM feed_data').fetchone()[0]
+        if not min_created_at or not max_created_at:
             return []
-        start_year=int(bounds[0][:4])
-        end_year=int(bounds[1][:4])
+        start_year=int(min_created_at[:4])
+        end_year=int(max_created_at[:4])
         years=[]
         for year in range(start_year, end_year + 1):
             exists=c.execute(

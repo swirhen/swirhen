@@ -195,6 +195,7 @@ def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
     items={row[2]: row for row in rows}
     downloaded=[]
     failed=[]
+    used_filenames: dict[str, set[str]] = {}
     for link in payload.links:
         item=items.get(link)
         if item is None:
@@ -205,7 +206,8 @@ def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
         destination=Path(download_settings.root_dir.strip())
         if category_dir:
             destination /= category_dir
-        filename=f'{tsc.sanitize_filename(title)}.torrent'
+        used_names=used_filenames.setdefault(str(destination), set())
+        filename=tsc.resolve_unique_filename(title, destination, used_names)
         if DOWNLOAD_DRY_RUN:
             downloaded.append({'category': category, 'title': title, 'filename': filename, 'path': str(destination / filename)})
             continue

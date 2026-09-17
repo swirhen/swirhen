@@ -116,6 +116,21 @@ def sanitize_filename(title, max_bytes=247):
     return truncate(filename, max_bytes)
 
 
+# 保存先ディレクトリ内、および同一バッチ内でのファイル名衝突を連番付与で回避する
+def resolve_unique_filename(title, destination, used_names, extension='.torrent', max_bytes=247):
+    destination = pathlib.Path(destination)
+    stem = sanitize_filename(title, max_bytes)
+    candidate = f'{stem}{extension}'
+    index = 1
+    while candidate in used_names or (destination / candidate).exists():
+        suffix = f' ({index})'
+        truncated_stem = truncate(stem, max(1, max_bytes - len(suffix.encode('utf-8'))))
+        candidate = f'{truncated_stem}{suffix}{extension}'
+        index += 1
+    used_names.add(candidate)
+    return candidate
+
+
 # 未ダウンロードの新着seedと、直近1時間に失敗したseedをカテゴリ単位で取得
 def find_undownloaded_seeds(category, last_check_date):
     conditions = [
@@ -169,11 +184,12 @@ def download_seeds(matches, download_dir):
     downloaded_matches = []
     failed_new_links = []
     failed_retry_links = []
+    used_filenames = set()
     for category, title, keyword, link, is_retry in matches:
-        filename = sanitize_filename(title)
+        filename = resolve_unique_filename(title, download_dir, used_filenames)
         data = download_torrent(link)
         if data is not None:
-            with open(f'{download_dir}/{filename}.torrent', mode='wb') as file:
+            with open(f'{download_dir}/{filename}', mode='wb') as file:
                 file.write(data)
             downloaded_matches.append((category, title, keyword, link))
         elif is_retry:

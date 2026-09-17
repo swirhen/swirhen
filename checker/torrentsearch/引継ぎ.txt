@@ -43,9 +43,10 @@ torrentsearch 管理画面 引継ぎメモ
   - ボタンラベルは常に「検索対象」固定。開いて選択しても閉じればラベルは戻る（選択値は保持）。
   - 選択肢はDBに実際にデータが存在する年だけを列挙（MIN/MAX+年ごとのEXISTSで高速に判定）。
   - 飛び飛びの複数年選択可（2024,2026のみなど）。ボタン右のサマリー表示に選択中の年をカンマ区切りで表示（未選択はall）。
-  - 選択は web/year_filter.json へシステム全体で永続化（トグル直後にPUT /api/year-filterで保存）。
+  - 選択は web/year_filter.json へシステム全体で永続化（プルダウンを閉じた時にPUT /api/year-filterで保存）。
   - 検索への反映はcreated_atの年範囲をORで結合しdate_from/date_toとはANDで併用。idx_feed_data_created_atが引き続き有効。
   - (修正済み) get_available_years()はMIN(created_at)とMAX(created_at)を一つのSELECTで同時取得しておりSQLiteのMIN/MAX最適化が効かず全件スキャンになっていた（/api/feed-data呼び出し毎に約83msのオーバーヘッド）。MIN/MAXを別クエリに分けて0.9ms程度へ改善済み。
+- 年絞り込みはチェック中の一時選択と適用済み選択を分離し、プルダウンを閉じた時にだけ検索・保存を実行する。
 
 DB統合とパフォーマンス改善
 - api.pyのDB配置先はwebディレクトリの親、torrentsearch/。DBは nyaatorrent_feed.db の1本のみ。

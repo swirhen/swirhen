@@ -76,6 +76,7 @@ function App() {
 	const [selectedSearchCondition, setSelectedSearchCondition] = React.useState('')
 	const [refreshing, setRefreshing] = React.useState(false)
 	const [selectedYears, setSelectedYears] = React.useState<number[]>([])
+	const [draftYears, setDraftYears] = React.useState<number[]>([])
 	const [yearMenuOpen, setYearMenuOpen] = React.useState(false)
 	const yearMenuRef = React.useRef<HTMLDivElement>(null)
 	React.useEffect(() => {
@@ -119,11 +120,11 @@ function App() {
 	React.useEffect(() => {
 		if (!yearMenuOpen) return
 		const handleClickOutside = (event: MouseEvent) => {
-			if (yearMenuRef.current && !yearMenuRef.current.contains(event.target as Node)) setYearMenuOpen(false)
+			if (yearMenuRef.current && !yearMenuRef.current.contains(event.target as Node)) closeYearMenu()
 		}
 		document.addEventListener('mousedown', handleClickOutside)
 		return () => document.removeEventListener('mousedown', handleClickOutside)
-	}, [yearMenuOpen])
+	}, [yearMenuOpen, draftYears, selectedYears])
 	React.useEffect(() => {
 		const url = new URL(window.location.href)
 		if (q) url.searchParams.set('q', q)
@@ -372,8 +373,13 @@ function App() {
 			window.alert(error instanceof Error ? error.message : '検索条件の削除に失敗しました')
 		}
 	}
-	const toggleYear = async (year: number) => {
-		const next = selectedYears.includes(year) ? selectedYears.filter(item => item !== year) : [...selectedYears, year]
+	const toggleYear = (year: number) => {
+		setDraftYears(current => current.includes(year) ? current.filter(item => item !== year) : [...current, year])
+	}
+	const closeYearMenu = async () => {
+		setYearMenuOpen(false)
+		if (draftYears.join(',') === selectedYears.join(',')) return
+		const next = [...draftYears].sort((a, b) => a - b)
 		setSelectedYears(next)
 		setPage(1)
 		setSelectedLinks(new Set())
@@ -381,6 +387,14 @@ function App() {
 			await fetch(`${base}/year-filter`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ years: next }) })
 		} catch {
 			// 保存に失敗しても画面上の絞り込みは継続する
+		}
+	}
+	const toggleYearMenu = () => {
+		if (yearMenuOpen) {
+			void closeYearMenu()
+		} else {
+			setDraftYears(selectedYears)
+			setYearMenuOpen(true)
 		}
 	}
 	const savedSearches = <div className="pagination-saved-searches"><button type="button" onClick={saveSearchCondition}>検索条件保存</button><select value={selectedSearchCondition} onChange={event => applySearchCondition(event.target.value)} aria-label="保存した検索条件"><option value="">保存した検索条件</option>{searchConditions.map((condition, index) => <option key={`${condition.category}-${condition.keyword}-${index}`} value={index}>{condition.category || 'all'}: {condition.keyword}</option>)}</select><button type="button" disabled={selectedSearchCondition === ''} onClick={deleteSearchCondition}>削除</button></div>
@@ -393,8 +407,8 @@ function App() {
 				<div className="title-row">
 					<h2>た、種ぇぇ</h2>
 					<div className="year-filter" ref={yearMenuRef}>
-						<button type="button" className="year-filter-toggle" onClick={() => setYearMenuOpen(open => !open)} aria-haspopup="true" aria-expanded={yearMenuOpen}>検索対象</button>
-						{yearMenuOpen && <div className="year-filter-menu">{(data.data?.years ?? []).map(year => <label key={year} className="year-filter-option"><input type="checkbox" checked={selectedYears.includes(year)} onChange={() => toggleYear(year)} />{year}</label>)}</div>}
+						<button type="button" className="year-filter-toggle" onClick={toggleYearMenu} aria-haspopup="true" aria-expanded={yearMenuOpen}>検索対象</button>
+						{yearMenuOpen && <div className="year-filter-menu">{(data.data?.years ?? []).map(year => <label key={year} className="year-filter-option"><input type="checkbox" checked={draftYears.includes(year)} onChange={() => toggleYear(year)} />{year}</label>)}</div>}
 						<span className="year-filter-summary">{selectedYears.length ? selectedYears.slice().sort((a, b) => a - b).join(',') : 'all'}</span>
 					</div>
 					<nav className="category-filters" aria-label="カテゴリ絞り込み">

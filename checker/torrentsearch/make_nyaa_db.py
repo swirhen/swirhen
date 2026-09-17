@@ -81,6 +81,7 @@ def make_nyaa_data(category='all'):
         download_failed_at timestamp
     );
     delete from feed_data where category = '';
+    create index if not exists idx_feed_data_created_at on feed_data(created_at);
     """
 
     values = []

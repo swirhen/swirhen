@@ -11,11 +11,12 @@ torrentsearch 管理画面 引継ぎメモ
 - 認証はFastAPIのログイン画面。Cookieセッションは180日保持。
 
 主なファイル
-- web/api.py: 認証、feed取得、削除、Undo、DB切り替え。
+- web/api.py: 認証、feed取得、削除、Undo。
 - web/src/main.tsx: React画面、検索、カテゴリ、日付、選択、削除、Google検索。
 - web/src/styles.css: 画面スタイル。
 - web/release.sh: フロントビルドとAPI再起動。
 - web/requirements.txt: FastAPI実行に必要な依存関係。requestsを追加済み。
+- make_nyaa_db.py: 参考DDLコメントにfeed_dataのインデックス定義を記載。
 
 現在の機能
 - URLの ?c=av でカテゴリ初期絞り込み。
@@ -27,10 +28,7 @@ torrentsearch 管理画面 引継ぎメモ
 - URLリンクは現在のタブで開く。
 - 開始日・終了日は個別入力、各欄のxで個別クリア。
 - 取得日時は画面上では秒を表示せず分まで。
-- 最新DBと過去DBをヘッダーのリンクで切り替え。
-  - 「2023年-」: nyaatorrent_feed.db
-  - 「それ以前」: nyaatorrent_feed_before_2023.db
-- 過去DB表示中は削除ボタンを無効化。
+- (統合済み) 以前は最新DBと過去DBをヘッダーのリンクで切り替えていたが、過去DBは現行DBへ統合したため廃止。ソース切り替えUI・APIのsourceパラメータは撤去。
 - 検索ボックスは半角スペースでAND、|でOR。先頭が-の語は除外。
 - 検索キーワードはURLの?q=へ同期し、特殊文字はURLエンコード。
 - 保存した検索条件をJSONへ保存し、上部ページネーション左側のプルダウンから呼び出せる。
@@ -42,13 +40,16 @@ torrentsearch 管理画面 引継ぎメモ
 - 一括ダウンロードは選択項目をサーバー側でカテゴリ別に保存し、完了モーダルへ結果を表示する。
 - 一括ダウンロードではDBのdownload_dirおよびdownload_failed_atを更新しない。
 
-DB切り替え
-- api.pyのDB配置先はwebディレクトリの親、torrentsearch/。
-- 現在DB: nyaatorrent_feed.db
-- 過去DB: nyaatorrent_feed_before_2023.db
-- 過去DBが存在しない環境で「それ以前」を押すと取得エラーになる。
-- 現在の開発環境には過去DBがないため、過去DB切り替えは未実機確認。
-- 本番サーバーに過去DBを配置してから動作確認すること。
+DB統合とパフォーマンス改善
+- api.pyのDB配置先はwebディレクトリの親、torrentsearch/。DBは nyaatorrent_feed.db の1本のみ。
+- nyaatorrent_feed_before_2023.db（過去DB、312,008件）の全レコードをnyaatorrent_feed.db（統合前722,530件）へINSERT OR IGNOREで統合済み（linkのunique制約により重複0件、統合後1,034,538件）。
+- 統合前にnyaatorrent_feed.dbをnyaatorrent_feed_premerge_backup.dbとしてバックアップ済み（.gitignore対象、実DBと同様Git管理外）。
+- nyaatorrent_feed_before_2023.db自体は削除せず現状のまま残置（未使用ファイルとして温存）。
+- 検索の日付絞り込み(date_from/date_to)は、これまで`date(created_at) >= date(?)`のように列を関数でラップしており、インデックスが一切効かず全件走査になっていた（絞り込みなしと同程度の235ms前後）。
+- `created_at >= ?` / `created_at <= ?`の直接比較へ修正し、新規インデックス`idx_feed_data_created_at`をfeed_data(created_at)へ追加（make_nyaa_db.pyの参考DDLにも追記済み）。
+- 実DBで実測: 日付のみ絞り込み+複合語検索が旧実装237ms→修正後85ms程度（統合後の103万件規模でも同等の効果を確認）。
+- カテゴリ絞り込みは既存のidx_feed_data_category_pubdate等が効くため元々高速（約73ms）。
+- ローカルAPI経由で date_from=2022-01-01/date_to=2022-12-31 を指定し、統合前は過去DBにしかなかった2022年データ(191,872件)が現行DBだけで取得できることを確認済み。
 
 設定ファイル
 - web/download_settings.json: ルートディレクトリとカテゴリ別保存先。個人設定のためGit管理外。
@@ -63,6 +64,8 @@ DB切り替え
 - 検索条件のAND/OR/除外指定を一時SQLiteで検証済み。
 - 保存先設定・検索条件保存を一時JSONで検証済み。
 - ローカルの一括ダウンロードは `TORRENT_ADMIN_DOWNLOAD_DRY_RUN=1` で実ダウンロード、ファイル作成、DB更新なしに結果モーダルを確認できる。
+- DB統合後、python -m py_compile web/api.py make_nyaa_db.py 成功。npm.cmd run build 成功。
+- ローカルAPI経由でログイン→feed-data取得の一連の動作を確認済み（統合後の合計件数1,034,538件と一致）。
 
 本番反映
 1. 本番でリポジトリを更新
@@ -78,6 +81,7 @@ DB切り替え
 - 認証環境変数は/etc/default/torrent-admin-apiの
   TORRENT_ADMIN_USERNAME / TORRENT_ADMIN_PASSWORD / TORRENT_ADMIN_SECRET。
 - 実環境へ反映する前に、`requests`を含むrequirements.txtを本番仮想環境へインストールすること。
+- 本番のnyaatorrent_feed.dbにも同様のDB統合（過去DBのINSERT OR IGNORE）とidx_feed_data_created_atインデックス追加を実施すること。本番でのバックアップ取得後に作業する。
 - ローカルデバッグではtorrentsearch/idpass.txtの1行目をID、2行目をパスワードとして読める。
 - idpass.txtは.gitignore対象。実際の認証情報はコミットしないこと。
 - ローカルデバッグ開始時は、まずtorrentsearch/idpass.txtが存在することだけ確認する。内容は表示・ログ出力しない。
@@ -91,3 +95,5 @@ TODO
 - (解消済み) サーバー側ダウンロードでファイル名重複処理が済んでいないので、全く同じタイトルで違うURLの者があると上書きされてしまう。要修正
   → web/api.py に resolve_unique_filename を追加。同一バッチ内の重複、および保存先ディレクトリに既存の同名ファイルを検知し、
     " (1)", " (2)" ... の連番を付与して重複を回避する。一時ディレクトリでの動作検証済み（py_compile / npm run build も成功）。
+- (解消済み) 検索パフォーマンス改善: 過去DBをnyaatorrent_feed.dbへ統合し、DB切り替え機能を撤去。日付絞り込みのSQLを関数ラップなしの直接比較へ修正し、created_atインデックスを追加。
+- 本番サーバーへの反映（git pull → release.sh実行）およびpull後の本番DBへの同様の統合・インデックス追加が未実施。

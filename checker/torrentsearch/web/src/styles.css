@@ -60,23 +60,6 @@ h2 {
   margin-left: auto;
   justify-content: flex-end;
 }
-.source-links {
-  display: flex;
-  gap: 8px;
-  margin-left: auto;
-}
-.source-link {
-  padding: 4px 8px;
-  border: 0;
-  color: var(--muted);
-  background: transparent;
-  font: 11px "IBM Plex Mono";
-  cursor: pointer;
-}
-.source-link:hover,
-.source-link.active {
-  color: var(--green);
-}
 .category-button {
   padding: 4px 9px;
   border: 1px solid var(--line);

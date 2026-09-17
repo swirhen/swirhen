@@ -17,7 +17,6 @@ type FeedResponse = {
 	items: Item[]
 	total: number
 	categories: string[]
-	source: 'current' | 'archive'
 }
 
 type SearchCondition = {
@@ -53,7 +52,6 @@ function App() {
 	const [password, setPassword] = React.useState('')
 	const [loginError, setLoginError] = React.useState('')
 	const [category, setCategory] = React.useState(initialCategory)
-	const [source, setSource] = React.useState<'current' | 'archive'>('current')
 	const [dateFrom, setDateFrom] = React.useState('')
 	const [dateTo, setDateTo] = React.useState('')
 	const dateFromPickerRef = React.useRef<HTMLInputElement>(null)
@@ -112,7 +110,7 @@ function App() {
 		else url.searchParams.delete('q')
 		window.history.replaceState(null, '', url)
 	}, [q])
-	const params = new URLSearchParams({ q, page: String(page), page_size: String(pageSize), source })
+	const params = new URLSearchParams({ q, page: String(page), page_size: String(pageSize) })
 
 	if (category) params.set('category', category)
 	if (dateFrom) params.set('date_from', dateFrom)
@@ -204,11 +202,6 @@ function App() {
 		else url.searchParams.delete('c')
 		window.history.replaceState(null, '', url)
 	}
-	const selectSource = (value: 'current' | 'archive') => {
-		setSource(value)
-		setPage(1)
-		setSelectedLinks(new Set())
-	}
 	const searchTitle = (title: string) => {
 		window.open(`https://www.google.com/search?q=${encodeURIComponent(title)}`, '_blank', 'noopener,noreferrer')
 	}
@@ -245,7 +238,7 @@ function App() {
 	const handleDownload = async () => {
 		if (!selectedLinks.size || !window.confirm(`選択した${selectedLinks.size}件をダウンロードしますか？`)) return
 		try {
-			const response = await fetch(`${base}/feed-data/download`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: Array.from(selectedLinks), source }) })
+			const response = await fetch(`${base}/feed-data/download`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: Array.from(selectedLinks) }) })
 			const result = await response.json() as DownloadResult | { detail?: string }
 			if (!response.ok) throw Error('detail' in result && result.detail ? result.detail : 'ダウンロードに失敗しました')
 			setDownloadResult(result as DownloadResult)
@@ -257,7 +250,7 @@ function App() {
 	}
 	const handleServerDownload = async (item: Item) => {
 		try {
-			const response = await fetch(`${base}/feed-data/download`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: [item.link], source }) })
+			const response = await fetch(`${base}/feed-data/download`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: [item.link] }) })
 			const result = await response.json() as DownloadResult | { detail?: string }
 			if (!response.ok) throw Error('detail' in result && result.detail ? result.detail : 'ダウンロードに失敗しました')
 			setServerDownloadResult(current => {
@@ -270,7 +263,7 @@ function App() {
 		}
 	}
 	const handleDelete = async () => {
-		if (source === 'archive' || !selectedLinks.size || !window.confirm(`選択した${selectedLinks.size}件を削除しますか？`)) return
+		if (!selectedLinks.size || !window.confirm(`選択した${selectedLinks.size}件を削除しますか？`)) return
 		try {
 			const response = await fetch(`${base}/feed-data`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: Array.from(selectedLinks) }) })
 			if (!response.ok) throw Error('削除に失敗しました')
@@ -361,7 +354,6 @@ function App() {
 			<div>
 				<div className="title-row">
 					<h2>た、種ぇぇ</h2>
-					<nav className="source-links" aria-label="データソース切り替え"><button type="button" className={source === 'current' ? 'source-link active' : 'source-link'} onClick={() => selectSource('current')}>2023年-</button><button type="button" className={source === 'archive' ? 'source-link active' : 'source-link'} onClick={() => selectSource('archive')}>それ以前</button></nav>
 					<nav className="category-filters" aria-label="カテゴリ絞り込み">
 						<button className={category === '' ? 'category-button active' : 'category-button'} onClick={() => selectCategory('')}>all</button>
 						{orderedCategories.map(item => <button key={item} className={`category-button${pinkCategories.has(item) ? ' pink-category' : ''}${category === item ? ' active' : ''}`} onClick={() => selectCategory(item)}>{item}</button>)}
@@ -385,7 +377,7 @@ function App() {
 		<div className="pagination pagination-top">{savedSearches}{pagination}</div>
 		{restoreToken && <div className="undo-banner">{deletedCount}件削除しました<button onClick={handleRestore}>元に戻す</button></div>}
 		<section>
-			<div className="table-toolbar"><button className="download-settings-link" type="button" onClick={openSettings}>ダウンロード先設定</button><button className="action-download" disabled={!selectedLinks.size} onClick={handleDownload}>一括ダウンロード</button><button className="action-delete" disabled={source === 'archive' || !selectedLinks.size} onClick={handleDelete}>削除</button><button className={notDownloadedOnly ? 'action-downloaded action-downloaded-group active' : 'action-downloaded action-downloaded-group'} onClick={toggleNotDownloadedOnly}>未DL</button><button className={downloadedOnly ? 'action-downloaded active' : 'action-downloaded'} onClick={toggleDownloadedOnly}>DL済み</button></div>
+			<div className="table-toolbar"><button className="download-settings-link" type="button" onClick={openSettings}>ダウンロード先設定</button><button className="action-download" disabled={!selectedLinks.size} onClick={handleDownload}>一括ダウンロード</button><button className="action-delete" disabled={!selectedLinks.size} onClick={handleDelete}>削除</button><button className={notDownloadedOnly ? 'action-downloaded action-downloaded-group active' : 'action-downloaded action-downloaded-group'} onClick={toggleNotDownloadedOnly}>未DL</button><button className={downloadedOnly ? 'action-downloaded active' : 'action-downloaded'} onClick={toggleDownloadedOnly}>DL済み</button></div>
 			{data.isLoading ? '読み込み中...' : data.isError ? '取得に失敗しました' : <table>
 				<thead><tr><th className="select-column"><input type="checkbox" checked={allPageItemsSelected} onChange={event => togglePageSelection(event.target.checked)} aria-label="このページの全行を選択"/></th><th>カテゴリ</th><th>タイトル</th><th>URL</th><th>取得日時</th><th className="download-column">DL</th></tr></thead>
 				<tbody>{data.data?.items.map(item => <tr key={item.link} className={selectedLinks.has(item.link) ? 'selected' : ''} onClick={() => toggleSelected(item.link)}>

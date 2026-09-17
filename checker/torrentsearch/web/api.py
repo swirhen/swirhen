@@ -14,7 +14,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import torrent_search_common as tsc
 app=FastAPI(title='Torrent Feed Admin API')
 DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed.db'
-ARCHIVE_DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed_before_2023.db'
 IDPASS_FILE=Path(__file__).resolve().parents[1]/'idpass.txt'
 DOWNLOAD_SETTINGS_FILE=Path(__file__).resolve().parent/'download_settings.json'
 SEARCH_CONDITIONS_FILE=Path(__file__).resolve().parent/'search_conditions.json'
@@ -50,7 +49,6 @@ class DownloadSettings(BaseModel):
 
 class FeedDownloadRequest(BaseModel):
     links: list[str]
-    source: str = 'current'
 
 class SearchCondition(BaseModel):
     category: str = ''
@@ -174,8 +172,6 @@ def delete_search_condition(index: int, _auth=Depends(require_auth)):
 
 @app.post('/api/feed-data/download')
 def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
-    if payload.source not in ('current', 'archive'):
-        raise HTTPException(status_code=422, detail='invalid source')
     if not payload.links:
         return {'downloaded': [], 'failed': []}
     try:
@@ -187,7 +183,7 @@ def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
         raise HTTPException(status_code=422, detail='ルートディレクトリが設定されていません')
     category_dirs=download_settings.category_dirs
     placeholders=','.join('?' for _ in payload.links)
-    with sqlite3.connect(get_db(payload.source)) as c:
+    with sqlite3.connect(DB) as c:
         rows=c.execute(
             f'SELECT category, title, link FROM feed_data WHERE link IN ({placeholders})',
             payload.links,
@@ -222,12 +218,8 @@ def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
             failed.append({'category': category, 'title': title, 'link': item_link, 'reason': str(error)})
     return {'downloaded': downloaded, 'failed': failed}
 
-def get_db(source: str):
-    if source == 'archive':
-        return ARCHIVE_DB
-    return DB
 @app.get('/api/feed-data')
-def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), not_downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100), source:str=Query('current', pattern='^(current|archive)$')):
+def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), not_downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100)):
     conditions=[]; args=[]
     if q:
         search_condition, search_args=build_title_search(q)
@@ -238,22 +230,22 @@ def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='
         conditions.append('category = ?')
         args.append(category)
     if date_from:
-        conditions.append('date(created_at) >= date(?)')
-        args.append(date_from)
+        conditions.append('created_at >= ?')
+        args.append(f'{date_from} 00:00:00')
     if date_to:
-        conditions.append('date(created_at) <= date(?)')
-        args.append(date_to)
+        conditions.append('created_at <= ?')
+        args.append(f'{date_to} 23:59:59')
     if downloaded:
         conditions.append('download_dir IS NOT NULL')
     elif not_downloaded:
         conditions.append('download_dir IS NULL')
     where=f" WHERE {' AND '.join(conditions)}" if conditions else ''
     off=(page-1)*page_size
-    with sqlite3.connect(get_db(source)) as c:
+    with sqlite3.connect(DB) as c:
         categories=[row[0] for row in c.execute('SELECT DISTINCT category FROM feed_data WHERE category IS NOT NULL ORDER BY category')]
         total=c.execute('SELECT COUNT(*) FROM feed_data'+where,args).fetchone()[0]
         rows=c.execute('SELECT category,title,link,pubdate,created_at,download_dir FROM feed_data'+where+' ORDER BY created_at DESC LIMIT ? OFFSET ?',args+[page_size,off]).fetchall()
-    return {'items':[dict(zip(('category','title','link','pubdate','created_at','download_dir'),r)) for r in rows],'total':total,'categories':categories,'source':source}
+    return {'items':[dict(zip(('category','title','link','pubdate','created_at','download_dir'),r)) for r in rows],'total':total,'categories':categories}
 
 @app.delete('/api/feed-data')
 def delete_feed(payload: FeedDeleteRequest, _auth=Depends(require_auth)):

@@ -108,4 +108,3 @@ TODO
   → web/api.py に resolve_unique_filename を追加。同一バッチ内の重複、および保存先ディレクトリに既存の同名ファイルを検知し、
     " (1)", " (2)" ... の連番を付与して重複を回避する。一時ディレクトリでの動作検証済み（py_compile / npm run build も成功）。
 - (解消済み) 検索パフォーマンス改善: 過去DBをnyaatorrent_feed.dbへ統合し、DB切り替え機能を撤去。日付絞り込みのSQLを関数ラップなしの直接比較へ修正し、created_atインデックスを追加。
-- 本番サーバーへの反映（git pull → release.sh実行）およびpull後の本番DBへの同様の統合・インデックス追加が未実施。

@@ -17,6 +17,7 @@ DB=Path(__file__).resolve().parents[1]/'nyaatorrent_feed.db'
 IDPASS_FILE=Path(__file__).resolve().parents[1]/'idpass.txt'
 DOWNLOAD_SETTINGS_FILE=Path(__file__).resolve().parent/'download_settings.json'
 SEARCH_CONDITIONS_FILE=Path(__file__).resolve().parent/'search_conditions.json'
+YEAR_FILTER_FILE=Path(__file__).resolve().parent/'year_filter.json'
 deleted_batches: dict[str, list[dict]] = {}
 AUTH_COOKIE='torrent_admin_session'
 SESSION_TTL=60 * 60 * 24 * 180
@@ -53,6 +54,26 @@ class FeedDownloadRequest(BaseModel):
 class SearchCondition(BaseModel):
     category: str = ''
     keyword: str = ''
+
+class YearFilter(BaseModel):
+    years: list[int] = []
+
+def get_available_years():
+    with sqlite3.connect(DB) as c:
+        bounds=c.execute('SELECT MIN(created_at), MAX(created_at) FROM feed_data').fetchone()
+        if not bounds or not bounds[0] or not bounds[1]:
+            return []
+        start_year=int(bounds[0][:4])
+        end_year=int(bounds[1][:4])
+        years=[]
+        for year in range(start_year, end_year + 1):
+            exists=c.execute(
+                'SELECT EXISTS(SELECT 1 FROM feed_data WHERE created_at >= ? AND created_at < ? LIMIT 1)',
+                (f'{year}-01-01 00:00:00', f'{year + 1}-01-01 00:00:00'),
+            ).fetchone()[0]
+            if exists:
+                years.append(year)
+        return years
 
 def build_title_search(query: str):
     positive_clauses=[]
@@ -170,6 +191,22 @@ def delete_search_condition(index: int, _auth=Depends(require_auth)):
     temporary.replace(SEARCH_CONDITIONS_FILE)
     return saved
 
+@app.get('/api/year-filter')
+def get_year_filter(_auth=Depends(require_auth)):
+    try:
+        settings=json.loads(YEAR_FILTER_FILE.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError):
+        settings={}
+    return YearFilter(**settings).model_dump()
+
+@app.put('/api/year-filter')
+def update_year_filter(payload: YearFilter, _auth=Depends(require_auth)):
+    settings={'years': sorted(set(payload.years))}
+    temporary=YEAR_FILTER_FILE.with_suffix('.json.tmp')
+    temporary.write_text(json.dumps(settings, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    temporary.replace(YEAR_FILTER_FILE)
+    return settings
+
 @app.post('/api/feed-data/download')
 def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
     if not payload.links:
@@ -219,7 +256,7 @@ def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
     return {'downloaded': downloaded, 'failed': failed}
 
 @app.get('/api/feed-data')
-def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), not_downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100)):
+def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), not_downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100), years:list[int]=Query(default=[])):
     conditions=[]; args=[]
     if q:
         search_condition, search_args=build_title_search(q)
@@ -235,6 +272,13 @@ def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='
     if date_to:
         conditions.append('created_at <= ?')
         args.append(f'{date_to} 23:59:59')
+    if years:
+        year_conditions=[]
+        for year in years:
+            year_conditions.append('(created_at >= ? AND created_at < ?)')
+            args.append(f'{year}-01-01 00:00:00')
+            args.append(f'{year + 1}-01-01 00:00:00')
+        conditions.append('(' + ' OR '.join(year_conditions) + ')')
     if downloaded:
         conditions.append('download_dir IS NOT NULL')
     elif not_downloaded:
@@ -245,7 +289,7 @@ def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='
         categories=[row[0] for row in c.execute('SELECT DISTINCT category FROM feed_data WHERE category IS NOT NULL ORDER BY category')]
         total=c.execute('SELECT COUNT(*) FROM feed_data'+where,args).fetchone()[0]
         rows=c.execute('SELECT category,title,link,pubdate,created_at,download_dir FROM feed_data'+where+' ORDER BY created_at DESC LIMIT ? OFFSET ?',args+[page_size,off]).fetchall()
-    return {'items':[dict(zip(('category','title','link','pubdate','created_at','download_dir'),r)) for r in rows],'total':total,'categories':categories}
+    return {'items':[dict(zip(('category','title','link','pubdate','created_at','download_dir'),r)) for r in rows],'total':total,'categories':categories,'years':get_available_years()}
 
 @app.delete('/api/feed-data')
 def delete_feed(payload: FeedDeleteRequest, _auth=Depends(require_auth)):

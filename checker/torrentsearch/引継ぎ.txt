@@ -39,6 +39,12 @@ torrentsearch 管理画面 引継ぎメモ
 - トースト表示中に続けて保存すると、ファイルリストへ結果を追記する。
 - 一括ダウンロードは選択項目をサーバー側でカテゴリ別に保存し、完了モーダルへ結果を表示する。
 - 一括ダウンロードではDBのdownload_dirおよびdownload_failed_atを更新しない。
+- タイトル(た、種ぇぇ)のすぐ右に年絞り込みの複数選択プルダウンを配置。
+  - ボタンラベルは常に「検索対象」固定。開いて選択しても閉じればラベルは戻る（選択値は保持）。
+  - 選択肢はDBに実際にデータが存在する年だけを列挙（MIN/MAX+年ごとのEXISTSで高速に判定）。
+  - 飛び飛びの複数年選択可（2024,2026のみなど）。ボタン右のサマリー表示に選択中の年をカンマ区切りで表示（未選択はall）。
+  - 選択は web/year_filter.json へシステム全体で永続化（トグル直後にPUT /api/year-filterで保存）。
+  - 検索への反映はcreated_atの年範囲をORで結合しdate_from/date_toとはANDで併用。idx_feed_data_created_atが引き続き有効。
 
 DB統合とパフォーマンス改善
 - api.pyのDB配置先はwebディレクトリの親、torrentsearch/。DBは nyaatorrent_feed.db の1本のみ。
@@ -50,10 +56,12 @@ DB統合とパフォーマンス改善
 - 実DBで実測: 日付のみ絞り込み+複合語検索が旧実装237ms→修正後85ms程度（統合後の103万件規模でも同等の効果を確認）。
 - カテゴリ絞り込みは既存のidx_feed_data_category_pubdate等が効くため元々高速（約73ms）。
 - ローカルAPI経由で date_from=2022-01-01/date_to=2022-12-31 を指定し、統合前は過去DBにしかなかった2022年データ(191,872件)が現行DBだけで取得できることを確認済み。
+- 実 DBで available_years は [2021, 2022, 2023, 2024, 2025, 2026] と確認済み。years=2024&years=2026 指定で351,541件へ絞り込みを確認済み。
 
 設定ファイル
 - web/download_settings.json: ルートディレクトリとカテゴリ別保存先。個人設定のためGit管理外。
 - web/search_conditions.json: 保存した検索条件。個人設定のためGit管理外。存在しなければAPIが作成する。
+- web/year_filter.json: 選択した年絞り込み（例: {"years": [2024, 2026]}）。個人設定のためGit管理外。存在しなければAPIが作成する。
 - カテゴリ別保存先が空欄の場合はルートディレクトリへ保存する。
 - 保存先は `root_dir / category_dirs[category]`。パスはPythonのPathで処理するため半角スペースを含められる。
 
@@ -66,6 +74,7 @@ DB統合とパフォーマンス改善
 - ローカルの一括ダウンロードは `TORRENT_ADMIN_DOWNLOAD_DRY_RUN=1` で実ダウンロード、ファイル作成、DB更新なしに結果モーダルを確認できる。
 - DB統合後、python -m py_compile web/api.py make_nyaa_db.py 成功。npm.cmd run build 成功。
 - ローカルAPI経由でログイン→feed-data取得の一連の動作を確認済み（統合後の合計件数1,034,538件と一致）。
+- 年絞り込みAPI(GET/PUT /api/year-filter、feed-dataのyearsパラメータ)をローカルAPI経由で検証済み。検証後はyear_filter.jsonを空に戻しておいた。
 
 本番反映
 1. 本番でリポジトリを更新

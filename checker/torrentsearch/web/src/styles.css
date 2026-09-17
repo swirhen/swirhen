@@ -60,6 +60,51 @@ h2 {
   margin-left: auto;
   justify-content: flex-end;
 }
+.year-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.year-filter-toggle {
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  color: var(--muted);
+  background: var(--panel);
+  font: 11px "IBM Plex Mono";
+  cursor: pointer;
+}
+.year-filter-toggle:hover {
+  color: #fff;
+  border-color: var(--muted);
+}
+.year-filter-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 4;
+  display: grid;
+  gap: 6px;
+  min-width: 100px;
+  padding: 10px 12px;
+  background: #111;
+  border: 1px solid var(--green);
+  box-shadow: 0 12px 36px #000b;
+}
+.year-filter-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font: 12px "IBM Plex Mono";
+  cursor: pointer;
+}
+.year-filter-summary {
+  color: var(--muted);
+  font: 11px "IBM Plex Mono";
+  white-space: nowrap;
+}
 .category-button {
   padding: 4px 9px;
   border: 1px solid var(--line);

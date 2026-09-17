@@ -4,3 +4,4 @@ dist/
 __pycache__/
 download_settings.json
 search_conditions.json
+year_filter.json

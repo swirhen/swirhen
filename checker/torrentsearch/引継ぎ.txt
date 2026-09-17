@@ -8,7 +8,7 @@ torrentsearch 管理画面 引継ぎメモ
 - FastAPI + React/Vite のtorrent管理画面。
 - Apache配下の /torrent-admin/ から配信。
 - APIはsystemdの torrent-admin-api.service で稼働。
-- 認証はFastAPIのログイン画面。Cookieセッションは180日保持。
+- 認証はFastAPIのログイン画面。Cookieセッションは180日保持。VS Code等の内部ブラウザ（サードパーティCookie制限環境）向けにBearerトークン/localStorage併用認証にも対応。
 
 主なファイル
 - web/api.py: 認証、feed取得、削除、Undo。
@@ -78,6 +78,7 @@ DB統合とパフォーマンス改善
 - ローカルAPI経由でログイン→feed-data取得の一連の動作を確認済み（統合後の合計件数1,034,538件と一致）。
 - 年絞り込みAPI(GET/PUT /api/year-filter、feed-dataのyearsパラメータ)をローカルAPI経由で検証済み。検証後はyear_filter.jsonを空に戻しておいた。
 - 取得日時の並び順プルダウンをページ件数選択の右に配置。「取得日時: 新しい順」が初期値で、「取得日時: 古い順」と切り替え可能。feed-dataのsortパラメータで全体をORDER BYしてからページングする。
+- 内部ブラウザ対応としてCookie + Bearerトークン併用認証を検証済み（CookieなしのBearerトークン単体でのセッション・feed-data取得、不正トークンの401拒絶、Cookie単体での完全後方互換性を自動テストで確認）。
 
 本番反映
 1. 本番でリポジトリを更新

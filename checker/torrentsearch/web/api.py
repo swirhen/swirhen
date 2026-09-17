@@ -8,7 +8,7 @@ import time
 from uuid import uuid4
 from typing import Dict
 import sys
-from fastapi import Cookie, Depends, FastAPI, HTTPException, Query, Response
+from fastapi import Cookie, Depends, FastAPI, Header, HTTPException, Query, Response
 from pydantic import BaseModel
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import torrent_search_common as tsc
@@ -103,17 +103,30 @@ def build_title_search(query: str):
         parameters.append(f'%{term}%')
     return ' AND '.join(conditions), parameters
 
-def require_auth(session: str | None = Cookie(default=None, alias=AUTH_COOKIE)):
-    if not PASSWORD or not SECRET or not session:
-        raise HTTPException(status_code=401, detail='認証が必要です')
+def verify_session_token(token_str: str | None) -> bool:
+    if not PASSWORD or not SECRET or not token_str:
+        return False
     try:
-        issued, token = session.split(':', 1)
+        issued, token = token_str.split(':', 1)
         issued_at = int(issued)
     except ValueError:
-        raise HTTPException(status_code=401, detail='認証が必要です')
+        return False
     expected = hmac.new(SECRET.encode(), f'{issued_at}:{USERNAME}'.encode(), hashlib.sha256).hexdigest()
     if time.time() - issued_at > SESSION_TTL or not hmac.compare_digest(token, expected):
-        raise HTTPException(status_code=401, detail='認証が必要です')
+        return False
+    return True
+
+def require_auth(
+    authorization: str | None = Header(default=None),
+    session: str | None = Cookie(default=None, alias=AUTH_COOKIE),
+):
+    if authorization and authorization.startswith('Bearer '):
+        bearer_token = authorization[7:].strip()
+        if verify_session_token(bearer_token):
+            return
+    if verify_session_token(session):
+        return
+    raise HTTPException(status_code=401, detail='認証が必要です')
 
 @app.get('/api/health')
 def health(): return {'status':'ok'}
@@ -128,8 +141,9 @@ def login(payload: LoginRequest, response: Response):
         raise HTTPException(status_code=401, detail='ユーザー名またはパスワードが違います')
     issued_at=int(time.time())
     token=hmac.new(SECRET.encode(), f'{issued_at}:{USERNAME}'.encode(), hashlib.sha256).hexdigest()
-    response.set_cookie(AUTH_COOKIE, f'{issued_at}:{token}', httponly=True, samesite='lax', max_age=SESSION_TTL)
-    return {'authenticated': True}
+    session_value = f'{issued_at}:{token}'
+    response.set_cookie(AUTH_COOKIE, session_value, httponly=True, samesite='lax', max_age=SESSION_TTL)
+    return {'authenticated': True, 'token': session_value}
 
 @app.post('/api/logout')
 def logout(response: Response):

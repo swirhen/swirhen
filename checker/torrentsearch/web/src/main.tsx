@@ -33,6 +33,33 @@ type DownloadResult = {
 type PasswordCredentialConstructor = new (data: { id: string; password: string }) => Credential
 
 const base = `${import.meta.env.BASE_URL}api`
+const AUTH_TOKEN_KEY = 'torrent_admin_token'
+
+function getAuthToken(): string | null {
+	return localStorage.getItem(AUTH_TOKEN_KEY)
+}
+
+function setAuthToken(token: string | null) {
+	if (token) {
+		localStorage.setItem(AUTH_TOKEN_KEY, token)
+	} else {
+		localStorage.removeItem(AUTH_TOKEN_KEY)
+	}
+}
+
+async function authFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+	const headers = new Headers(init?.headers)
+	const token = getAuthToken()
+	if (token && !headers.has('Authorization')) {
+		headers.set('Authorization', `Bearer ${token}`)
+	}
+	const response = await fetch(input, { ...init, headers })
+	if (response.status === 401) {
+		setAuthToken(null)
+	}
+	return response
+}
+
 const client = new QueryClient()
 const initialSearchParams = new URLSearchParams(window.location.search)
 const initialCategory = initialSearchParams.get('c') ?? ''
@@ -91,9 +118,13 @@ function App() {
 	}, [serverDownloadResult])
 	React.useEffect(() => {
 		let active = true
-		fetch(`${base}/session`)
+		authFetch(`${base}/session`)
 			.then(response => {
-				if (active && response.ok) setAuthenticated(true)
+				if (active && response.ok) {
+					setAuthenticated(true)
+				} else if (active) {
+					setAuthToken(null)
+				}
 			})
 			.catch(() => undefined)
 			.finally(() => {
@@ -105,14 +136,14 @@ function App() {
 	}, [])
 	React.useEffect(() => {
 		if (!authenticated) return
-		fetch(`${base}/search-conditions`)
+		authFetch(`${base}/search-conditions`)
 			.then(response => response.ok ? response.json() as Promise<SearchCondition[]> : [])
 			.then(setSearchConditions)
 			.catch(() => undefined)
 	}, [authenticated])
 	React.useEffect(() => {
 		if (!authenticated) return
-		fetch(`${base}/year-filter`)
+		authFetch(`${base}/year-filter`)
 			.then(response => response.ok ? response.json() as Promise<{ years: number[] }> : { years: [] })
 			.then(settings => setSelectedYears(settings.years))
 			.catch(() => undefined)
@@ -145,7 +176,7 @@ function App() {
 		queryKey: ['feed', params.toString()],
 		enabled: authenticated,
 		queryFn: async () => {
-			const response = await fetch(`${base}/feed-data?${params}`)
+			const response = await authFetch(`${base}/feed-data?${params}`)
 			if (!response.ok) throw Error('取得に失敗しました')
 			return response.json() as Promise<FeedResponse>
 		},
@@ -157,6 +188,10 @@ function App() {
 		if (!response.ok) {
 			setLoginError('ユーザー名またはパスワードが違います')
 			return
+		}
+		const data = await response.json().catch(() => ({})) as { token?: string }
+		if (data.token) {
+			setAuthToken(data.token)
 		}
 		const PasswordCredential = (window as Window & { PasswordCredential?: PasswordCredentialConstructor }).PasswordCredential
 		if (window.isSecureContext && 'credentials' in navigator && PasswordCredential) {
@@ -170,8 +205,12 @@ function App() {
 		setAuthenticated(true)
 	}
 	const logout = async () => {
-		await fetch(`${base}/logout`, { method: 'POST' })
-		setAuthenticated(false)
+		try {
+			await authFetch(`${base}/logout`, { method: 'POST' })
+		} finally {
+			setAuthToken(null)
+			setAuthenticated(false)
+		}
 	}
 	const refreshData = async () => {
 		setRefreshing(true)
@@ -266,7 +305,7 @@ function App() {
 	const handleDownload = async () => {
 		if (!selectedLinks.size || !window.confirm(`選択した${selectedLinks.size}件をダウンロードしますか？`)) return
 		try {
-			const response = await fetch(`${base}/feed-data/download`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: Array.from(selectedLinks) }) })
+			const response = await authFetch(`${base}/feed-data/download`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: Array.from(selectedLinks) }) })
 			const result = await response.json() as DownloadResult | { detail?: string }
 			if (!response.ok) throw Error('detail' in result && result.detail ? result.detail : 'ダウンロードに失敗しました')
 			setDownloadResult(result as DownloadResult)
@@ -278,7 +317,7 @@ function App() {
 	}
 	const handleServerDownload = async (item: Item) => {
 		try {
-			const response = await fetch(`${base}/feed-data/download`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: [item.link] }) })
+			const response = await authFetch(`${base}/feed-data/download`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: [item.link] }) })
 			const result = await response.json() as DownloadResult | { detail?: string }
 			if (!response.ok) throw Error('detail' in result && result.detail ? result.detail : 'ダウンロードに失敗しました')
 			setServerDownloadResult(current => {
@@ -293,7 +332,7 @@ function App() {
 	const handleDelete = async () => {
 		if (!selectedLinks.size || !window.confirm(`選択した${selectedLinks.size}件を削除しますか？`)) return
 		try {
-			const response = await fetch(`${base}/feed-data`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: Array.from(selectedLinks) }) })
+			const response = await authFetch(`${base}/feed-data`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ links: Array.from(selectedLinks) }) })
 			if (!response.ok) throw Error('削除に失敗しました')
 			const result = await response.json() as { deleted: number; restore_token: string }
 			setSelectedLinks(new Set())
@@ -307,7 +346,7 @@ function App() {
 	const handleRestore = async () => {
 		if (!restoreToken) return
 		try {
-			const response = await fetch(`${base}/feed-data/restore`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: restoreToken }) })
+			const response = await authFetch(`${base}/feed-data/restore`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: restoreToken }) })
 			if (!response.ok) throw Error('復元に失敗しました')
 			setRestoreToken(null)
 			setDeletedCount(0)
@@ -320,7 +359,7 @@ function App() {
 		setSettingsOpen(true)
 		setSettingsMessage('')
 		try {
-			const response = await fetch(`${base}/download-settings`)
+			const response = await authFetch(`${base}/download-settings`)
 			if (!response.ok) throw Error('設定の取得に失敗しました')
 			const settings = await response.json() as { root_dir: string; category_dirs: Record<string, string> }
 			setRootDir(settings.root_dir)
@@ -332,7 +371,7 @@ function App() {
 	const saveSettings = async (event: React.FormEvent) => {
 		event.preventDefault()
 		try {
-			const response = await fetch(`${base}/download-settings`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ root_dir: rootDir, category_dirs: categoryDirs }) })
+			const response = await authFetch(`${base}/download-settings`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ root_dir: rootDir, category_dirs: categoryDirs }) })
 			if (!response.ok) throw Error('設定の保存に失敗しました')
 			setSettingsMessage('保存しました')
 		} catch (error) {
@@ -341,7 +380,7 @@ function App() {
 	}
 	const saveSearchCondition = async () => {
 		try {
-			const response = await fetch(`${base}/search-conditions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ category, keyword: q }) })
+			const response = await authFetch(`${base}/search-conditions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ category, keyword: q }) })
 			if (!response.ok) throw Error('検索条件の保存に失敗しました')
 			setSearchConditions(await response.json() as SearchCondition[])
 		} catch (error) {
@@ -365,7 +404,7 @@ function App() {
 	const deleteSearchCondition = async () => {
 		if (selectedSearchCondition === '') return
 		try {
-			const response = await fetch(`${base}/search-conditions/${selectedSearchCondition}`, { method: 'DELETE' })
+			const response = await authFetch(`${base}/search-conditions/${selectedSearchCondition}`, { method: 'DELETE' })
 			if (!response.ok) throw Error('検索条件の削除に失敗しました')
 			setSearchConditions(await response.json() as SearchCondition[])
 			setSelectedSearchCondition('')
@@ -384,7 +423,7 @@ function App() {
 		setPage(1)
 		setSelectedLinks(new Set())
 		try {
-			await fetch(`${base}/year-filter`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ years: next }) })
+			await authFetch(`${base}/year-filter`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ years: next }) })
 		} catch {
 			// 保存に失敗しても画面上の絞り込みは継続する
 		}

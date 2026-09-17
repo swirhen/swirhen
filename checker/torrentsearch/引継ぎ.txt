@@ -1,8 +1,9 @@
 torrentsearch 管理画面 引継ぎメモ
 
 最終コミット
-- 次回コミットで更新予定（現在の実装をpushする）
-- origin/master へpush済み
+- bad7c397 ダウンロード時のReferrer-Policyをno-referrer-when-downgradeに設定
+- f6a4434c 内部ブラウザ向けにBearerトークンとCookieの併用認証に対応
+- origin/master へpush済み。本番サーバーへリリース適用済み。
 
 概要
 - FastAPI + React/Vite のtorrent管理画面。
@@ -81,13 +82,15 @@ DB統合とパフォーマンス改善
 - 内部ブラウザ対応としてCookie + Bearerトークン併用認証を検証済み（CookieなしのBearerトークン単体でのセッション・feed-data取得、不正トークンの401拒絶、Cookie単体での完全後方互換性を自動テストで確認）。
 
 本番反映
-1. 本番でリポジトリを更新
-   cd /home/swirhen/sh/checker
-   git pull --ff-only
-2. フロントビルド/API再起動
-   cd torrentsearch/web
-   ./release.sh
-3. ブラウザでCtrl+F5。必要ならsystemctl status torrent-admin-api.serviceで確認。
+- ローカルPC（PowerShell）からSSH経由でワンライナー自動リリースが可能（AIによる代行実行に対応済み）。
+  コマンド: `ssh prod-checker "cd /home/swirhen/sh/checker && git pull --ff-only && cd torrentsearch/web && ./release.sh"`
+- SSH接続設定はローカルの `~/.ssh/config` に `Host prod-checker` として構成済み（公開鍵認証、パスワード不要）。
+- サーバー側で sudoers により release.sh 内の `sudo systemctl restart torrent-admin-api.service` はパスワードなしで実行可能。
+- 実行後は `ssh prod-checker "systemctl is-active torrent-admin-api.service"` で `active` を確認する。
+- 手動でサーバーにログインして作業する場合の手順：
+  1. cd /home/swirhen/sh/checker && git pull --ff-only
+  2. cd torrentsearch/web && ./release.sh
+  3. ブラウザでCtrl+F5。必要ならsystemctl status torrent-admin-api.serviceで確認。
 
 注意
 - release.shはVITE_BASE_PATH=/torrent-admin/でビルドする。

@@ -5,6 +5,7 @@
 import sys
 import pathlib
 current_dir = pathlib.Path(__file__).resolve().parent
+sys.path.append(str(current_dir.parent / 'anime-podcast' / 'python-lib'))
 sys.path.append('/data/share/movie/sh/python-lib/')
 import swirhentv_util as swiutil
 
@@ -12,6 +13,6 @@ import swirhentv_util as swiutil
 if __name__ == '__main__':
     args = sys.argv
     if len(args) == 3:
-        swiutil.slack_post(args[1], args[2])
+        swiutil.discord_post(args[1], args[2])
     else:
         print('usage: python slack_post.py [channel] [text]')

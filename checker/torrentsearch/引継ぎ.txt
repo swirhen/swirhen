@@ -76,6 +76,7 @@ DB統合とパフォーマンス改善
 - DB統合後、python -m py_compile web/api.py make_nyaa_db.py 成功。npm.cmd run build 成功。
 - ローカルAPI経由でログイン→feed-data取得の一連の動作を確認済み（統合後の合計件数1,034,538件と一致）。
 - 年絞り込みAPI(GET/PUT /api/year-filter、feed-dataのyearsパラメータ)をローカルAPI経由で検証済み。検証後はyear_filter.jsonを空に戻しておいた。
+- 取得日時の並び順プルダウンをページ件数選択の右に配置。「取得日時: 新しい順」が初期値で、「取得日時: 古い順」と切り替え可能。feed-dataのsortパラメータで全体をORDER BYしてからページングする。
 
 本番反映
 1. 本番でリポジトリを更新

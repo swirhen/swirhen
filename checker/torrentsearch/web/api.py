@@ -258,7 +258,7 @@ def download_feed(payload: FeedDownloadRequest, _auth=Depends(require_auth)):
     return {'downloaded': downloaded, 'failed': failed}
 
 @app.get('/api/feed-data')
-def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), not_downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100), years:list[int]=Query(default=[])):
+def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='', date_to:str='', downloaded:int=Query(0,ge=0,le=1), not_downloaded:int=Query(0,ge=0,le=1), page:int=Query(1,ge=1), page_size:int=Query(50,ge=1,le=100), years:list[int]=Query(default=[]), sort:str=Query('desc', pattern='^(asc|desc)$')):
     conditions=[]; args=[]
     if q:
         search_condition, search_args=build_title_search(q)
@@ -290,7 +290,7 @@ def feed(_auth=Depends(require_auth), q:str='', category:str='', date_from:str='
     with sqlite3.connect(DB) as c:
         categories=[row[0] for row in c.execute('SELECT DISTINCT category FROM feed_data WHERE category IS NOT NULL ORDER BY category')]
         total=c.execute('SELECT COUNT(*) FROM feed_data'+where,args).fetchone()[0]
-        rows=c.execute('SELECT category,title,link,pubdate,created_at,download_dir FROM feed_data'+where+' ORDER BY created_at DESC LIMIT ? OFFSET ?',args+[page_size,off]).fetchall()
+        rows=c.execute('SELECT category,title,link,pubdate,created_at,download_dir FROM feed_data'+where+f' ORDER BY created_at {sort.upper()} LIMIT ? OFFSET ?',args+[page_size,off]).fetchall()
     return {'items':[dict(zip(('category','title','link','pubdate','created_at','download_dir'),r)) for r in rows],'total':total,'categories':categories,'years':get_available_years()}
 
 @app.delete('/api/feed-data')

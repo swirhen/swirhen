@@ -61,6 +61,7 @@ function App() {
 	const [notDownloadedOnly, setNotDownloadedOnly] = React.useState(false)
 	const [page, setPage] = React.useState(1)
 	const [pageSize, setPageSize] = React.useState(50)
+	const [sortOrder, setSortOrder] = React.useState<'desc' | 'asc'>('desc')
 	const [selectedLinks, setSelectedLinks] = React.useState<Set<string>>(new Set())
 	const [restoreToken, setRestoreToken] = React.useState<string | null>(null)
 	const [deletedCount, setDeletedCount] = React.useState(0)
@@ -130,6 +131,7 @@ function App() {
 		window.history.replaceState(null, '', url)
 	}, [q])
 	const params = new URLSearchParams({ q, page: String(page), page_size: String(pageSize) })
+	params.set('sort', sortOrder)
 
 	if (category) params.set('category', category)
 	if (dateFrom) params.set('date_from', dateFrom)
@@ -209,6 +211,11 @@ function App() {
 	}
 	const updatePageSize = (value: number) => {
 		setPageSize(value)
+		setPage(1)
+		setSelectedLinks(new Set())
+	}
+	const updateSortOrder = (value: 'desc' | 'asc') => {
+		setSortOrder(value)
 		setPage(1)
 		setSelectedLinks(new Set())
 	}
@@ -377,7 +384,7 @@ function App() {
 		}
 	}
 	const savedSearches = <div className="pagination-saved-searches"><button type="button" onClick={saveSearchCondition}>検索条件保存</button><select value={selectedSearchCondition} onChange={event => applySearchCondition(event.target.value)} aria-label="保存した検索条件"><option value="">保存した検索条件</option>{searchConditions.map((condition, index) => <option key={`${condition.category}-${condition.keyword}-${index}`} value={index}>{condition.category || 'all'}: {condition.keyword}</option>)}</select><button type="button" disabled={selectedSearchCondition === ''} onClick={deleteSearchCondition}>削除</button></div>
-	const pagination = <div className="pagination-controls"><button disabled={page === 1} onClick={() => setPage(1)}>最初へ</button><button disabled={page === 1} onClick={() => setPage(page - 1)}>前へ</button><b>{rangeStart}-{rangeEnd} / {total}</b><button disabled={page === pages} onClick={() => setPage(page + 1)}>次へ</button><button disabled={page === pages} onClick={() => setPage(pages)}>最後へ</button><select value={pageSize} onChange={event => updatePageSize(Number(event.target.value))} aria-label="表示件数"><option value="10">10件</option><option value="20">20件</option><option value="50">50件</option><option value="100">100件</option></select></div>
+	const pagination = <div className="pagination-controls"><button disabled={page === 1} onClick={() => setPage(1)}>最初へ</button><button disabled={page === 1} onClick={() => setPage(page - 1)}>前へ</button><b>{rangeStart}-{rangeEnd} / {total}</b><button disabled={page === pages} onClick={() => setPage(page + 1)}>次へ</button><button disabled={page === pages} onClick={() => setPage(pages)}>最後へ</button><select value={pageSize} onChange={event => updatePageSize(Number(event.target.value))} aria-label="表示件数"><option value="10">10件</option><option value="20">20件</option><option value="50">50件</option><option value="100">100件</option></select><select value={sortOrder} onChange={event => updateSortOrder(event.target.value as 'desc' | 'asc')} aria-label="並び順"><option value="desc">取得日時: 新しい順</option><option value="asc">取得日時: 古い順</option></select></div>
 
 	return <main>
 		{serverDownloadResult && <div className={`server-download-toast${serverDownloadToastFading ? ' fading' : ''}`} role="status"><div className="toast-header"><strong>サーバー保存結果</strong><button type="button" onClick={() => setServerDownloadResult(null)} aria-label="通知を閉じる">×</button></div><p>{serverDownloadResult.downloaded.length}件保存しました。</p>{serverDownloadResult.downloaded.length > 0 && <ul>{serverDownloadResult.downloaded.map(item => <li key={`${item.category}-${item.filename}`}>{item.path}</li>)}</ul>}{serverDownloadResult.failed.length > 0 && <p className="toast-error">失敗: {serverDownloadResult.failed.map(item => item.title ?? item.link).join(', ')}</p>}</div>}

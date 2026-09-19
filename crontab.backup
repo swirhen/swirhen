@@ -24,7 +24,7 @@ PATH=/home/swirhen/.rbenv/shims:/home/swirhen/.rbenv/bin:/home/swirhen/perl5/bin
 0 * * * * python /home/swirhen/sh/checker/torrentsearch/torrentsearch.py
 
 # swirhentv auto download(サ終)
-55 5,11,17,23 * * * python /data/share/movie/sh/make_nyaa_movie_db.py
+#55 5,11,17,23 * * * python /data/share/movie/sh/make_nyaa_movie_db.py
 #0 0,6,12,18 * * * python /data/share/movie/sh/auto_publish.py
 
 # きょうのいちまい

@@ -15,6 +15,7 @@ TARGET_MAPPINGS=(
   "d:_dojin"
   "c:_manga"
   "v:_av"
+  "cos:_cos"
 )
 
 # スクリプトの配置ディレクトリを特定

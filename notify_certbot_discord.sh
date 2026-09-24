@@ -9,7 +9,8 @@
 #   - 引数:
 #       $1: ステータス ("開始", "成功", "失敗", または任意タイトル)
 #       $2: メッセージ本文
-#       $3: 証明書の有効期限 (例: opensslで取得した notAfter 文字列、省略可)
+#       $3: 更新前の証明書期限 (省略可)
+#       $4: 更新後の証明書期限 (省略可)
 #
 # Certbot連携時:
 #   - 環境変数 RENEWED_DOMAINS, RENEWED_LINEAGE が存在する場合は自動でEmbedに追加
@@ -38,7 +39,8 @@ fi
 
 STATUS="${1:-情報}"
 MESSAGE="${2:-}"
-EXPIRY="${3:-}"
+PRE_EXPIRY="${3:-}"
+POST_EXPIRY="${4:-}"
 HOST_NAME=$(hostname)
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
@@ -70,8 +72,12 @@ if [[ -n "${LINEAGE}" ]]; then
     FIELDS+=",{\"name\": \"証明書パス\", \"value\": \"\`\`\`\n${LINEAGE}\n\`\`\`\", \"inline\": false}"
 fi
 
-if [[ -n "${EXPIRY}" ]]; then
-    FIELDS+=",{\"name\": \"現在適用中の証明書期限 (notAfter)\", \"value\": \"\`${EXPIRY}\`\", \"inline\": false}"
+if [[ -n "${PRE_EXPIRY}" ]]; then
+    FIELDS+=",{\"name\": \"更新前の証明書期限 (notAfter)\", \"value\": \"\`${PRE_EXPIRY}\`\", \"inline\": true}"
+fi
+
+if [[ -n "${POST_EXPIRY}" ]]; then
+    FIELDS+=",{\"name\": \"更新後の証明書期限 (notAfter)\", \"value\": \"\`${POST_EXPIRY}\`\", \"inline\": true}"
 fi
 
 if [[ -n "${MESSAGE}" ]]; then

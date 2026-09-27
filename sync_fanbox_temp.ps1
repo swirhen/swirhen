@@ -121,8 +121,8 @@ foreach ($parent in $parentFolders) {
     if ($SpecialCreators -contains $parent.Name) {
         Write-Host "  [モード] 連番フォルダ管理（ファイル直下移動）" -ForegroundColor Cyan
 
-        if ($subDirs.Count -eq 0) {
-            Write-Host "  -> サブフォルダが存在しないためスキップします。" -ForegroundColor DarkGray
+        if ($subDirs.Count -le 1) {
+            Write-Host "  -> サブフォルダが複数存在しないため（$($subDirs.Count)件）、処理をスキップします。" -ForegroundColor DarkGray
             $summaryResults.Add([PSCustomObject]@{
                 Name        = $parent.Name
                 Transferred = $parentTransferred

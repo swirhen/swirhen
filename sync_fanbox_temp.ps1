@@ -5,8 +5,8 @@
     ローカルの fanbox_temp 配下のフォルダを走査し同期処理を行います。
     
     1. 通常フォルダ:
-       中にファイルが存在するサブフォルダが複数ある場合、
-       全フォルダ（最新含む）を zip 圧縮して SMB 共有へ転送。
+       サブフォルダが複数ある場合、
+       全フォルダ（最新含む）を zip 圧縮して SMB 共有へ転送。（ファイルの存在しないフォルダは処理しない）
        ローカル側は最新フォルダのみ保持し、それ以外のフォルダは削除します。
 
     2. 連番管理対象フォルダ ($SpecialCreators で指定):
@@ -14,7 +14,7 @@
        ローカルのサブフォルダ内のファイルのみを移動（上書き）。
        移動前に連番フォルダ内のファイル数が100件以上であれば、
        その連番フォルダをzip圧縮してフォルダを削除し、新規インクリメント連番フォルダを作成してそこへ移動します。
-       ファイル移動完了後、ローカルのサブフォルダは削除します。
+       ファイル移動完了後、フォルダは最新フォルダを保持して削除します。
 #>
 
 [CmdletBinding(SupportsShouldProcess = $true)]
@@ -105,15 +105,6 @@ foreach ($parent in $parentFolders) {
 
     # サブフォルダ一覧を取得
     $subDirs = Get-ChildItem -LiteralPath $parent.FullName -Directory
-
-    # 「中にファイルが存在するフォルダ」をフィルタリング
-    $validDirs = [System.Collections.Generic.List[System.IO.DirectoryInfo]]::new()
-    foreach ($dir in $subDirs) {
-        $hasFiles = (Get-ChildItem -LiteralPath $dir.FullName -File -Recurse | Select-Object -First 1) -ne $null
-        if ($hasFiles) {
-            $validDirs.Add($dir)
-        }
-    }
 
     $targetSmbParent = Join-Path -Path $SmbBasePath -ChildPath $parent.Name
     if (-not (Test-Path -LiteralPath $targetSmbParent)) {

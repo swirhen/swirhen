@@ -61,6 +61,54 @@ function Get-SafeZipName {
 }
 
 # -------------------------------------------------------------------------
+# ヘルパー関数: ファイル名の長さを拡張子込みで 255 バイト (UTF-8) 以内に切り詰める
+# -------------------------------------------------------------------------
+function Get-SafeFileName {
+    param ([string]$FileName)
+    $enc = [System.Text.Encoding]::UTF8
+    $totalBytes = $enc.GetBytes($FileName)
+    if ($totalBytes.Length -le 255) {
+        return $FileName
+    }
+    $extension = [System.IO.Path]::GetExtension($FileName)
+    $baseName = [System.IO.Path]::GetFileNameWithoutExtension($FileName)
+    $maxBytes = 255 - $enc.GetByteCount($extension)
+
+    $truncated = [System.Text.StringBuilder]::new()
+    $bytesUsed = 0
+    foreach ($ch in $baseName.GetEnumerator()) {
+        $chBytes = $enc.GetByteCount([string]$ch)
+        if ($bytesUsed + $chBytes -gt $maxBytes) { break }
+        [void]$truncated.Append($ch)
+        $bytesUsed += $chBytes
+    }
+    return $truncated.ToString() + $extension
+}
+
+# -------------------------------------------------------------------------
+# ヘルパー関数: フォルダ名の長さを 255 バイト (UTF-8) 以内に切り詰める
+# -------------------------------------------------------------------------
+function Get-SafeFolderName {
+    param ([string]$FolderName)
+    $enc = [System.Text.Encoding]::UTF8
+    $totalBytes = $enc.GetBytes($FolderName)
+    if ($totalBytes.Length -le 255) {
+        return $FolderName
+    }
+    $truncated = [System.Text.StringBuilder]::new()
+    $bytesUsed = 0
+    foreach ($ch in $FolderName.GetEnumerator()) {
+        $chBytes = $enc.GetByteCount([string]$ch)
+        if ($bytesUsed + $chBytes -gt 255) { break }
+        [void]$truncated.Append($ch)
+        $bytesUsed += $chBytes
+    }
+    return $truncated.ToString()
+}
+
+
+
+# -------------------------------------------------------------------------
 # ヘルパー関数: Windows 通知の表示
 # -------------------------------------------------------------------------
 function Show-Notification {
@@ -210,8 +258,10 @@ foreach ($parent in $parentFolders) {
             $filesToMove = Get-ChildItem -LiteralPath $dir.FullName -File -Recurse
 
             foreach ($file in $filesToMove) {
-                $destFilePath = Join-Path -Path $targetNumberedDir.FullName -ChildPath $file.Name
-                Write-Host "     [移動] $($file.Name) -> $($targetNumberedDir.Name)\" -ForegroundColor Green
+                $safeFileName = Get-SafeFileName $file.Name
+                $destFilePath = Join-Path -Path $targetNumberedDir.FullName -ChildPath $safeFileName
+                $renameLabel = if ($safeFileName -ne $file.Name) { " (短縮リネーム: $safeFileName)" } else { "" }
+                Write-Host "     [移動] $($file.Name)$($renameLabel) -> $($targetNumberedDir.Name)\" -ForegroundColor Green
                 if ($PSCmdlet.ShouldProcess($file.FullName, "移動 to $destFilePath (上書き)")) {
                     try {
                         Move-Item -LiteralPath $file.FullName -Destination $destFilePath -Force
@@ -285,11 +335,6 @@ foreach ($parent in $parentFolders) {
 
         # フォルダ内にファイルが存在するかチェック
         $hasFiles = (Get-ChildItem -LiteralPath $dir.FullName -File -Recurse | Select-Object -First 1) -ne $null
-
-        $zipFileName  = Get-SafeZipName $dir.Name
-        $smbZipPath   = Join-Path -Path $targetSmbParent -ChildPath $zipFileName
-        $localTempZip = Join-Path -Path $parent.FullName -ChildPath $zipFileName
-
         $compressionSucceeded = $false
 
         if (-not $hasFiles) {
@@ -298,7 +343,46 @@ foreach ($parent in $parentFolders) {
             $compressionSucceeded = $true  # 削除可能とする
         }
         else {
-            # ファイルが存在する場合：zip圧縮・転送処理
+            # ファイルが存在する場合：
+            # Linuxサーバー等での解凍時に備え、配下のファイル名およびフォルダ名を255バイト以内にリネーム
+            $innerFiles = Get-ChildItem -LiteralPath $dir.FullName -File -Recurse
+            foreach ($file in $innerFiles) {
+                $safeName = Get-SafeFileName $file.Name
+                if ($safeName -ne $file.Name) {
+                    $newFilePath = Join-Path -Path $file.DirectoryName -ChildPath $safeName
+                    Write-Host "     [ファイル短縮] $($file.Name) -> $safeName" -ForegroundColor DarkYellow
+                    if ($PSCmdlet.ShouldProcess($file.FullName, "ファイル名短縮リネーム to $safeName")) {
+                        try {
+                            Rename-Item -LiteralPath $file.FullName -NewName $safeName -Force
+                        }
+                        catch {
+                            Write-Error "ファイル名のリネームに失敗しました: $($file.FullName) - $($_.Exception.Message)"
+                        }
+                    }
+                }
+            }
+
+            # フォルダ名自体も255バイト以内に短縮リネーム
+            $safeFolderName = Get-SafeFolderName $dir.Name
+            if ($safeFolderName -ne $dir.Name) {
+                Write-Host "     [フォルダ短縮] $($dir.Name) -> $safeFolderName" -ForegroundColor DarkYellow
+                if ($PSCmdlet.ShouldProcess($dir.FullName, "フォルダ名短縮リネーム to $safeFolderName")) {
+                    try {
+                        Rename-Item -LiteralPath $dir.FullName -NewName $safeFolderName -Force
+                        $newDirFullName = Join-Path -Path $dir.Parent.FullName -ChildPath $safeFolderName
+                        $dir = [System.IO.DirectoryInfo]::new($newDirFullName)
+                    }
+                    catch {
+                        Write-Error "フォルダ名のリネームに失敗しました: $($dir.FullName) - $($_.Exception.Message)"
+                    }
+                }
+            }
+
+            # zip ファイル名は短縮済みフォルダ名に対して拡張子含め255バイト以内に切り詰める（重複して安全に処理）
+            $zipFileName  = Get-SafeZipName $dir.Name
+            $smbZipPath   = Join-Path -Path $targetSmbParent -ChildPath $zipFileName
+            $localTempZip = Join-Path -Path $parent.FullName -ChildPath $zipFileName
+
             # 1. すでに SMB 側に同名 zip が存在するかチェック
             if (Test-Path -LiteralPath $smbZipPath) {
                 Write-Host "     [スキップ] SMB側に同名zipが既に存在します: $zipFileName" -ForegroundColor Yellow

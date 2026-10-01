@@ -16,7 +16,7 @@ SCRIPT_DIR = str(current_dir)
 RECENT_LIST = f'{SCRIPT_DIR}/today_picture_recent.txt'
 DISCORD_WEBHOOK_URI_FILE = f'{SCRIPT_DIR}/discord_webhook_url'
 PIC_DIR = '/data/share/temp/wallpaper'
-CHANNEL = 'bot-open'
+CHANNEL = 'ztb_today_pic'
 
 
 # discord channel decision

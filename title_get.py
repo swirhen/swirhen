@@ -4,9 +4,6 @@
 import sys,re,pathlib,sqlite3
 import urllib.request
 from bs4 import BeautifulSoup
-current_dir = pathlib.Path(__file__).resolve().parent
-sys.path.append(str(current_dir / 'python-lib'))
-import torrent_search_common as ts
 
 WINDOWS_RESERVED_FILENAMES = {
     'CON', 'PRN', 'AUX', 'NUL',
@@ -35,6 +32,20 @@ def sanitize_filename(title, max_bytes=255):
     return truncate(filename, max_bytes)
 
 
+# nyaa データベース検索
+def search_seed_ext(category, keyword):
+    with sqlite3.connect(FEED_DB) as conn:
+        cur = conn.cursor()
+        select_sql = 'select category, title, link, download_dir' \
+                     ' from feed_data'
+        if category != 'all':
+            select_sql += f' where category = "{category}"' \
+                          f' and title like "%{keyword}%"'
+        else:
+            select_sql += f' where title like "%{keyword}%"'
+        return list(cur.execute(select_sql))
+
+
 # fantiaのタイトル取得(入れたキーワードは頭につけて「 - 」で連結して返す)
 def get_fantia_title(keyword, regexp='\<.*?\>|\ -.*|【.*?】', uri='https://fantia.jp/posts/'):
     id = re.sub(r'\D', '', keyword)
@@ -53,7 +64,7 @@ def get_fantia_title(keyword, regexp='\<.*?\>|\ -.*|【.*?】', uri='https://fan
 
 # avのタイトル取得(sukebeiのDBからとる)
 def get_av_title(keyword, regexp='\+\+\+|\[.*?\]', cut=True):
-    result = ts.search_seed_ext('av', keyword)
+    result = search_seed_ext('av', keyword)
     
     if len(result) == 0:
         return 'NORESULTSFOUND'
@@ -67,20 +78,6 @@ def get_av_title(keyword, regexp='\+\+\+|\[.*?\]', cut=True):
                 title = title + '### ' + str(len(title.encode('utf-8'))) + 'bytes'
             ret = title
     return ret
-
-
-# nyaa データベース検索
-def search_seed_ext(category, keyword):
-    with sqlite3.connect(FEED_DB) as conn:
-        cur = conn.cursor()
-        select_sql = 'select category, title, link, download_dir' \
-                     ' from feed_data'
-        if category != 'all':
-            select_sql += f' where category = "{category}"' \
-                          f' and title like "%{keyword}%"'
-        else:
-            select_sql += f' where title like "%{keyword}%"'
-        return list(cur.execute(select_sql))
 
 
 # main section

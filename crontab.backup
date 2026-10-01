@@ -11,7 +11,6 @@ PATH=/home/swirhen/.rbenv/shims:/home/swirhen/.rbenv/bin:/home/swirhen/perl5/bin
 0 1 * * * /home/swirhen/sh/backup.sh
 0 1 * * * /home/swirhen/sh/cron_backup.sh
 #0 0 * * * python /data/share/movie/sh/python-lib/make_feed_list.py
-0 0-2,6-23 * * * python /data/share/movie/sh/python-lib/jihou.py
 0 12 * * * /home/swirhen/sh/update_latest_symlinks.sh
 
 #* * 1-7 * * [ "$(date '+\%w')" -eq 1 ] && echo "だいいちげつようび～"
@@ -29,4 +28,6 @@ PATH=/home/swirhen/.rbenv/shims:/home/swirhen/.rbenv/bin:/home/swirhen/perl5/bin
 #0 0,6,12,18 * * * python /data/share/movie/sh/auto_publish.py
 
 # きょうのいちまい
-0 9,12,15,18,21 * * * python /data/share/movie/sh/python-lib/today_picture.py
+0 9,12,15,18,21 * * * python /home/swirhen/sh/today_picture.py
+# 時報くん
+0 0-2,6-23 * * * python /home/swirhen/sh/python-lib/jihou.py

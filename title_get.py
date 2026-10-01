@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # import section
-import sys,re,pathlib
+import sys,re,pathlib,sqlite3
 import urllib.request
 from bs4 import BeautifulSoup
 current_dir = pathlib.Path(__file__).resolve().parent
 sys.path.append(str(current_dir / 'python-lib'))
-import swirhentv_util as swiutil
 import torrent_search_common as ts
 
 WINDOWS_RESERVED_FILENAMES = {
@@ -14,6 +13,14 @@ WINDOWS_RESERVED_FILENAMES = {
     'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
     'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9'
 }
+FEED_DB = '/home/swirhen/sh/checker/torrentsearch/nyaatorrent_feed.db'
+
+
+# 文字列カット(指定バイト数より多い場合文字単位で削除)
+def truncate(in_str, num_bytes, encoding='utf-8'):
+    while len(in_str.encode(encoding)) > num_bytes:
+        in_str = in_str[:-1]
+    return in_str
 
 
 # フォルダ名の安全化(Windows禁止文字・制御文字を置換)
@@ -25,7 +32,7 @@ def sanitize_filename(title, max_bytes=255):
         filename = '_'
     if filename.split('.')[0].upper() in WINDOWS_RESERVED_FILENAMES:
         filename = f'_{filename}'
-    return swiutil.truncate(filename, max_bytes)
+    return truncate(filename, max_bytes)
 
 
 # fantiaのタイトル取得(入れたキーワードは頭につけて「 - 」で連結して返す)
@@ -60,6 +67,20 @@ def get_av_title(keyword, regexp='\+\+\+|\[.*?\]', cut=True):
                 title = title + '### ' + str(len(title.encode('utf-8'))) + 'bytes'
             ret = title
     return ret
+
+
+# nyaa データベース検索
+def search_seed_ext(category, keyword):
+    with sqlite3.connect(FEED_DB) as conn:
+        cur = conn.cursor()
+        select_sql = 'select category, title, link, download_dir' \
+                     ' from feed_data'
+        if category != 'all':
+            select_sql += f' where category = "{category}"' \
+                          f' and title like "%{keyword}%"'
+        else:
+            select_sql += f' where title like "%{keyword}%"'
+        return list(cur.execute(select_sql))
 
 
 # main section

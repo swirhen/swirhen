@@ -31,3 +31,5 @@ PATH=/home/swirhen/.rbenv/shims:/home/swirhen/.rbenv/bin:/home/swirhen/perl5/bin
 0 9,12,15,18,21 * * * python /home/swirhen/sh/today_picture.py
 # 時報くん
 0 0-2,6-23 * * * python /home/swirhen/sh/python-lib/jihou.py
+# 玄関ダッシュボード 電子ペーパー用画像生成
+5-50/15 * * * * python3 /var/www/entrance-dashboard/render_epaper.py

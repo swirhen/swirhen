@@ -244,8 +244,9 @@ foreach ($parent in $parentFolders) {
             }
         }
 
-        # 名前順にソートし、最新（最後尾）フォルダを特定（空フォルダ含む全サブフォルダが対象）
-        $sortedDirs = $subDirs | Sort-Object -Property Name
+        # 先頭の投稿IDの数値順にソートし、最新（最後尾）フォルダを特定（空フォルダ含む全サブフォルダが対象）
+        # 桁数が違っても正しく並ぶよう数値として比較する。同じIDなら名前順
+        $sortedDirs = $subDirs | Sort-Object -Property @{ Expression = { if ($_.Name -match '^(\d+)') { [long]$Matches[1] } else { -1 } } }, Name
         $latestKeepDir = $sortedDirs[-1]
         Write-Host "  -> ローカルに空で保持する最新フォルダ: [$($latestKeepDir.Name)]" -ForegroundColor Magenta
 
@@ -321,8 +322,8 @@ foreach ($parent in $parentFolders) {
         continue
     }
 
-    # 全サブフォルダを名前順にソート
-    $sortedDirs = $subDirs | Sort-Object -Property Name
+    # 全サブフォルダを先頭の投稿IDの数値順にソート（桁数が違っても正しく並ぶように）。同じIDなら名前順
+    $sortedDirs = $subDirs | Sort-Object -Property @{ Expression = { if ($_.Name -match '^(\d+)') { [long]$Matches[1] } else { -1 } } }, Name
 
     # 最後のもの（最新）
     $latestKeepDir = $sortedDirs[-1]

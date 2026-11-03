@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Dynamic DNS (Value-Domain) IP Updater & Discord Notifier
+# Dynamic DNS (Cloudflare) IP Updater & Discord Notifier
 #
 # 動作概要:
-#   1. 現在のグローバルIPを取得 (Value-DomainのIP取得API)
+#   1. 現在のグローバルIPを取得 (OpenDNS)
 #   2. swirhen.tv の正引きIP (Aレコード) を DNS から取得
 #   3. グローバルIPの変化、またはDNSとの不一致を検知した場合に:
-#      - Value-Domain の DDNS 更新 API を実行
+#      - Cloudflare API で A レコードを更新
 #      - Discord へ Embed 形式でリッチ通知
 #   4. 引数がある場合 (例: ./upip.sh -f) は状態変化にかかわらず現状を通知
 # ==============================================================================
@@ -25,6 +25,23 @@ fi
 
 HOST_NAME=$(hostname)
 DOMAIN_NAME="swirhen.tv"
+
+# Cloudflare 設定 (1行に「キー 値」の形式: zone_id / record_id / api_token)
+CF_CONF="${SCRIPT_DIR}/cloudflare_conf"
+if [[ ! -f "${CF_CONF}" ]]; then
+    echo "[ERROR] Cloudflare設定ファイルが見つかりません: ${CF_CONF}" >&2
+    exit 1
+fi
+read_cf_conf() {
+    awk -v key="$1" '$1 == key {print $2; exit}' "${CF_CONF}" | tr -d '\r'
+}
+CF_ZONE_ID=$(read_cf_conf zone_id)
+CF_RECORD_ID=$(read_cf_conf record_id)
+CF_API_TOKEN=$(read_cf_conf api_token)
+if [[ -z "${CF_ZONE_ID}" || -z "${CF_RECORD_ID}" || -z "${CF_API_TOKEN}" ]]; then
+    echo "[ERROR] Cloudflare設定 (zone_id / record_id / api_token) が不足しています: ${CF_CONF}" >&2
+    exit 1
+fi
 
 # ------------------------------------------------------------------------------
 # Discord Webhook 通知関数
@@ -82,11 +99,11 @@ EOF
 # ------------------------------------------------------------------------------
 # 1. 現在のグローバルIP取得
 # ------------------------------------------------------------------------------
-CURRENT_IP=$(curl -sS --max-time 10 "https://dyn.value-domain.com/cgi-bin/dyn.fcg?ip" 2>/dev/null | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' || true)
+CURRENT_IP=$(dig +short myip.opendns.com @resolver1.opendns.com)
 
 if [[ -z "${CURRENT_IP}" ]]; then
     # バックアップ用IP取得
-    CURRENT_IP=$(curl -sS --max-time 10 "https://inet-ip.info/ip" 2>/dev/null | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' || true)
+    CURRENT_IP=$(dig +short myip.opendns.com @resolver2.opendns.com)
 fi
 
 if [[ -z "${CURRENT_IP}" ]]; then
@@ -129,8 +146,22 @@ fi
 
 # A. グローバルIP変化 または DNS不一致がある場合 -> DDNS更新APIを実行して通知
 if [[ ${IP_CHANGED} -eq 1 || ${DNS_MISMATCH} -eq 1 ]]; then
-    # Value-Domain DDNS 更新実行
-    DDNS_RES=$(curl -sS --max-time 15 "https://dyn.value-domain.com/cgi-bin/dyn.fcg?d=${DOMAIN_NAME}&p=irankae1" 2>/dev/null || echo "実行失敗")
+    # Cloudflare API で A レコードの IP を更新 (content のみ変更し、TTL・プロキシ設定は維持)
+    CF_RES=$(curl -sS --max-time 15 -X PATCH \
+        "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/dns_records/${CF_RECORD_ID}" \
+        -H "Authorization: Bearer ${CF_API_TOKEN}" \
+        -H "Content-Type: application/json" \
+        --data "{\"content\":\"${CURRENT_IP}\"}" 2>/dev/null || true)
+
+    # 応答の JSON をそのまま Discord の payload に埋め込むと壊れるので、結果を要約する
+    if [[ -z "${CF_RES}" ]]; then
+        DDNS_RES="実行失敗 (Cloudflare API に接続できません)"
+    elif grep -q '"success": *true' <<< "${CF_RES}"; then
+        DDNS_RES="成功 (Cloudflare: ${DOMAIN_NAME} -> ${CURRENT_IP})"
+    else
+        CF_ERR=$(grep -o '"message": *"[^"]*"' <<< "${CF_RES}" | head -n 1 | sed 's/.*: *"\(.*\)"/\1/' || true)
+        DDNS_RES="失敗 (Cloudflare: ${CF_ERR:-不明なエラー})"
+    fi
 
     STATUS_DESC=""
     if [[ ${IP_CHANGED} -eq 1 && ${DNS_MISMATCH} -eq 1 ]]; then

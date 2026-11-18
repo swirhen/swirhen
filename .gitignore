@@ -1,4 +1,5 @@
 checker/
+logs/
 discord_webhook_url
 today_picture_recent.txt
 cloudflare_conf

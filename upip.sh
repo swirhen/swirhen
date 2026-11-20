@@ -97,13 +97,22 @@ EOF
 }
 
 # ------------------------------------------------------------------------------
+# IPv4 の行だけを取り出す関数
+#   dig はリトライ時に ";; communications error ..." を標準出力に混ぜるため、
+#   IPv4 形式の行の最後の1件だけを返す (なければ空)
+# ------------------------------------------------------------------------------
+extract_ipv4() {
+    grep -E '^([0-9]{1,3}\.){3}[0-9]{1,3}$' | tail -n 1 || true
+}
+
+# ------------------------------------------------------------------------------
 # 1. 現在のグローバルIP取得
 # ------------------------------------------------------------------------------
-CURRENT_IP=$(dig +short myip.opendns.com @resolver1.opendns.com)
+CURRENT_IP=$(dig +short myip.opendns.com @resolver1.opendns.com 2>/dev/null | extract_ipv4 || true)
 
 if [[ -z "${CURRENT_IP}" ]]; then
     # バックアップ用IP取得
-    CURRENT_IP=$(dig +short myip.opendns.com @resolver2.opendns.com)
+    CURRENT_IP=$(dig +short myip.opendns.com @resolver2.opendns.com 2>/dev/null | extract_ipv4 || true)
 fi
 
 if [[ -z "${CURRENT_IP}" ]]; then
@@ -114,16 +123,17 @@ fi
 # 前回のIPを読み込み
 PREV_IP=""
 if [[ -f "${PREV_IP_FILE}" ]]; then
-    PREV_IP=$(cat "${PREV_IP_FILE}" | tr -d '\r\n[:space:]')
+    # 過去に壊れた値が記録されていた場合は「前回IPなし」として扱う
+    PREV_IP=$(tr -d '\r' < "${PREV_IP_FILE}" | tr -d '[:blank:]' | extract_ipv4)
 fi
 
 # ------------------------------------------------------------------------------
 # 2. swirhen.tv の正引きIP取得 (Google Public DNS)
 # ------------------------------------------------------------------------------
-DOMAIN_IP=$(dig +short @8.8.8.8 "${DOMAIN_NAME}" A 2>/dev/null | tail -n 1 || true)
+DOMAIN_IP=$(dig +short @8.8.8.8 "${DOMAIN_NAME}" A 2>/dev/null | extract_ipv4 || true)
 if [[ -z "${DOMAIN_IP}" ]]; then
     sleep 3
-    DOMAIN_IP=$(dig +short @8.8.4.4 "${DOMAIN_NAME}" A 2>/dev/null | tail -n 1 || true)
+    DOMAIN_IP=$(dig +short @8.8.4.4 "${DOMAIN_NAME}" A 2>/dev/null | extract_ipv4 || true)
 fi
 
 if [[ -z "${DOMAIN_IP}" ]]; then
